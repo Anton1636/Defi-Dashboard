@@ -1,0 +1,52 @@
+version: '3.9'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: defi_app
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env.local
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - defi_network
+
+  db:
+    image: postgres:16-alpine
+    container_name: defi_db
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: defi_dashboard
+      POSTGRES_USER: ${POSTGRES_USER:-defi_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-defi_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-defi_user} -d defi_dashboard',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - defi_network
+
+volumes:
+  postgres_data:
+
+networks:
+  defi_network:
+    driver: bridge
