@@ -5,108 +5,245 @@ function formatUSD(v: number) {
 	return `$${v.toFixed(2)}`
 }
 
-interface AaveCardProps {
-	position: AavePosition
-}
-
-export function AaveCard({ position }: AaveCardProps) {
-	// Liquidation risk
+export function AaveCard({ position }: { position: AavePosition }) {
 	const hfColor =
 		position.healthFactor > 2
-			? 'text-green-600 bg-green-50'
+			? 'var(--accent-green)'
 			: position.healthFactor > 1.5
-				? 'text-amber-600 bg-amber-50'
-				: 'text-red-600 bg-red-50'
+				? 'var(--accent-amber)'
+				: 'var(--accent-red)'
 
-	// Health factor bar
-	const hfPercent = Math.min((position.healthFactor / 3) * 100, 100)
+	const hfBg =
+		position.healthFactor > 2
+			? 'var(--accent-green-glow)'
+			: position.healthFactor > 1.5
+				? 'rgba(245, 158, 11, 0.1)'
+				: 'rgba(239, 68, 68, 0.1)'
+
 	const hfBarColor =
 		position.healthFactor > 2
-			? 'bg-green-400'
+			? 'var(--accent-green)'
 			: position.healthFactor > 1.5
-				? 'bg-amber-400'
-				: 'bg-red-400'
+				? 'var(--accent-amber)'
+				: 'var(--accent-red)'
+
+	const hfPercent = Math.min((position.healthFactor / 3) * 100, 100)
 
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 transition-colors'>
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+				transition: 'border-color 0.2s',
+			}}
+			onMouseEnter={e => {
+				e.currentTarget.style.borderColor = 'var(--aave)44'
+			}}
+			onMouseLeave={e => {
+				e.currentTarget.style.borderColor = 'var(--border-primary)'
+			}}
+		>
 			{/* Header */}
-			<div className='flex items-center justify-between mb-4'>
-				<div className='flex items-center gap-3'>
-					<div className='w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-xl'>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: '16px',
+				}}
+			>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+					<div
+						style={{
+							width: '40px',
+							height: '40px',
+							borderRadius: '50%',
+							background: 'var(--aave-glow)',
+							border: '1px solid var(--aave)44',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							fontSize: '20px',
+						}}
+					>
 						👻
 					</div>
 					<div>
-						<p className='font-semibold text-gray-900'>Aave V3</p>
-						<p className='text-xs text-gray-400'>Lending · Ethereum</p>
+						<p
+							style={{
+								fontWeight: 600,
+								color: 'var(--text-primary)',
+								fontSize: '14px',
+							}}
+						>
+							Aave V3
+						</p>
+						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+							Lending · Ethereum
+						</p>
 					</div>
 				</div>
 				<span
-					className={`text-xs font-semibold px-2.5 py-1 rounded-full ${hfColor}`}
+					style={{
+						fontSize: '12px',
+						fontWeight: 600,
+						padding: '4px 10px',
+						borderRadius: '20px',
+						background: hfBg,
+						color: hfColor,
+					}}
 				>
 					HF: {position.healthFactor.toFixed(2)}
 				</span>
 			</div>
 
 			{/* Health factor bar */}
-			<div className='mb-4'>
-				<div className='flex justify-between text-xs text-gray-400 mb-1'>
+			<div style={{ marginBottom: '16px' }}>
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						fontSize: '11px',
+						color: 'var(--text-tertiary)',
+						marginBottom: '6px',
+					}}
+				>
 					<span>Health factor</span>
 					<span
-						className={
-							position.healthFactor < 1.5 ? 'text-red-500 font-medium' : ''
-						}
+						style={{
+							color:
+								position.healthFactor < 1.5
+									? 'var(--accent-red)'
+									: 'var(--text-tertiary)',
+						}}
 					>
 						{position.healthFactor < 1.5 ? '⚠ Liquidation risk' : 'Safe'}
 					</span>
 				</div>
-				<div className='h-1.5 bg-gray-100 rounded-full overflow-hidden'>
+				<div
+					style={{
+						height: '4px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '2px',
+						overflow: 'hidden',
+					}}
+				>
 					<div
-						className={`h-full rounded-full transition-all ${hfBarColor}`}
-						style={{ width: `${hfPercent}%` }}
+						style={{
+							height: '100%',
+							width: `${hfPercent}%`,
+							background: hfBarColor,
+							borderRadius: '2px',
+							boxShadow: `0 0 8px ${hfBarColor}`,
+							transition: 'width 0.4s ease',
+						}}
 					/>
 				</div>
 			</div>
 
-			{/* Stats grid */}
-			<div className='grid grid-cols-3 gap-3 mb-4'>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Net worth</p>
-					<p className='text-sm font-semibold text-gray-900'>
-						{formatUSD(position.valueUSD)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Collateral</p>
-					<p className='text-sm font-semibold text-gray-900'>
-						{formatUSD(position.totalCollateralUSD)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Debt</p>
-					<p className='text-sm font-semibold text-red-500'>
-						{formatUSD(position.totalDebtUSD)}
-					</p>
-				</div>
+			{/* Stats */}
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, 1fr)',
+					gap: '8px',
+					marginBottom: '16px',
+				}}
+			>
+				{[
+					{
+						label: 'Net worth',
+						value: formatUSD(position.valueUSD),
+						color: 'var(--text-primary)',
+					},
+					{
+						label: 'Collateral',
+						value: formatUSD(position.totalCollateralUSD),
+						color: 'var(--text-primary)',
+					},
+					{
+						label: 'Debt',
+						value: formatUSD(position.totalDebtUSD),
+						color: 'var(--accent-red)',
+					},
+				].map(stat => (
+					<div
+						key={stat.label}
+						style={{
+							background: 'var(--bg-elevated)',
+							borderRadius: '10px',
+							padding: '10px 12px',
+						}}
+					>
+						<p
+							style={{
+								fontSize: '11px',
+								color: 'var(--text-tertiary)',
+								marginBottom: '4px',
+							}}
+						>
+							{stat.label}
+						</p>
+						<p style={{ fontSize: '13px', fontWeight: 600, color: stat.color }}>
+							{stat.value}
+						</p>
+					</div>
+				))}
 			</div>
 
 			{/* Supplies */}
 			{position.supplies.length > 0 && (
-				<div className='mb-3'>
-					<p className='text-xs font-medium text-gray-500 mb-2'>Supplied</p>
-					<div className='space-y-1.5'>
+				<div style={{ marginBottom: '12px' }}>
+					<p
+						style={{
+							fontSize: '11px',
+							fontWeight: 500,
+							color: 'var(--text-tertiary)',
+							marginBottom: '8px',
+						}}
+					>
+						SUPPLIED
+					</p>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
 						{position.supplies.map(s => (
 							<div
 								key={s.symbol}
-								className='flex justify-between items-center bg-green-50 rounded-lg px-3 py-2'
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+									background: 'rgba(16, 185, 129, 0.06)',
+									border: '1px solid rgba(16, 185, 129, 0.12)',
+									borderRadius: '8px',
+									padding: '8px 12px',
+								}}
 							>
-								<span className='text-xs font-medium text-gray-700'>
+								<span
+									style={{
+										fontSize: '13px',
+										fontWeight: 500,
+										color: 'var(--text-primary)',
+									}}
+								>
 									{s.symbol}
 								</span>
-								<div className='text-right'>
-									<span className='text-xs text-gray-600'>
+								<div
+									style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
+								>
+									<span
+										style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+									>
 										{formatUSD(s.valueUSD)}
 									</span>
-									<span className='text-xs text-green-600 ml-2'>
+									<span
+										style={{
+											fontSize: '12px',
+											color: 'var(--accent-green)',
+											fontWeight: 500,
+										}}
+									>
 										{s.apy.toFixed(2)}% APY
 									</span>
 								</div>
@@ -119,21 +256,54 @@ export function AaveCard({ position }: AaveCardProps) {
 			{/* Borrows */}
 			{position.borrows.length > 0 && (
 				<div>
-					<p className='text-xs font-medium text-gray-500 mb-2'>Borrowed</p>
-					<div className='space-y-1.5'>
+					<p
+						style={{
+							fontSize: '11px',
+							fontWeight: 500,
+							color: 'var(--text-tertiary)',
+							marginBottom: '8px',
+						}}
+					>
+						BORROWED
+					</p>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
 						{position.borrows.map(b => (
 							<div
 								key={b.symbol}
-								className='flex justify-between items-center bg-red-50 rounded-lg px-3 py-2'
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									alignItems: 'center',
+									background: 'rgba(239, 68, 68, 0.06)',
+									border: '1px solid rgba(239, 68, 68, 0.12)',
+									borderRadius: '8px',
+									padding: '8px 12px',
+								}}
 							>
-								<span className='text-xs font-medium text-gray-700'>
+								<span
+									style={{
+										fontSize: '13px',
+										fontWeight: 500,
+										color: 'var(--text-primary)',
+									}}
+								>
 									{b.symbol}
 								</span>
-								<div className='text-right'>
-									<span className='text-xs text-gray-600'>
+								<div
+									style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
+								>
+									<span
+										style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+									>
 										{formatUSD(b.valueUSD)}
 									</span>
-									<span className='text-xs text-red-500 ml-2'>
+									<span
+										style={{
+											fontSize: '12px',
+											color: 'var(--accent-red)',
+											fontWeight: 500,
+										}}
+									>
 										{b.apy.toFixed(2)}% APR
 									</span>
 								</div>

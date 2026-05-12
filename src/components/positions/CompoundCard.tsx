@@ -5,75 +5,212 @@ function formatUSD(v: number) {
 	return `$${v.toFixed(2)}`
 }
 
-interface CompoundCardProps {
-	position: CompoundPosition
-}
-
-export function CompoundCard({ position }: CompoundCardProps) {
-	//Much of the supplied assets are currently borrowed
+export function CompoundCard({ position }: { position: CompoundPosition }) {
 	const utilizationRate =
 		position.supplied > 0 ? (position.borrowed / position.supplied) * 100 : 0
 
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 transition-colors'>
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+				transition: 'border-color 0.2s',
+			}}
+			onMouseEnter={e => {
+				e.currentTarget.style.borderColor = 'var(--compound)44'
+			}}
+			onMouseLeave={e => {
+				e.currentTarget.style.borderColor = 'var(--border-primary)'
+			}}
+		>
 			{/* Header */}
-			<div className='flex items-center justify-between mb-4'>
-				<div className='flex items-center gap-3'>
-					<div className='w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-xl'>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: '16px',
+				}}
+			>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+					<div
+						style={{
+							width: '40px',
+							height: '40px',
+							borderRadius: '50%',
+							background: 'var(--compound-glow)',
+							border: '1px solid var(--compound)44',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							fontSize: '20px',
+						}}
+					>
 						🏦
 					</div>
 					<div>
-						<p className='font-semibold text-gray-900'>
+						<p
+							style={{
+								fontWeight: 600,
+								color: 'var(--text-primary)',
+								fontSize: '14px',
+							}}
+						>
 							Compound V3 · {position.market}
 						</p>
-						<p className='text-xs text-gray-400'>Money market · Ethereum</p>
+						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+							Money market · Ethereum
+						</p>
 					</div>
 				</div>
-				<span className='text-xs font-medium px-2.5 py-1 rounded-full bg-green-50 text-green-700'>
+				<span
+					style={{
+						fontSize: '12px',
+						fontWeight: 600,
+						padding: '4px 10px',
+						borderRadius: '20px',
+						background: 'var(--compound-glow)',
+						color: 'var(--compound)',
+					}}
+				>
 					{position.supplyAPR.toFixed(2)}% APR
 				</span>
 			</div>
 
-			{/* Stats grid */}
-			<div className='grid grid-cols-3 gap-3 mb-4'>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Net value</p>
-					<p className='text-sm font-semibold text-gray-900'>
-						{formatUSD(position.valueUSD)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Supplied</p>
-					<p className='text-sm font-semibold text-green-600'>
-						{formatUSD(position.supplied)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Borrowed</p>
-					<p className='text-sm font-semibold text-gray-900'>
-						{position.borrowed > 0 ? formatUSD(position.borrowed) : '—'}
-					</p>
-				</div>
+			{/* Stats */}
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, 1fr)',
+					gap: '8px',
+					marginBottom: '16px',
+				}}
+			>
+				{[
+					{
+						label: 'Net value',
+						value: formatUSD(position.valueUSD),
+						color: 'var(--text-primary)',
+					},
+					{
+						label: 'Supplied',
+						value: formatUSD(position.supplied),
+						color: 'var(--compound)',
+					},
+					{
+						label: 'Borrowed',
+						value: position.borrowed > 0 ? formatUSD(position.borrowed) : '—',
+						color: 'var(--text-secondary)',
+					},
+				].map(stat => (
+					<div
+						key={stat.label}
+						style={{
+							background: 'var(--bg-elevated)',
+							borderRadius: '10px',
+							padding: '10px 12px',
+						}}
+					>
+						<p
+							style={{
+								fontSize: '11px',
+								color: 'var(--text-tertiary)',
+								marginBottom: '4px',
+							}}
+						>
+							{stat.label}
+						</p>
+						<p style={{ fontSize: '13px', fontWeight: 600, color: stat.color }}>
+							{stat.value}
+						</p>
+					</div>
+				))}
 			</div>
 
 			{/* APR comparison */}
-			<div className='flex gap-2'>
-				<div className='flex-1 bg-green-50 rounded-lg p-2.5'>
-					<p className='text-xs text-gray-400'>Supply APR</p>
-					<p className='text-sm font-semibold text-green-600'>
+			<div style={{ display: 'flex', gap: '8px' }}>
+				<div
+					style={{
+						flex: 1,
+						background: 'rgba(0, 211, 149, 0.06)',
+						border: '1px solid rgba(0, 211, 149, 0.12)',
+						borderRadius: '8px',
+						padding: '10px 12px',
+					}}
+				>
+					<p
+						style={{
+							fontSize: '11px',
+							color: 'var(--text-tertiary)',
+							marginBottom: '4px',
+						}}
+					>
+						Supply APR
+					</p>
+					<p
+						style={{
+							fontSize: '14px',
+							fontWeight: 600,
+							color: 'var(--compound)',
+						}}
+					>
 						{position.supplyAPR.toFixed(2)}%
 					</p>
 				</div>
-				<div className='flex-1 bg-gray-50 rounded-lg p-2.5'>
-					<p className='text-xs text-gray-400'>Borrow APR</p>
-					<p className='text-sm font-semibold text-gray-600'>
+				<div
+					style={{
+						flex: 1,
+						background: 'var(--bg-elevated)',
+						borderRadius: '8px',
+						padding: '10px 12px',
+					}}
+				>
+					<p
+						style={{
+							fontSize: '11px',
+							color: 'var(--text-tertiary)',
+							marginBottom: '4px',
+						}}
+					>
+						Borrow APR
+					</p>
+					<p
+						style={{
+							fontSize: '14px',
+							fontWeight: 600,
+							color: 'var(--text-secondary)',
+						}}
+					>
 						{position.borrowAPR.toFixed(2)}%
 					</p>
 				</div>
 				{utilizationRate > 0 && (
-					<div className='flex-1 bg-gray-50 rounded-lg p-2.5'>
-						<p className='text-xs text-gray-400'>Utilization</p>
-						<p className='text-sm font-semibold text-gray-600'>
+					<div
+						style={{
+							flex: 1,
+							background: 'var(--bg-elevated)',
+							borderRadius: '8px',
+							padding: '10px 12px',
+						}}
+					>
+						<p
+							style={{
+								fontSize: '11px',
+								color: 'var(--text-tertiary)',
+								marginBottom: '4px',
+							}}
+						>
+							Utilization
+						</p>
+						<p
+							style={{
+								fontSize: '14px',
+								fontWeight: 600,
+								color: 'var(--text-secondary)',
+							}}
+						>
 							{utilizationRate.toFixed(1)}%
 						</p>
 					</div>

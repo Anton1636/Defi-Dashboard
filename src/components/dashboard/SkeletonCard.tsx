@@ -1,25 +1,95 @@
 export function SkeletonCard({ lines = 3 }: { lines?: number }) {
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5 animate-pulse'>
-			<div className='flex items-center justify-between mb-4'>
-				<div className='h-4 bg-gray-100 rounded w-32' />
-				<div className='h-6 bg-gray-100 rounded w-16' />
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+			}}
+		>
+			<div
+				style={{
+					display: 'flex',
+					justifyContent: 'space-between',
+					marginBottom: '16px',
+				}}
+			>
+				<div
+					style={{
+						height: '14px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '6px',
+						width: '35%',
+					}}
+				/>
+				<div
+					style={{
+						height: '22px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '6px',
+						width: '20%',
+					}}
+				/>
 			</div>
 			{Array.from({ length: lines }).map((_, i) => (
 				<div
 					key={i}
-					className='flex justify-between items-center py-2.5 border-b border-gray-50 last:border-0'
+					style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						padding: '10px 0',
+						borderBottom: '1px solid var(--border-primary)',
+					}}
 				>
-					<div className='flex items-center gap-3'>
-						<div className='w-8 h-8 bg-gray-100 rounded-full' />
+					<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+						<div
+							style={{
+								width: '32px',
+								height: '32px',
+								borderRadius: '50%',
+								background: 'var(--bg-elevated)',
+							}}
+						/>
 						<div>
-							<div className='h-3.5 bg-gray-100 rounded w-20 mb-1.5' />
-							<div className='h-3 bg-gray-100 rounded w-14' />
+							<div
+								style={{
+									height: '12px',
+									background: 'var(--bg-elevated)',
+									borderRadius: '4px',
+									width: '80px',
+									marginBottom: '6px',
+								}}
+							/>
+							<div
+								style={{
+									height: '10px',
+									background: 'var(--bg-elevated)',
+									borderRadius: '4px',
+									width: '56px',
+								}}
+							/>
 						</div>
 					</div>
-					<div className='text-right'>
-						<div className='h-3.5 bg-gray-100 rounded w-16 mb-1.5' />
-						<div className='h-3 bg-gray-100 rounded w-12' />
+					<div style={{ textAlign: 'right' }}>
+						<div
+							style={{
+								height: '12px',
+								background: 'var(--bg-elevated)',
+								borderRadius: '4px',
+								width: '64px',
+								marginBottom: '6px',
+							}}
+						/>
+						<div
+							style={{
+								height: '10px',
+								background: 'var(--bg-elevated)',
+								borderRadius: '4px',
+								width: '48px',
+							}}
+						/>
 					</div>
 				</div>
 			))}

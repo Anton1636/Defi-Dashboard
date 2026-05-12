@@ -53,7 +53,16 @@ export default function PositionsPage() {
 		return (
 			<div>
 				<div className='mb-6'>
-					<h1 className='text-2xl font-semibold text-gray-900'>Positions</h1>
+					<h1
+						style={{
+							fontSize: '24px',
+							fontWeight: 700,
+							color: 'var(--text-primary)',
+							letterSpacing: '-0.5px',
+						}}
+					>
+						Positions
+					</h1>
 				</div>
 				<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
 					{Array.from({ length: 3 }).map((_, i) => (
@@ -77,7 +86,16 @@ export default function PositionsPage() {
 			{/* Header */}
 			<div className='flex items-center justify-between mb-6'>
 				<div>
-					<h1 className='text-2xl font-semibold text-gray-900'>Positions</h1>
+					<h1
+						style={{
+							fontSize: '24px',
+							fontWeight: 700,
+							color: 'var(--text-primary)',
+							letterSpacing: '-0.5px',
+						}}
+					>
+						Positions
+					</h1>
 					<p className='text-gray-400 text-sm mt-0.5'>
 						{portfolio?.positions.length ?? 0} open positions across{' '}
 						{Object.values(counts).filter(Boolean).length} protocols

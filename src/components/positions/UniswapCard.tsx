@@ -5,81 +5,162 @@ function formatUSD(v: number) {
 	return `$${v.toFixed(2)}`
 }
 
-interface UniswapCardProps {
-	position: UniswapPosition
-}
-
-export function UniswapCard({ position }: UniswapCardProps) {
+export function UniswapCard({ position }: { position: UniswapPosition }) {
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 transition-colors'>
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+				transition: 'border-color 0.2s',
+			}}
+			onMouseEnter={e => {
+				e.currentTarget.style.borderColor = 'var(--uniswap)44'
+			}}
+			onMouseLeave={e => {
+				e.currentTarget.style.borderColor = 'var(--border-primary)'
+			}}
+		>
 			{/* Header */}
-			<div className='flex items-center justify-between mb-4'>
-				<div className='flex items-center gap-3'>
-					<div className='w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-xl'>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: '16px',
+				}}
+			>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+					<div
+						style={{
+							width: '40px',
+							height: '40px',
+							borderRadius: '50%',
+							background: 'var(--uniswap-glow)',
+							border: '1px solid var(--uniswap)44',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							fontSize: '20px',
+						}}
+					>
 						🦄
 					</div>
 					<div>
-						<p className='font-semibold text-gray-900'>
+						<p
+							style={{
+								fontWeight: 600,
+								color: 'var(--text-primary)',
+								fontSize: '14px',
+							}}
+						>
 							{position.token0.symbol}/{position.token1.symbol}
 						</p>
-						<p className='text-xs text-gray-400'>Uniswap V3 · Ethereum</p>
+						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+							Uniswap V3 · Ethereum
+						</p>
 					</div>
 				</div>
 
-				{/* In range / Out of range badge */}
 				<span
-					className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-						position.inRange
-							? 'bg-green-50 text-green-700'
-							: 'bg-amber-50 text-amber-700'
-					}`}
+					style={{
+						fontSize: '12px',
+						fontWeight: 500,
+						padding: '4px 10px',
+						borderRadius: '20px',
+						background: position.inRange
+							? 'var(--accent-green-glow)'
+							: 'rgba(245, 158, 11, 0.1)',
+						color: position.inRange
+							? 'var(--accent-green)'
+							: 'var(--accent-amber)',
+						border: `1px solid ${position.inRange ? 'var(--accent-green)44' : 'var(--accent-amber)44'}`,
+					}}
 				>
 					{position.inRange ? '● In range' : '○ Out of range'}
 				</span>
 			</div>
 
-			{/* Stats grid */}
-			<div className='grid grid-cols-3 gap-3'>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Position value</p>
-					<p className='text-sm font-semibold text-gray-900'>
-						{formatUSD(position.valueUSD)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Fees earned</p>
-					<p className='text-sm font-semibold text-green-600'>
-						{formatUSD(position.feesEarned)}
-					</p>
-				</div>
-				<div className='bg-gray-50 rounded-lg p-3'>
-					<p className='text-xs text-gray-400 mb-1'>Pool ID</p>
-					<p className='text-sm font-mono text-gray-500 truncate'>
-						{position.poolId.slice(0, 8)}...
-					</p>
-				</div>
+			{/* Stats */}
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, 1fr)',
+					gap: '8px',
+					marginBottom: '12px',
+				}}
+			>
+				{[
+					{
+						label: 'Position value',
+						value: formatUSD(position.valueUSD),
+						color: 'var(--text-primary)',
+					},
+					{
+						label: 'Fees earned',
+						value: formatUSD(position.feesEarned),
+						color: 'var(--accent-green)',
+					},
+					{
+						label: 'Pool ID',
+						value: position.poolId.slice(0, 8) + '...',
+						color: 'var(--text-tertiary)',
+					},
+				].map(stat => (
+					<div
+						key={stat.label}
+						style={{
+							background: 'var(--bg-elevated)',
+							borderRadius: '10px',
+							padding: '10px 12px',
+						}}
+					>
+						<p
+							style={{
+								fontSize: '11px',
+								color: 'var(--text-tertiary)',
+								marginBottom: '4px',
+							}}
+						>
+							{stat.label}
+						</p>
+						<p
+							style={{
+								fontSize: '13px',
+								fontWeight: 600,
+								color: stat.color,
+								fontFamily: stat.label === 'Pool ID' ? 'monospace' : 'inherit',
+							}}
+						>
+							{stat.value}
+						</p>
+					</div>
+				))}
 			</div>
 
-			{/* Token breakdown */}
-			<div className='mt-3 flex gap-2'>
-				<div className='flex-1 bg-gray-50 rounded-lg p-2.5 text-xs'>
-					<span className='text-gray-400'>Token 0: </span>
-					<span className='font-medium text-gray-700'>
-						{position.token0.symbol}
-					</span>
-					<span className='text-gray-400 ml-1'>
-						${position.token0.priceUSD.toFixed(2)}
-					</span>
-				</div>
-				<div className='flex-1 bg-gray-50 rounded-lg p-2.5 text-xs'>
-					<span className='text-gray-400'>Token 1: </span>
-					<span className='font-medium text-gray-700'>
-						{position.token1.symbol}
-					</span>
-					<span className='text-gray-400 ml-1'>
-						${position.token1.priceUSD.toFixed(2)}
-					</span>
-				</div>
+			{/* Tokens */}
+			<div style={{ display: 'flex', gap: '8px' }}>
+				{[position.token0, position.token1].map((token, i) => (
+					<div
+						key={i}
+						style={{
+							flex: 1,
+							background: 'var(--bg-elevated)',
+							borderRadius: '8px',
+							padding: '8px 12px',
+							fontSize: '12px',
+						}}
+					>
+						<span style={{ color: 'var(--text-tertiary)' }}>Token {i}: </span>
+						<span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+							{token.symbol}
+						</span>
+						<span style={{ color: 'var(--text-tertiary)', marginLeft: '6px' }}>
+							${token.priceUSD.toFixed(2)}
+						</span>
+					</div>
+				))}
 			</div>
 		</div>
 	)
