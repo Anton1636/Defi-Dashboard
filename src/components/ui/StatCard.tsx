@@ -1,11 +1,10 @@
-// Картка з одним числовим показником
-// Використовується для: Total Value, 24h Change, Best APY тощо
 interface StatCardProps {
 	label: string
 	value: string
-	subValue?: string // додатковий текст під числом
+	subValue?: string
 	trend?: 'up' | 'down' | 'neutral'
 	isLoading?: boolean
+	accent?: 'blue' | 'green' | 'purple'
 }
 
 export function StatCard({
@@ -14,29 +13,103 @@ export function StatCard({
 	subValue,
 	trend = 'neutral',
 	isLoading = false,
+	accent,
 }: StatCardProps) {
 	const trendColor = {
-		up: 'text-green-600',
-		down: 'text-red-500',
-		neutral: 'text-gray-500',
+		up: 'var(--accent-green)',
+		down: 'var(--accent-red)',
+		neutral: 'var(--text-tertiary)',
 	}[trend]
+
+	const accentGlow =
+		{
+			blue: '0 0 30px var(--accent-blue-glow)',
+			green: '0 0 30px var(--accent-green-glow)',
+			purple: '0 0 30px rgba(139, 92, 246, 0.15)',
+		}[accent ?? ''] ?? 'none'
 
 	if (isLoading) {
 		return (
-			<div className='bg-white rounded-xl border border-gray-100 p-5 animate-pulse'>
-				<div className='h-3.5 bg-gray-100 rounded w-24 mb-3' />
-				<div className='h-7 bg-gray-100 rounded w-32 mb-2' />
-				<div className='h-3 bg-gray-100 rounded w-20' />
+			<div
+				style={{
+					background: 'var(--gradient-card)',
+					border: '1px solid var(--border-primary)',
+					borderRadius: '16px',
+					padding: '20px',
+				}}
+			>
+				<div
+					style={{
+						height: '12px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '6px',
+						width: '60%',
+						marginBottom: '12px',
+					}}
+				/>
+				<div
+					style={{
+						height: '28px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '6px',
+						width: '80%',
+						marginBottom: '8px',
+					}}
+				/>
+				<div
+					style={{
+						height: '10px',
+						background: 'var(--bg-elevated)',
+						borderRadius: '6px',
+						width: '40%',
+					}}
+				/>
 			</div>
 		)
 	}
 
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5 hover:border-gray-200 transition-colors'>
-			<p className='text-sm text-gray-500 mb-1'>{label}</p>
-			<p className='text-2xl font-semibold text-gray-900 mb-1'>{value}</p>
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+				boxShadow: accentGlow,
+				transition: 'border-color 0.2s',
+			}}
+			onMouseEnter={e => {
+				e.currentTarget.style.borderColor = 'var(--border-secondary)'
+			}}
+			onMouseLeave={e => {
+				e.currentTarget.style.borderColor = 'var(--border-primary)'
+			}}
+		>
+			<p
+				style={{
+					fontSize: '12px',
+					color: 'var(--text-tertiary)',
+					marginBottom: '8px',
+				}}
+			>
+				{label}
+			</p>
+			<p
+				style={{
+					fontSize: '24px',
+					fontWeight: 600,
+					color: 'var(--text-primary)',
+					marginBottom: '4px',
+					letterSpacing: '-0.5px',
+				}}
+				className='animate-count'
+			>
+				{value}
+			</p>
 			{subValue && (
-				<p className={`text-xs font-medium ${trendColor}`}>{subValue}</p>
+				<p style={{ fontSize: '12px', color: trendColor, fontWeight: 500 }}>
+					{subValue}
+				</p>
 			)}
 		</div>
 	)

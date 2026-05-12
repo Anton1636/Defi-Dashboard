@@ -4,7 +4,6 @@ import type {
 	AavePosition,
 	CompoundPosition,
 } from '@/types'
-import { ProtocolBadge } from '@/components/ui/Badge'
 
 function formatUSD(value: number): string {
 	if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`
@@ -12,16 +11,38 @@ function formatUSD(value: number): string {
 	return `$${value.toFixed(2)}`
 }
 
-// ─── Protocol-specific details ────────────────────────────────────────────────
+const PROTOCOL_STYLES: Record<
+	string,
+	{ color: string; glow: string; icon: string }
+> = {
+	uniswap: { color: 'var(--uniswap)', glow: 'var(--uniswap-glow)', icon: '🦄' },
+	aave: { color: 'var(--aave)', glow: 'var(--aave-glow)', icon: '👻' },
+	compound: {
+		color: 'var(--compound)',
+		glow: 'var(--compound-glow)',
+		icon: '🏦',
+	},
+}
 
 function UniswapDetails({ position }: { position: UniswapPosition }) {
 	return (
-		<div className='text-right'>
-			<p className='text-sm font-medium text-gray-900'>
+		<div style={{ textAlign: 'right' }}>
+			<p
+				style={{
+					fontSize: '13px',
+					fontWeight: 500,
+					color: 'var(--text-primary)',
+				}}
+			>
 				{position.token0.symbol}/{position.token1.symbol}
 			</p>
 			<p
-				className={`text-xs ${position.inRange ? 'text-green-600' : 'text-amber-500'}`}
+				style={{
+					fontSize: '11px',
+					color: position.inRange
+						? 'var(--accent-green)'
+						: 'var(--accent-amber)',
+				}}
 			>
 				{position.inRange ? '● In range' : '○ Out of range'}
 			</p>
@@ -30,59 +51,101 @@ function UniswapDetails({ position }: { position: UniswapPosition }) {
 }
 
 function AaveDetails({ position }: { position: AavePosition }) {
-	// Health factor < 1.5 — danger liquidation risk
 	const hfColor =
 		position.healthFactor > 2
-			? 'text-green-600'
+			? 'var(--accent-green)'
 			: position.healthFactor > 1.5
-				? 'text-amber-500'
-				: 'text-red-500'
+				? 'var(--accent-amber)'
+				: 'var(--accent-red)'
 
 	return (
-		<div className='text-right'>
-			<p className={`text-xs font-medium ${hfColor}`}>
+		<div style={{ textAlign: 'right' }}>
+			<p style={{ fontSize: '12px', fontWeight: 600, color: hfColor }}>
 				HF: {position.healthFactor.toFixed(2)}
 			</p>
-			<p className='text-xs text-gray-400'>{position.netAPY.toFixed(2)}% APY</p>
+			<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+				{position.netAPY.toFixed(2)}% APY
+			</p>
 		</div>
 	)
 }
 
 function CompoundDetails({ position }: { position: CompoundPosition }) {
 	return (
-		<div className='text-right'>
-			<p className='text-xs text-gray-600'>{position.market}</p>
-			<p className='text-xs text-green-600'>
+		<div style={{ textAlign: 'right' }}>
+			<p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+				{position.market}
+			</p>
+			<p style={{ fontSize: '11px', color: 'var(--accent-green)' }}>
 				{position.supplyAPR.toFixed(2)}% APR
 			</p>
 		</div>
 	)
 }
 
-// ─── Main component ──────────────────────────────────────────────────────────
-
 interface PositionRowProps {
 	position: DeFiPosition
 }
 
 export function PositionRow({ position }: PositionRowProps) {
-	const PROTOCOL_ICONS: Record<string, string> = {
-		uniswap: '🦄',
-		aave: '👻',
-		compound: '🏦',
-	}
+	const style = PROTOCOL_STYLES[position.protocol]
 
 	return (
-		<div className='flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 -mx-5 px-5 transition-colors'>
-			<div className='flex items-center gap-3'>
-				<div className='w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-lg'>
-					{PROTOCOL_ICONS[position.protocol] ?? '💠'}
+		<div
+			style={{
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'space-between',
+				padding: '12px 0',
+				borderBottom: '1px solid var(--border-primary)',
+				transition: 'background 0.15s',
+				cursor: 'default',
+			}}
+			onMouseEnter={e => {
+				e.currentTarget.style.background = 'var(--bg-elevated)'
+				e.currentTarget.style.margin = '0 -20px'
+				e.currentTarget.style.padding = '12px 20px'
+			}}
+			onMouseLeave={e => {
+				e.currentTarget.style.background = 'transparent'
+				e.currentTarget.style.margin = '0'
+				e.currentTarget.style.padding = '12px 0'
+			}}
+		>
+			<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+				<div
+					style={{
+						width: '36px',
+						height: '36px',
+						borderRadius: '50%',
+						background: `${style?.color}22`,
+						border: `1px solid ${style?.color}44`,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: '16px',
+					}}
+				>
+					{style?.icon}
 				</div>
 				<div>
-					<div className='flex items-center gap-2 mb-0.5'>
-						<ProtocolBadge protocol={position.protocol} />
-					</div>
-					<p className='text-sm font-semibold text-gray-900'>
+					<p
+						style={{
+							fontSize: '13px',
+							fontWeight: 500,
+							color: 'var(--text-primary)',
+						}}
+					>
+						{position.protocol.charAt(0).toUpperCase() +
+							position.protocol.slice(1)}
+					</p>
+					<p
+						style={{
+							fontSize: '13px',
+							fontWeight: 600,
+							color: 'var(--text-primary)',
+						}}
+					>
 						{formatUSD(position.valueUSD)}
 					</p>
 				</div>

@@ -5,7 +5,6 @@ import { useWallet } from '@/hooks/useWallet'
 import { StatCard } from '@/components/ui/StatCard'
 import { PortfolioChart } from '@/components/dashboard/PortfolioChart'
 import { PositionRow } from '@/components/dashboard/PositionRow'
-import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
 
@@ -21,12 +20,33 @@ export default function PortfolioPage() {
 
 	if (!isConnected) {
 		return (
-			<div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
-				<div className='text-4xl'>◈</div>
-				<h2 className='text-xl font-semibold text-gray-900'>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: '60vh',
+					gap: '16px',
+				}}
+			>
+				<div style={{ fontSize: '48px' }}>◈</div>
+				<h2
+					style={{
+						fontSize: '20px',
+						fontWeight: 600,
+						color: 'var(--text-primary)',
+					}}
+				>
 					Connect your wallet
 				</h2>
-				<p className='text-gray-500 text-sm mb-2'>
+				<p
+					style={{
+						fontSize: '14px',
+						color: 'var(--text-secondary)',
+						marginBottom: '8px',
+					}}
+				>
 					Connect MetaMask to see your DeFi positions
 				</p>
 				<ConnectButton />
@@ -37,26 +57,36 @@ export default function PortfolioPage() {
 	if (isLoading) {
 		return (
 			<div>
-				<div className='mb-6'>
-					<h1 className='text-2xl font-semibold text-gray-900'>Portfolio</h1>
-					<p className='text-gray-400 text-sm mt-1'>
-						{address?.slice(0, 6)}...{address?.slice(-4)}
-					</p>
+				<div style={{ marginBottom: '24px' }}>
+					<div
+						style={{
+							height: '28px',
+							background: 'var(--bg-elevated)',
+							borderRadius: '8px',
+							width: '160px',
+							marginBottom: '8px',
+						}}
+					/>
+					<div
+						style={{
+							height: '14px',
+							background: 'var(--bg-elevated)',
+							borderRadius: '6px',
+							width: '120px',
+						}}
+					/>
 				</div>
-
-				{/* Skeleton for stat cards */}
-				<div className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: 'repeat(4, 1fr)',
+						gap: '16px',
+						marginBottom: '24px',
+					}}
+				>
 					{Array.from({ length: 4 }).map((_, i) => (
 						<StatCard key={i} label='' value='' isLoading />
 					))}
-				</div>
-
-				{/* Skeleton for positions */}
-				<div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
-					<div className='lg:col-span-2'>
-						<SkeletonCard lines={4} />
-					</div>
-					<SkeletonCard lines={3} />
 				</div>
 			</div>
 		)
@@ -64,9 +94,15 @@ export default function PortfolioPage() {
 
 	if (error) {
 		return (
-			<div className='flex flex-col items-center justify-center min-h-[60vh] gap-3'>
-				<p className='text-red-500 font-medium'>Failed to load portfolio</p>
-				<p className='text-gray-400 text-sm'>{(error as Error).message}</p>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: '60vh',
+				}}
+			>
+				<p style={{ color: 'var(--accent-red)' }}>Failed to load portfolio</p>
 			</div>
 		)
 	}
@@ -88,14 +124,37 @@ export default function PortfolioPage() {
 	return (
 		<div>
 			{/* Header */}
-			<div className='flex items-center justify-between mb-6'>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: '24px',
+				}}
+			>
 				<div>
-					<h1 className='text-2xl font-semibold text-gray-900'>Portfolio</h1>
-					<p className='text-gray-400 text-sm mt-0.5 font-mono'>
+					<h1
+						style={{
+							fontSize: '24px',
+							fontWeight: 700,
+							color: 'var(--text-primary)',
+							letterSpacing: '-0.5px',
+						}}
+					>
+						Portfolio
+					</h1>
+					<p
+						style={{
+							fontSize: '12px',
+							color: 'var(--text-tertiary)',
+							fontFamily: 'monospace',
+							marginTop: '4px',
+						}}
+					>
 						{address?.slice(0, 6)}...{address?.slice(-4)}
 					</p>
 				</div>
-				<p className='text-xs text-gray-400'>
+				<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
 					Updated{' '}
 					{portfolio?.lastUpdated
 						? new Date(portfolio.lastUpdated).toLocaleTimeString()
@@ -104,7 +163,14 @@ export default function PortfolioPage() {
 			</div>
 
 			{/* Stat cards */}
-			<div className='grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(4, 1fr)',
+					gap: '16px',
+					marginBottom: '24px',
+				}}
+			>
 				<StatCard
 					label='Total value'
 					value={formatUSD(totalValue)}
@@ -114,6 +180,7 @@ export default function PortfolioPage() {
 							: undefined
 					}
 					trend={change > 0 ? 'up' : change < 0 ? 'down' : 'neutral'}
+					accent='blue'
 				/>
 				<StatCard
 					label='Positions'
@@ -124,26 +191,70 @@ export default function PortfolioPage() {
 					label='Best APY'
 					value={bestAPY > 0 ? `${bestAPY.toFixed(2)}%` : '—'}
 					trend={bestAPY > 0 ? 'up' : 'neutral'}
+					accent='green'
 				/>
 				<StatCard label='Network' value='Ethereum' subValue='Mainnet' />
 			</div>
 
-			{/* Main content */}
-			<div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
+			{/* Main grid */}
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: '2fr 1fr',
+					gap: '16px',
+				}}
+			>
 				{/* Positions list */}
-				<div className='lg:col-span-2 bg-white rounded-xl border border-gray-100 p-5'>
-					<div className='flex items-center justify-between mb-4'>
-						<p className='text-sm font-medium text-gray-700'>Open positions</p>
-						<span className='text-xs text-gray-400'>
+				<div
+					style={{
+						background: 'var(--gradient-card)',
+						border: '1px solid var(--border-primary)',
+						borderRadius: '16px',
+						padding: '20px',
+					}}
+				>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
+							marginBottom: '16px',
+						}}
+					>
+						<p
+							style={{
+								fontSize: '13px',
+								fontWeight: 500,
+								color: 'var(--text-secondary)',
+							}}
+						>
+							Open positions
+						</p>
+						<span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
 							{positions.length} total
 						</span>
 					</div>
 
 					{positions.length === 0 ? (
-						<div className='flex flex-col items-center justify-center py-12 text-gray-300'>
-							<p className='text-4xl mb-3'>◎</p>
-							<p className='text-sm'>No DeFi positions found</p>
-							<p className='text-xs mt-1'>
+						<div
+							style={{
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: '48px 0',
+								color: 'var(--text-tertiary)',
+							}}
+						>
+							<p style={{ fontSize: '32px', marginBottom: '12px' }}>◎</p>
+							<p style={{ fontSize: '13px' }}>No DeFi positions found</p>
+							<p
+								style={{
+									fontSize: '12px',
+									marginTop: '4px',
+									color: 'var(--text-tertiary)',
+								}}
+							>
 								Start by supplying assets to Aave or adding liquidity on Uniswap
 							</p>
 						</div>

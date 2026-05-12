@@ -12,11 +12,32 @@ export default async function DashboardLayout({
 	if (!session) redirect('/login')
 
 	return (
-		<div className='flex min-h-screen bg-gray-50'>
+		<div
+			style={{
+				display: 'flex',
+				minHeight: '100vh',
+				background: 'var(--bg-primary)',
+			}}
+		>
 			<Sidebar />
-			<div className='flex-1 flex flex-col'>
+			<div
+				style={{
+					flex: 1,
+					display: 'flex',
+					flexDirection: 'column',
+					overflow: 'hidden',
+				}}
+			>
 				<TopBar />
-				<main className='flex-1 p-6'>{children}</main>
+				<main
+					style={{
+						flex: 1,
+						padding: '24px',
+						overflowY: 'auto',
+					}}
+				>
+					{children}
+				</main>
 			</div>
 		</div>
 	)

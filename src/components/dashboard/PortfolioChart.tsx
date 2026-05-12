@@ -15,21 +15,10 @@ interface PortfolioChartProps {
 	totalValueUSD: number
 }
 
-interface TooltipProps {
-	active?: boolean
-	payload?: Array<{
-		name: string
-		value: number
-		payload: {
-			percent: number
-		}
-	}>
-}
-
 const PROTOCOL_COLORS: Record<string, string> = {
-	uniswap: '#7C3AED', // purple
-	aave: '#2563EB', // blue
-	compound: '#059669', // green
+	uniswap: '#ff007a',
+	aave: '#b6509e',
+	compound: '#00d395',
 }
 
 function formatUSD(value: number): string {
@@ -38,14 +27,36 @@ function formatUSD(value: number): string {
 	return `$${value.toFixed(2)}`
 }
 
+interface TooltipProps {
+	active?: boolean
+	payload?: Array<{
+		name: string
+		value: number
+		payload: { percent: number }
+	}>
+}
+
 function CustomTooltip({ active, payload }: TooltipProps) {
 	if (!active || !payload?.length) return null
-
 	return (
-		<div className='bg-white border border-gray-100 rounded-lg px-3 py-2 shadow-sm text-sm'>
-			<p className='font-medium text-gray-900'>{payload[0].name}</p>
-			<p className='text-gray-500'>{formatUSD(payload[0].value)}</p>
-			<p className='text-gray-400'>{payload[0].payload.percent}%</p>
+		<div
+			style={{
+				background: 'var(--bg-elevated)',
+				border: '1px solid var(--border-secondary)',
+				borderRadius: '10px',
+				padding: '10px 14px',
+				fontSize: '13px',
+			}}
+		>
+			<p style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+				{payload[0].name}
+			</p>
+			<p style={{ color: 'var(--text-secondary)' }}>
+				{formatUSD(payload[0].value)}
+			</p>
+			<p style={{ color: 'var(--text-tertiary)' }}>
+				{payload[0].payload.percent}%
+			</p>
 		</div>
 	)
 }
@@ -56,11 +67,31 @@ export function PortfolioChart({
 }: PortfolioChartProps) {
 	if (positions.length === 0) {
 		return (
-			<div className='bg-white rounded-xl border border-gray-100 p-5'>
-				<p className='text-sm text-gray-500 mb-4'>Asset allocation</p>
-				<div className='flex items-center justify-center h-48 text-gray-300 text-sm'>
+			<div
+				style={{
+					background: 'var(--gradient-card)',
+					border: '1px solid var(--border-primary)',
+					borderRadius: '16px',
+					padding: '20px',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: '280px',
+				}}
+			>
+				<p
+					style={{
+						fontSize: '12px',
+						color: 'var(--text-tertiary)',
+						marginBottom: '16px',
+					}}
+				>
+					Asset allocation
+				</p>
+				<p style={{ color: 'var(--text-tertiary)', fontSize: '13px' }}>
 					No positions found
-				</div>
+				</p>
 			</div>
 		)
 	}
@@ -78,36 +109,67 @@ export function PortfolioChart({
 	}))
 
 	return (
-		<div className='bg-white rounded-xl border border-gray-100 p-5'>
-			<p className='text-sm text-gray-500 mb-4'>Asset allocation</p>
+		<div
+			style={{
+				background: 'var(--gradient-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: '16px',
+				padding: '20px',
+			}}
+		>
+			<p
+				style={{
+					fontSize: '12px',
+					color: 'var(--text-tertiary)',
+					marginBottom: '16px',
+				}}
+			>
+				Asset allocation
+			</p>
 
-			<ResponsiveContainer width='100%' height={220}>
+			<ResponsiveContainer width='100%' height={200}>
 				<PieChart>
 					<Pie
 						data={chartData}
 						cx='50%'
 						cy='50%'
-						innerRadius={60} // donut chart — innerRadius > 0
-						outerRadius={90}
-						paddingAngle={3}
+						innerRadius={55}
+						outerRadius={80}
+						paddingAngle={4}
 						dataKey='value'
+						strokeWidth={0}
 					>
 						{chartData.map((entry, index) => (
-							<Cell key={index} fill={entry.color} />
+							<Cell
+								key={index}
+								fill={entry.color}
+								style={{ filter: `drop-shadow(0 0 8px ${entry.color}66)` }}
+							/>
 						))}
 					</Pie>
 					<Tooltip content={<CustomTooltip />} />
 					<Legend
 						formatter={value => (
-							<span className='text-xs text-gray-600'>{value}</span>
+							<span
+								style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+							>
+								{value}
+							</span>
 						)}
 					/>
 				</PieChart>
 			</ResponsiveContainer>
 
-			<div className='text-center -mt-2'>
-				<p className='text-xs text-gray-400'>Total</p>
-				<p className='text-lg font-semibold text-gray-900'>
+			{/* Total */}
+			<div style={{ textAlign: 'center', marginTop: '8px' }}>
+				<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>Total</p>
+				<p
+					style={{
+						fontSize: '18px',
+						fontWeight: 600,
+						color: 'var(--text-primary)',
+					}}
+				>
 					{formatUSD(totalValueUSD)}
 				</p>
 			</div>

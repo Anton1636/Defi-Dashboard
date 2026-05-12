@@ -4,43 +4,173 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const NAV_ITEMS = [
-	{ href: '/portfolio', label: 'Portfolio', icon: '◈' },
-	{ href: '/positions', label: 'Positions', icon: '⬡' },
-	{ href: '/analytics', label: 'Analytics', icon: '◎' },
-	{ href: '/ai-insights', label: 'AI Insights', icon: '◇' },
+	{
+		href: '/portfolio',
+		label: 'Portfolio',
+		icon: (
+			<svg
+				width='18'
+				height='18'
+				viewBox='0 0 24 24'
+				fill='none'
+				stroke='currentColor'
+				strokeWidth='1.5'
+			>
+				<rect x='3' y='3' width='7' height='7' rx='1' />
+				<rect x='14' y='3' width='7' height='7' rx='1' />
+				<rect x='3' y='14' width='7' height='7' rx='1' />
+				<rect x='14' y='14' width='7' height='7' rx='1' />
+			</svg>
+		),
+	},
+	{
+		href: '/positions',
+		label: 'Positions',
+		icon: (
+			<svg
+				width='18'
+				height='18'
+				viewBox='0 0 24 24'
+				fill='none'
+				stroke='currentColor'
+				strokeWidth='1.5'
+			>
+				<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
+			</svg>
+		),
+	},
+	{
+		href: '/analytics',
+		label: 'Analytics',
+		icon: (
+			<svg
+				width='18'
+				height='18'
+				viewBox='0 0 24 24'
+				fill='none'
+				stroke='currentColor'
+				strokeWidth='1.5'
+			>
+				<path
+					d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
+					strokeLinecap='round'
+				/>
+			</svg>
+		),
+	},
+	{
+		href: '/ai-insights',
+		label: 'AI Insights',
+		icon: (
+			<svg
+				width='18'
+				height='18'
+				viewBox='0 0 24 24'
+				fill='none'
+				stroke='currentColor'
+				strokeWidth='1.5'
+			>
+				<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
+				<path d='M12 8v4l3 3' strokeLinecap='round' />
+			</svg>
+		),
+	},
 ]
 
 export function Sidebar() {
 	const pathname = usePathname()
 
 	return (
-		<aside className='w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col'>
+		<aside
+			style={{
+				width: '220px',
+				minHeight: '100vh',
+				background: 'var(--bg-secondary)',
+				borderRight: '1px solid var(--border-primary)',
+				display: 'flex',
+				flexDirection: 'column',
+				flexShrink: 0,
+			}}
+		>
 			{/* Logo */}
-			<div className='p-6 border-b border-gray-100'>
-				<div className='flex items-center gap-3'>
-					<div className='w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center'>
-						<span className='text-white text-sm font-bold'>D</span>
+			<div
+				style={{
+					padding: '24px 20px',
+					borderBottom: '1px solid var(--border-primary)',
+				}}
+			>
+				<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+					<div
+						style={{
+							width: '32px',
+							height: '32px',
+							borderRadius: '10px',
+							background: 'var(--gradient-blue)',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							boxShadow: '0 0 20px var(--accent-blue-glow)',
+						}}
+					>
+						<span style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
+							D
+						</span>
 					</div>
-					<span className='font-semibold text-gray-900'>DeFi Dashboard</span>
+					<div>
+						<p
+							style={{
+								color: 'var(--text-primary)',
+								fontWeight: 600,
+								fontSize: '14px',
+							}}
+						>
+							DeFi
+						</p>
+						<p style={{ color: 'var(--text-tertiary)', fontSize: '11px' }}>
+							Dashboard
+						</p>
+					</div>
 				</div>
 			</div>
 
-			{/* Navigation */}
-			<nav className='flex-1 p-4'>
-				<ul className='space-y-1'>
+			{/* Nav */}
+			<nav style={{ flex: 1, padding: '12px' }}>
+				<ul
+					style={{
+						listStyle: 'none',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: '2px',
+					}}
+				>
 					{NAV_ITEMS.map(item => {
 						const isActive = pathname === item.href
 						return (
 							<li key={item.href}>
 								<Link
 									href={item.href}
-									className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
-										isActive
-											? 'bg-blue-50 text-blue-600 font-medium'
-											: 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-									}`}
+									style={{
+										display: 'flex',
+										alignItems: 'center',
+										gap: '10px',
+										padding: '10px 12px',
+										borderRadius: '10px',
+										fontSize: '13px',
+										fontWeight: isActive ? 500 : 400,
+										color: isActive
+											? 'var(--text-primary)'
+											: 'var(--text-secondary)',
+										background: isActive ? 'var(--bg-elevated)' : 'transparent',
+										borderLeft: isActive
+											? '2px solid var(--accent-blue)'
+											: '2px solid transparent',
+										transition: 'all 0.15s',
+										textDecoration: 'none',
+									}}
 								>
-									<span className='text-lg'>{item.icon}</span>
+									<span style={{ opacity: isActive ? 1 : 0.6 }}>
+										{item.icon}
+									</span>
 									{item.label}
 								</Link>
 							</li>
@@ -50,8 +180,21 @@ export function Sidebar() {
 			</nav>
 
 			{/* Bottom */}
-			<div className='p-4 border-t border-gray-100'>
-				<p className='text-xs text-gray-400 text-center'>DeFi Dashboard v0.1</p>
+			<div
+				style={{
+					padding: '16px',
+					borderTop: '1px solid var(--border-primary)',
+				}}
+			>
+				<p
+					style={{
+						fontSize: '11px',
+						color: 'var(--text-tertiary)',
+						textAlign: 'center',
+					}}
+				>
+					v0.1.0 · Mainnet
+				</p>
 			</div>
 		</aside>
 	)
