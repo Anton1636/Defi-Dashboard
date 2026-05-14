@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { auth } from '../../../../auth'
 import { prisma } from '@/lib/prisma'
-import { geminiModel, buildPortfolioPrompt } from '@/lib/gemini'
+import { buildPortfolioPrompt, getGeminiStream } from '@/lib/gemini'
 import { getPortfolio } from '@/lib/defi/portfolio'
 import { walletAddressSchema, validate } from '@/lib/security/validation'
 import { z } from 'zod'
+import { Prisma } from '@prisma/client'
 
 const aiRequestSchema = z.object({
 	walletAddress: z.string(),
@@ -50,9 +51,10 @@ export async function POST(request: NextRequest) {
 		const stream = new ReadableStream({
 			async start(controller) {
 				try {
-					const result = await geminiModel.generateContentStream(prompt)
+					const { modelName, stream: geminiStream } =
+						await getGeminiStream(prompt)
 
-					for await (const chunk of result.stream) {
+					for await (const chunk of geminiStream) {
 						const text = chunk.text()
 						if (text) {
 							fullResponse += text
@@ -67,8 +69,10 @@ export async function POST(request: NextRequest) {
 							userId: session.user.id,
 							prompt: body.question ?? 'Portfolio analysis',
 							response: fullResponse,
-							model: 'gemini-1.5-flash',
-							positionsCtx: portfolio.positions as any,
+							model: modelName,
+							positionsCtx: JSON.parse(
+								JSON.stringify(portfolio.positions),
+							) as Prisma.InputJsonValue,
 						},
 					})
 

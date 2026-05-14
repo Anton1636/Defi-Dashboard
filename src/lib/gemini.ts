@@ -8,15 +8,44 @@ import type {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
-export const geminiModel = genAI.getGenerativeModel({
-	model: 'gemini-1.5-flash',
-	generationConfig: {
-		temperature: 0.7,
-		maxOutputTokens: 1024,
-	},
-})
+// Models are tried in order, falling back to the next if one fails
+const MODELS = [
+	'gemini-3-flash-preview',
+	'gemini-3.1-flash-lite-preview',
+	'gemini-2.5-flash-lite',
+]
 
-function formatPositionsForPrompt(positions: DeFiPosition[]): string {
+export async function getGeminiStream(prompt: string) {
+	let lastError: Error | null = null
+
+	for (const modelName of MODELS) {
+		try {
+			const model = genAI.getGenerativeModel({
+				model: modelName,
+				generationConfig: {
+					temperature: 0.7,
+					maxOutputTokens: 1024,
+				},
+			})
+
+			const result = await model.generateContentStream(prompt)
+
+			console.info(`[Gemini] Using model: ${modelName}`)
+			return { modelName, stream: result.stream }
+		} catch (error) {
+			console.warn(
+				`[Gemini] Model ${modelName} failed, trying next...`,
+				(error as Error).message,
+			)
+			lastError = error as Error
+			continue
+		}
+	}
+
+	throw new Error(`All Gemini models failed. Last error: ${lastError?.message}`)
+}
+
+export function formatPositionsForPrompt(positions: DeFiPosition[]): string {
 	if (positions.length === 0) {
 		return 'The user has no active DeFi positions.'
 	}
@@ -33,7 +62,6 @@ UNISWAP V3 POSITION:
 - Fees earned: $${p.feesEarned.toFixed(2)}
 - Token prices: ${p.token0.symbol} = $${p.token0.priceUSD.toFixed(2)}, ${p.token1.symbol} = $${p.token1.priceUSD.toFixed(2)}`
 			}
-
 			if (pos.protocol === 'aave') {
 				const p = pos as AavePosition
 				return `
@@ -43,10 +71,9 @@ AAVE V3 POSITION:
 - Total collateral: $${p.totalCollateralUSD.toFixed(2)}
 - Total debt: $${p.totalDebtUSD.toFixed(2)}
 - Net APY: ${p.netAPY.toFixed(2)}%
-- Supplied assets: ${p.supplies.map(s => `${s.symbol} $${s.valueUSD.toFixed(2)} at ${s.apy.toFixed(2)}% APY`).join(', ')}
-- Borrowed assets: ${p.borrows.map(b => `${b.symbol} $${b.valueUSD.toFixed(2)} at ${b.apy.toFixed(2)}% APR`).join(', ')}`
+- Supplied: ${p.supplies.map(s => `${s.symbol} $${s.valueUSD.toFixed(2)} at ${s.apy.toFixed(2)}% APY`).join(', ')}
+- Borrowed: ${p.borrows.map(b => `${b.symbol} $${b.valueUSD.toFixed(2)} at ${b.apy.toFixed(2)}% APR`).join(', ')}`
 			}
-
 			if (pos.protocol === 'compound') {
 				const p = pos as CompoundPosition
 				return `
@@ -54,15 +81,13 @@ COMPOUND V3 POSITION:
 - Market: ${p.market}
 - Net value: $${p.valueUSD.toFixed(2)}
 - Supplied: $${p.supplied.toFixed(2)} at ${p.supplyAPR.toFixed(2)}% APR
-- Borrowed: $${p.borrowed > 0 ? `$${p.borrowed.toFixed(2)} at ${p.borrowAPR.toFixed(2)}% APR` : 'None'}`
+- Borrowed: ${p.borrowed > 0 ? `$${p.borrowed.toFixed(2)} at ${p.borrowAPR.toFixed(2)}% APR` : 'None'}`
 			}
-
-			return `UNKNOWN POSITION: ${JSON.stringify(pos)}`
+			return ''
 		})
 		.join('\n')
 }
 
-// Prompt for analyzing a user's DeFi portfolio and providing insights and recommendations.
 export function buildPortfolioPrompt(
 	positions: DeFiPosition[],
 	totalValueUSD: number,
@@ -70,7 +95,7 @@ export function buildPortfolioPrompt(
 ): string {
 	const positionsText = formatPositionsForPrompt(positions)
 
-	const basePrompt = `You are a DeFi portfolio advisor analyzing a user's positions. 
+	return `You are a DeFi portfolio advisor analyzing a user's positions.
 Be concise, friendly, and use simple language. Avoid jargon when possible.
 Always mention specific numbers and percentages from the data.
 
@@ -94,8 +119,5 @@ Please answer the user's specific question based on their portfolio data above.`
 4. **Market Context** - Brief note on current DeFi market conditions affecting these positions
 
 Keep total response under 400 words. Use **bold** for important terms.`
-}
-`
-
-	return basePrompt
+}`
 }

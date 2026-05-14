@@ -21,6 +21,19 @@ export function useAI() {
 		clearStreaming,
 	} = useAIStore()
 
+	const fetchHistory = useCallback(async () => {
+		setLoadingHistory(true)
+		try {
+			const res = await fetch('/api/ai?limit=10')
+			if (!res.ok) throw new Error('Failed to fetch history')
+			const data = await res.json()
+			setHistory(data.analyses ?? [])
+		} catch (err) {
+			console.error('[useAI] History fetch error:', err)
+			setLoadingHistory(false)
+		}
+	}, [setHistory, setLoadingHistory])
+
 	const analyze = useCallback(
 		async (question?: string) => {
 			if (!address || isStreaming) return
@@ -31,19 +44,11 @@ export function useAI() {
 				const response = await fetch('/api/ai', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						walletAddress: address,
-						question,
-					}),
+					body: JSON.stringify({ walletAddress: address, question }),
 				})
 
-				if (!response.ok) {
-					throw new Error(`HTTP ${response.status}`)
-				}
-
-				if (!response.body) {
-					throw new Error('No response body')
-				}
+				if (!response.ok) throw new Error(`HTTP ${response.status}`)
+				if (!response.body) throw new Error('No response body')
 
 				const reader = response.body.getReader()
 				const decoder = new TextDecoder()
@@ -57,23 +62,15 @@ export function useAI() {
 
 					for (const line of lines) {
 						if (!line.startsWith('data: ')) continue
-
 						try {
 							const data = JSON.parse(line.slice(6))
-
-							if (data.error) {
-								throw new Error(data.error)
-							}
-
+							if (data.error) throw new Error(data.error)
 							if (data.done) {
 								finishStreaming()
 								fetchHistory()
 								break
 							}
-
-							if (data.text) {
-								appendStreamChunk(data.text)
-							}
+							if (data.text) appendStreamChunk(data.text)
 						} catch (parseError) {
 							console.warn('[useAI] Parse error:', parseError)
 						}
@@ -83,21 +80,17 @@ export function useAI() {
 				setError(err instanceof Error ? err.message : 'Analysis failed')
 			}
 		},
-		[address, isStreaming],
-	)
 
-	const fetchHistory = useCallback(async () => {
-		setLoadingHistory(true)
-		try {
-			const res = await fetch('/api/ai?limit=10')
-			if (!res.ok) throw new Error('Failed to fetch history')
-			const data = await res.json()
-			setHistory(data.analyses ?? [])
-		} catch (err) {
-			console.error('[useAI] History fetch error:', err)
-			setLoadingHistory(false)
-		}
-	}, [])
+		[
+			address,
+			isStreaming,
+			startStreaming,
+			appendStreamChunk,
+			finishStreaming,
+			fetchHistory,
+			setError,
+		],
+	)
 
 	return {
 		analyze,

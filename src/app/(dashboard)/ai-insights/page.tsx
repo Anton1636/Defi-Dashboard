@@ -25,7 +25,7 @@ export default function AIInsightsPage() {
 		if (isConnected) {
 			fetchHistory()
 		}
-	}, [isConnected])
+	}, [isConnected, fetchHistory])
 
 	if (!isConnected) {
 		return (
