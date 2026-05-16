@@ -1,26 +1,23 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { formatEth, getEthBalance } from '@/lib/viem'
+import { getBalance, formatBalance } from '@/lib/viem'
 
 interface WalletState {
-	// Дані гаманця
-	address: string | null // Ethereum адреса (0x...)
-	chainId: number | null // ID мережі (1 = mainnet, 11155111 = sepolia)
-	ethBalance: string | null // Баланс ETH відформатований ('1.2345')
-	ethBalanceRaw: bigint | null // Баланс в wei для точних розрахунків
+	address: string | null
+	chainId: number | null
+	ethBalance: string | null
+	ethBalanceRaw: bigint | null
 	isConnected: boolean
 	isLoadingBalance: boolean
 
-	// Actions
 	setWallet: (address: string, chainId: number) => void
 	clearWallet: () => void
-	fetchBalance: () => Promise<void>
+	fetchBalance: (chainId?: number) => Promise<void>
 }
 
 export const useWalletStore = create<WalletState>()(
 	persist(
 		(set, get) => ({
-			// Initial state
 			address: null,
 			chainId: null,
 			ethBalance: null,
@@ -28,14 +25,11 @@ export const useWalletStore = create<WalletState>()(
 			isConnected: false,
 			isLoadingBalance: false,
 
-			// Встановлюємо дані після підключення гаманця
 			setWallet: (address, chainId) => {
 				set({ address, chainId, isConnected: true })
-				// Автоматично завантажуємо баланс після підключення
-				get().fetchBalance()
+				get().fetchBalance(chainId)
 			},
 
-			// Очищаємо при дисконнекті
 			clearWallet: () =>
 				set({
 					address: null,
@@ -45,18 +39,21 @@ export const useWalletStore = create<WalletState>()(
 					isConnected: false,
 				}),
 
-			// Читаємо баланс з блокчейну через viem
-			fetchBalance: async () => {
-				const { address } = get()
+			fetchBalance: async (chainId?: number) => {
+				const { address, chainId: storedChainId } = get()
 				if (!address) return
 
+				const targetChainId = chainId ?? storedChainId ?? 1
 				set({ isLoadingBalance: true })
 
 				try {
-					const balanceWei = await getEthBalance(address as `0x${string}`)
+					const balanceWei = await getBalance(
+						address as `0x${string}`,
+						targetChainId,
+					)
 					set({
 						ethBalanceRaw: balanceWei,
-						ethBalance: formatEth(balanceWei),
+						ethBalance: formatBalance(balanceWei),
 					})
 				} catch (error) {
 					console.error('[WalletStore] Failed to fetch balance:', error)
@@ -67,9 +64,6 @@ export const useWalletStore = create<WalletState>()(
 		}),
 		{
 			name: 'wallet-store',
-			// Зберігаємо тільки адресу і chainId в localStorage —
-			// не зберігаємо баланс бо він може застаріти.
-			// bigint не серіалізується в JSON тому ethBalanceRaw теж не зберігаємо.
 			partialize: state => ({
 				address: state.address,
 				chainId: state.chainId,

@@ -2,6 +2,7 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useWallet } from '@/hooks/useWallet'
+import { ChainSelector } from './ChainSelector'
 import { signOut } from 'next-auth/react'
 
 export function TopBar() {
@@ -23,7 +24,6 @@ export function TopBar() {
 				zIndex: 50,
 			}}
 		>
-			{/* ETH balance */}
 			<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 				{address && (
 					<div
@@ -37,7 +37,6 @@ export function TopBar() {
 							padding: '6px 12px',
 						}}
 					>
-						{/* Pulse dot */}
 						<span
 							style={{
 								width: '6px',
@@ -53,7 +52,7 @@ export function TopBar() {
 							style={{
 								fontSize: '13px',
 								color: 'var(--text-secondary)',
-								fontFamily: 'var(--font-mono)',
+								fontFamily: 'monospace',
 							}}
 						>
 							{isLoadingBalance ? '...' : `${ethBalance ?? '0.0000'} ETH`}
@@ -62,13 +61,16 @@ export function TopBar() {
 				)}
 			</div>
 
-			{/* Right side */}
-			<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+			<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+				{/* Chain selector only if connected */}
+				{address && <ChainSelector />}
+
 				<ConnectButton
 					showBalance={false}
 					accountStatus='avatar'
-					chainStatus='icon'
+					chainStatus='none'
 				/>
+
 				<button
 					onClick={() => signOut({ callbackUrl: '/login' })}
 					style={{

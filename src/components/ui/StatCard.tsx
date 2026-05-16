@@ -5,6 +5,8 @@ interface StatCardProps {
 	trend?: 'up' | 'down' | 'neutral'
 	isLoading?: boolean
 	accent?: 'blue' | 'green' | 'purple'
+	size?: 'default' | 'hero'
+	tooltip?: string
 }
 
 export function StatCard({
@@ -14,102 +16,125 @@ export function StatCard({
 	trend = 'neutral',
 	isLoading = false,
 	accent,
+	size = 'default',
+	tooltip,
 }: StatCardProps) {
-	const trendColor = {
-		up: 'var(--accent-green)',
-		down: 'var(--accent-red)',
-		neutral: 'var(--text-tertiary)',
-	}[trend]
+	const ACCENT_GLOWS: Record<string, string> = {
+		blue: 'var(--shadow-glow-blue)',
+		green: '0 0 40px var(--accent-green-glow)',
+		purple: '0 0 40px rgba(139, 92, 246, 0.15)',
+	}
 
-	const accentGlow =
-		{
-			blue: '0 0 30px var(--accent-blue-glow)',
-			green: '0 0 30px var(--accent-green-glow)',
-			purple: '0 0 30px rgba(139, 92, 246, 0.15)',
-		}[accent ?? ''] ?? 'none'
+	const accentGlow = accent ? (ACCENT_GLOWS[accent] ?? 'none') : 'none'
 
 	if (isLoading) {
 		return (
 			<div
-				style={{
-					background: 'var(--gradient-card)',
-					border: '1px solid var(--border-primary)',
-					borderRadius: '16px',
-					padding: '20px',
-				}}
+				className='card'
+				style={{ padding: size === 'hero' ? '28px' : '20px' }}
 			>
 				<div
-					style={{
-						height: '12px',
-						background: 'var(--bg-elevated)',
-						borderRadius: '6px',
-						width: '60%',
-						marginBottom: '12px',
-					}}
+					className='skeleton'
+					style={{ height: 12, width: '55%', marginBottom: 12 }}
 				/>
 				<div
+					className='skeleton'
 					style={{
-						height: '28px',
-						background: 'var(--bg-elevated)',
-						borderRadius: '6px',
-						width: '80%',
-						marginBottom: '8px',
+						height: size === 'hero' ? 44 : 28,
+						width: '75%',
+						marginBottom: 10,
 					}}
 				/>
-				<div
-					style={{
-						height: '10px',
-						background: 'var(--bg-elevated)',
-						borderRadius: '6px',
-						width: '40%',
-					}}
-				/>
+				<div className='skeleton' style={{ height: 10, width: '35%' }} />
 			</div>
 		)
 	}
 
 	return (
 		<div
+			className='card'
 			style={{
-				background: 'var(--gradient-card)',
-				border: '1px solid var(--border-primary)',
-				borderRadius: '16px',
-				padding: '20px',
-				boxShadow: accentGlow,
-				transition: 'border-color 0.2s',
+				padding: size === 'hero' ? '28px' : '20px',
+				boxShadow: accent
+					? `var(--shadow-card), ${accentGlow}`
+					: 'var(--shadow-card)',
+				position: 'relative',
+				overflow: 'hidden',
 			}}
-			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'var(--border-secondary)'
-			}}
-			onMouseLeave={e => {
-				e.currentTarget.style.borderColor = 'var(--border-primary)'
-			}}
+			title={tooltip}
 		>
+			{/* Subtle accent line */}
+			{size === 'hero' && accent && (
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						height: '2px',
+						background:
+							accent === 'blue'
+								? 'var(--gradient-blue)'
+								: 'var(--gradient-green)',
+						borderRadius: '16px 16px 0 0',
+					}}
+				/>
+			)}
+
+			{/* Label */}
 			<p
 				style={{
-					fontSize: '12px',
+					fontSize: 'var(--text-2xs)',
 					color: 'var(--text-tertiary)',
-					marginBottom: '8px',
+					fontWeight: 500,
+					textTransform: 'uppercase',
+					letterSpacing: '0.08em',
+					marginBottom: 8,
 				}}
 			>
 				{label}
 			</p>
+
 			<p
-				style={{
-					fontSize: '24px',
-					fontWeight: 600,
-					color: 'var(--text-primary)',
-					marginBottom: '4px',
-					letterSpacing: '-0.5px',
-				}}
 				className='animate-count'
+				style={{
+					fontSize: size === 'hero' ? 'var(--text-hero)' : 'var(--text-xl)',
+					fontWeight: 700,
+					color: 'var(--text-primary)',
+					letterSpacing: '-1.5px',
+					lineHeight: 1,
+					marginBottom: 10,
+					fontVariantNumeric: 'tabular-nums',
+				}}
 			>
 				{value}
 			</p>
+
+			{/* Sub value — trend */}
 			{subValue && (
-				<p style={{ fontSize: '12px', color: trendColor, fontWeight: 500 }}>
+				<span
+					className={
+						trend === 'up'
+							? 'trend-up-bg'
+							: trend === 'down'
+								? 'trend-down-bg'
+								: ''
+					}
+					style={{
+						display: 'inline-flex',
+						alignItems: 'center',
+						gap: 4,
+						fontSize: 'var(--text-xs)',
+						fontWeight: 600,
+						padding: '3px 8px',
+						borderRadius: 20,
+						color: trend === 'neutral' ? 'var(--text-tertiary)' : undefined,
+					}}
+				>
+					{trend === 'up' && '↑'}
+					{trend === 'down' && '↓'}
 					{subValue}
-				</p>
+				</span>
 			)}
 		</div>
 	)

@@ -3,8 +3,12 @@
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useWallet } from '@/hooks/useWallet'
 import { StatCard } from '@/components/ui/StatCard'
+import { TrendBadge } from '@/components/ui/TrendBadge'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { Tooltip } from '@/components/ui/Tooltip'
 import { PortfolioChart } from '@/components/dashboard/PortfolioChart'
 import { PositionRow } from '@/components/dashboard/PositionRow'
+import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
 
@@ -16,8 +20,9 @@ function formatUSD(value: number): string {
 
 export default function PortfolioPage() {
 	const { isConnected, address } = useWallet()
-	const { data: portfolio, isLoading, error } = usePortfolio()
+	const { data: portfolio, isLoading, error, refetch } = usePortfolio()
 
+	// ─── Not connected ────────────────────────────────────────────────────────
 	if (!isConnected) {
 		return (
 			<div
@@ -26,84 +31,86 @@ export default function PortfolioPage() {
 					flexDirection: 'column',
 					alignItems: 'center',
 					justifyContent: 'center',
-					minHeight: '60vh',
-					gap: '16px',
+					minHeight: '70vh',
+					gap: 16,
 				}}
 			>
-				<div style={{ fontSize: '48px' }}>◈</div>
+				<div style={{ fontSize: 56, marginBottom: 8 }}>◈</div>
 				<h2
 					style={{
-						fontSize: '20px',
-						fontWeight: 600,
+						fontSize: 'var(--text-xl)',
+						fontWeight: 700,
 						color: 'var(--text-primary)',
 					}}
 				>
-					Connect your wallet
+					Track your DeFi portfolio
 				</h2>
 				<p
 					style={{
-						fontSize: '14px',
+						fontSize: 'var(--text-sm)',
 						color: 'var(--text-secondary)',
-						marginBottom: '8px',
+						textAlign: 'center',
+						maxWidth: 320,
 					}}
 				>
-					Connect MetaMask to see your DeFi positions
+					Connect your wallet to see positions across Uniswap, Aave and Compound
 				</p>
 				<ConnectButton />
 			</div>
 		)
 	}
 
+	// ─── Loading ──────────────────────────────────────────────────────────────
 	if (isLoading) {
 		return (
-			<div>
-				<div style={{ marginBottom: '24px' }}>
+			<div className='fade-in'>
+				{/* Hero skeleton */}
+				<div className='card' style={{ padding: 28, marginBottom: 16 }}>
 					<div
-						style={{
-							height: '28px',
-							background: 'var(--bg-elevated)',
-							borderRadius: '8px',
-							width: '160px',
-							marginBottom: '8px',
-						}}
+						className='skeleton'
+						style={{ height: 12, width: 100, marginBottom: 16 }}
 					/>
 					<div
-						style={{
-							height: '14px',
-							background: 'var(--bg-elevated)',
-							borderRadius: '6px',
-							width: '120px',
-						}}
+						className='skeleton'
+						style={{ height: 56, width: 220, marginBottom: 12 }}
+					/>
+					<div
+						className='skeleton'
+						style={{ height: 22, width: 80, borderRadius: 20 }}
 					/>
 				</div>
+				{/* Secondary skeletons */}
 				<div
 					style={{
 						display: 'grid',
-						gridTemplateColumns: 'repeat(4, 1fr)',
-						gap: '16px',
-						marginBottom: '24px',
+						gridTemplateColumns: 'repeat(3, 1fr)',
+						gap: 12,
+						marginBottom: 16,
 					}}
 				>
-					{Array.from({ length: 4 }).map((_, i) => (
+					{Array.from({ length: 3 }).map((_, i) => (
 						<StatCard key={i} label='' value='' isLoading />
 					))}
+				</div>
+				<div
+					style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}
+				>
+					<SkeletonCard lines={4} />
+					<SkeletonCard lines={3} />
 				</div>
 			</div>
 		)
 	}
 
+	// ─── Error ────────────────────────────────────────────────────────────────
 	if (error) {
 		return (
-			<div
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					minHeight: '60vh',
-				}}
-			>
-				<p style={{ color: 'var(--accent-red)' }}>Failed to load portfolio</p>
-			</div>
+			<EmptyState
+				icon='⚠️'
+				title='Failed to load portfolio'
+				description={(error as Error).message}
+				action={{ label: 'Try again', onClick: () => refetch() }}
+			/>
 		)
 	}
 
@@ -121,143 +128,182 @@ export default function PortfolioPage() {
 		return apy > best ? apy : best
 	}, 0)
 
+	const protocolCount = new Set(positions.map(p => p.protocol)).size
+
 	return (
-		<div>
-			{/* Header */}
+		<div className='fade-in'>
+			{/* ─── Hero block ──────────────────────── */}
 			<div
+				className='card'
 				style={{
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'space-between',
-					marginBottom: '24px',
+					padding: 28,
+					marginBottom: 16,
+					background: 'linear-gradient(135deg, #16161f 0%, #1a1a2e 100%)',
+					boxShadow: `var(--shadow-card), var(--shadow-glow-blue)`,
 				}}
 			>
-				<div>
-					<h1
-						style={{
-							fontSize: '24px',
-							fontWeight: 700,
-							color: 'var(--text-primary)',
-							letterSpacing: '-0.5px',
-						}}
-					>
-						Portfolio
-					</h1>
-					<p
-						style={{
-							fontSize: '12px',
-							color: 'var(--text-tertiary)',
-							fontFamily: 'monospace',
-							marginTop: '4px',
-						}}
-					>
-						{address?.slice(0, 6)}...{address?.slice(-4)}
-					</p>
-				</div>
-				<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-					Updated{' '}
-					{portfolio?.lastUpdated
-						? new Date(portfolio.lastUpdated).toLocaleTimeString()
-						: '—'}
-				</p>
-			</div>
-
-			{/* Stat cards */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(4, 1fr)',
-					gap: '16px',
-					marginBottom: '24px',
-				}}
-			>
-				<StatCard
-					label='Total value'
-					value={formatUSD(totalValue)}
-					subValue={
-						change !== 0
-							? `${change > 0 ? '+' : ''}${change.toFixed(2)}% 24h`
-							: undefined
-					}
-					trend={change > 0 ? 'up' : change < 0 ? 'down' : 'neutral'}
-					accent='blue'
-				/>
-				<StatCard
-					label='Positions'
-					value={positions.length.toString()}
-					subValue={`${new Set(positions.map(p => p.protocol)).size} protocols`}
-				/>
-				<StatCard
-					label='Best APY'
-					value={bestAPY > 0 ? `${bestAPY.toFixed(2)}%` : '—'}
-					trend={bestAPY > 0 ? 'up' : 'neutral'}
-					accent='green'
-				/>
-				<StatCard label='Network' value='Ethereum' subValue='Mainnet' />
-			</div>
-
-			{/* Main grid */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: '2fr 1fr',
-					gap: '16px',
-				}}
-			>
-				{/* Positions list */}
+				{/* Accent top line */}
 				<div
 					style={{
-						background: 'var(--gradient-card)',
-						border: '1px solid var(--border-primary)',
-						borderRadius: '16px',
-						padding: '20px',
+						position: 'absolute' as const,
+						top: 0,
+						left: 0,
+						right: 0,
+						height: 2,
+						background: 'var(--gradient-blue)',
+						borderRadius: '16px 16px 0 0',
+					}}
+				/>
+
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'flex-start',
 					}}
 				>
+					<div>
+						{/* Label */}
+						<p
+							style={{
+								fontSize: 'var(--text-2xs)',
+								color: 'var(--text-tertiary)',
+								fontWeight: 500,
+								textTransform: 'uppercase',
+								letterSpacing: '0.08em',
+								marginBottom: 12,
+							}}
+						>
+							Total Portfolio Value
+						</p>
+
+						<p
+							className='animate-count'
+							style={{
+								fontSize: 'var(--text-hero)',
+								fontWeight: 800,
+								color: 'var(--text-primary)',
+								letterSpacing: '-2px',
+								lineHeight: 1,
+								marginBottom: 12,
+								fontVariantNumeric: 'tabular-nums',
+							}}
+						>
+							{formatUSD(totalValue)}
+						</p>
+
+						{/* Trend badge */}
+						<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+							<TrendBadge value={change} suffix='24h' size='md' />
+							<span
+								style={{
+									fontSize: 'var(--text-xs)',
+									color: 'var(--text-tertiary)',
+								}}
+							>
+								across {protocolCount} protocols
+							</span>
+						</div>
+					</div>
+
+					{/* Wallet address + timestamp */}
+					<div style={{ textAlign: 'right' }}>
+						<p
+							style={{
+								fontSize: 'var(--text-xs)',
+								color: 'var(--text-tertiary)',
+								fontFamily: 'monospace',
+								marginBottom: 4,
+							}}
+						>
+							{address?.slice(0, 6)}...{address?.slice(-4)}
+						</p>
+						<p
+							style={{
+								fontSize: 'var(--text-2xs)',
+								color: 'var(--text-tertiary)',
+							}}
+						>
+							Updated{' '}
+							{portfolio?.lastUpdated
+								? new Date(portfolio.lastUpdated).toLocaleTimeString()
+								: '—'}
+						</p>
+					</div>
+				</div>
+			</div>
+
+			{/* ─── Secondary stats ─────────────────────────────────────────────── */}
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(3, 1fr)',
+					gap: 12,
+					marginBottom: 16,
+				}}
+			>
+				<Tooltip content='Number of open DeFi positions'>
+					<StatCard
+						label='Open positions'
+						value={positions.length.toString()}
+						subValue={`${protocolCount} protocol${protocolCount !== 1 ? 's' : ''}`}
+					/>
+				</Tooltip>
+
+				<Tooltip content='Best annual percentage yield among your positions'>
+					<StatCard
+						label='Best APY'
+						value={bestAPY > 0 ? `${bestAPY.toFixed(2)}%` : '—'}
+						trend={bestAPY > 5 ? 'up' : bestAPY > 0 ? 'neutral' : 'neutral'}
+						accent={bestAPY > 5 ? 'green' : undefined}
+					/>
+				</Tooltip>
+
+				<Tooltip content='Current network'>
+					<StatCard label='Network' value='Ethereum' subValue='Mainnet' />
+				</Tooltip>
+			</div>
+
+			{/* ─── Main content ────────────────────────────────────────────────── */}
+			<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+				{/* Positions list */}
+				<div className='card' style={{ padding: 20 }}>
 					<div
 						style={{
 							display: 'flex',
 							justifyContent: 'space-between',
 							alignItems: 'center',
-							marginBottom: '16px',
+							marginBottom: 20,
 						}}
 					>
 						<p
 							style={{
-								fontSize: '13px',
-								fontWeight: 500,
+								fontSize: 'var(--text-sm)',
+								fontWeight: 600,
 								color: 'var(--text-secondary)',
 							}}
 						>
 							Open positions
 						</p>
-						<span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+						<span
+							style={{
+								fontSize: 'var(--text-2xs)',
+								color: 'var(--text-tertiary)',
+								background: 'var(--bg-elevated)',
+								padding: '2px 8px',
+								borderRadius: 20,
+							}}
+						>
 							{positions.length} total
 						</span>
 					</div>
 
 					{positions.length === 0 ? (
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'center',
-								justifyContent: 'center',
-								padding: '48px 0',
-								color: 'var(--text-tertiary)',
-							}}
-						>
-							<p style={{ fontSize: '32px', marginBottom: '12px' }}>◎</p>
-							<p style={{ fontSize: '13px' }}>No DeFi positions found</p>
-							<p
-								style={{
-									fontSize: '12px',
-									marginTop: '4px',
-									color: 'var(--text-tertiary)',
-								}}
-							>
-								Start by supplying assets to Aave or adding liquidity on Uniswap
-							</p>
-						</div>
+						<EmptyState
+							icon='◎'
+							title='No DeFi positions found'
+							description='Start by supplying assets to Aave or adding liquidity on Uniswap'
+						/>
 					) : (
 						positions.map(position => (
 							<PositionRow key={position.id} position={position} />

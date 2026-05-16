@@ -1,36 +1,55 @@
-import { createPublicClient, createWalletClient, http, custom } from 'viem'
-import { mainnet, sepolia } from 'viem/chains'
+import { createPublicClient, http, formatEther } from 'viem'
+import {
+	mainnet,
+	arbitrum,
+	base,
+	optimism,
+	polygon,
+	sepolia,
+} from 'viem/chains'
+import type { Chain } from 'viem'
+import { CHAINS } from './chains'
 
-export const publicClient = createPublicClient({
-	chain: mainnet,
-	transport: http(
-		`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
-	),
-})
+export function createChainClient(chainId: number) {
+	const chainConfig = CHAINS[chainId]
+	if (!chainConfig) throw new Error(`Unsupported chain: ${chainId}`)
 
-export const sepoliaClient = createPublicClient({
-	chain: sepolia,
-	transport: http(
-		`https://sepolia.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_API_KEY}`,
-	),
-})
-
-export async function getWalletClient() {
-	if (typeof window === 'undefined' || !window.ethereum) {
-		throw new Error('No wallet found')
+	const VIEM_CHAINS: Record<number, Chain> = {
+		[mainnet.id]: mainnet,
+		[arbitrum.id]: arbitrum,
+		[base.id]: base,
+		[optimism.id]: optimism,
+		[polygon.id]: polygon,
+		[sepolia.id]: sepolia,
 	}
 
-	return createWalletClient({
-		chain: mainnet,
-		transport: custom(window.ethereum),
+	const chain = VIEM_CHAINS[chainId]
+	if (!chain) throw new Error(`No viem chain for chainId: ${chainId}`)
+
+	return createPublicClient({
+		chain,
+		transport: http(chainConfig.rpcUrl),
 	})
 }
 
-export async function getEthBalance(address: `0x${string}`): Promise<bigint> {
-	return publicClient.getBalance({ address })
+const clientCache = new Map<number, ReturnType<typeof createPublicClient>>()
+
+export function getPublicClient(chainId: number) {
+	if (!clientCache.has(chainId)) {
+		clientCache.set(chainId, createChainClient(chainId))
+	}
+	return clientCache.get(chainId)!
 }
 
-export function formatEth(wei: bigint, decimals = 4): string {
-	const eth = Number(wei) / 1e18
+export async function getBalance(
+	address: `0x${string}`,
+	chainId: number,
+): Promise<bigint> {
+	const client = getPublicClient(chainId)
+	return client.getBalance({ address })
+}
+
+export function formatBalance(wei: bigint, decimals = 4): string {
+	const eth = parseFloat(formatEther(wei))
 	return eth.toFixed(decimals)
 }
