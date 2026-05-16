@@ -2,12 +2,16 @@ import { GraphQLClient, gql } from 'graphql-request'
 import type { AavePosition } from '@/types'
 
 const AAVE_GRAPHQL = 'https://api.v3.aave.com/graphql'
-const client = new GraphQLClient(AAVE_GRAPHQL)
+const client = new GraphQLClient(AAVE_GRAPHQL, {
+	fetch: (url, options) => {
+		const controller = new AbortController()
+		const timeoutId = setTimeout(() => controller.abort(), 8000)
+		return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+			clearTimeout(timeoutId),
+		)
+	},
+})
 
-// Правильні query fields згідно офіційної документації:
-// userSupplies — депозити юзера
-// userBorrows  — позики юзера
-// Документація: https://aave.com/docs/aave-v3/markets/positions
 const GET_USER_SUPPLIES = gql`
 	query GetUserSupplies($user: EvmAddress!, $chainId: Int!) {
 		userSupplies(user: $user, markets: [{ chainId: $chainId }]) {

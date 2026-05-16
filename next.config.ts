@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
 			'@react-native-async-storage/async-storage': './src/lib/empty-module.ts',
 			'pino-pretty': './src/lib/empty-module.ts',
 			'pg-native': './src/lib/empty-module.ts',
+			'ox/tempo': './src/lib/empty-module.ts',
 		},
 	},
 

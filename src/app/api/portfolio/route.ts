@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
 
 	const { searchParams } = new URL(request.url)
 	const walletParam = searchParams.get('wallet')
-	// chainId from query params, default Ethereum mainnet (1)
 	const chainIdParam = parseInt(searchParams.get('chainId') ?? '1')
 
 	if (!walletParam) {
@@ -23,7 +22,6 @@ export async function GET(request: NextRequest) {
 		)
 	}
 
-	// validate chainId
 	if (!SUPPORTED_CHAIN_IDS.includes(chainIdParam)) {
 		return NextResponse.json(
 			{ error: `Unsupported chainId: ${chainIdParam}` },
@@ -42,10 +40,29 @@ export async function GET(request: NextRequest) {
 	}
 
 	try {
-		const portfolio = await getPortfolio(walletAddress, chainIdParam)
+		const portfolio = await Promise.race([
+			getPortfolio(walletAddress, chainIdParam),
+			new Promise<never>((_, reject) =>
+				setTimeout(() => reject(new Error('Portfolio fetch timeout')), 15_000),
+			),
+		])
+
 		return NextResponse.json(portfolio)
 	} catch (error) {
-		console.error('[API/portfolio]', error)
+		const message = error instanceof Error ? error.message : 'Unknown error'
+		console.error('[API/portfolio]', message)
+
+		if (message === 'Portfolio fetch timeout') {
+			return NextResponse.json({
+				walletAddress,
+				totalValueUSD: 0,
+				change24hPercent: 0,
+				positions: [],
+				lastUpdated: new Date().toISOString(),
+				error: 'Data temporarily unavailable',
+			})
+		}
+
 		return NextResponse.json(
 			{ error: 'Failed to fetch portfolio' },
 			{ status: 500 },

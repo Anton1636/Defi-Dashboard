@@ -1,18 +1,18 @@
 import { GraphQLClient, gql } from 'graphql-request'
 import type { UniswapPosition } from '@/types'
 
-// Uniswap V3 Subgraph на The Graph Protocol.
-// Субграф — це індексована копія даних з блокчейну в зручному GraphQL форматі.
-// Замість того щоб читати raw контракт дані через viem (складно і повільно),
-// робимо простий GraphQL запит.
 const UNISWAP_SUBGRAPH = `https://gateway.thegraph.com/api/${process.env.THE_GRAPH_API_KEY}/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV`
 
-const client = new GraphQLClient(UNISWAP_SUBGRAPH)
+const client = new GraphQLClient(UNISWAP_SUBGRAPH, {
+	fetch: (url, options) => {
+		const controller = new AbortController()
+		const timeoutId = setTimeout(() => controller.abort(), 8000)
+		return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+			clearTimeout(timeoutId),
+		)
+	},
+})
 
-// GraphQL запит для отримання LP позицій юзера.
-// position — одна позиція в Uniswap V3 пулі.
-// liquidity — кількість ліквідності (0 = закрита позиція).
-// tickLower/tickUpper — діапазон цін позиції.
 const GET_POSITIONS = gql`
 	query GetPositions($owner: String!) {
 		positions(

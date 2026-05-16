@@ -67,3 +67,9 @@ export interface JWTPayload {
 	iat: number
 	exp: number
 }
+
+export interface TokenPrice {
+	symbol: string
+	priceUSD: number
+	change24h: number
+}

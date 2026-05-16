@@ -1,11 +1,7 @@
-// CoinGecko API — безкоштовний, без API ключа для базових запитів.
-// Використовуємо для отримання поточних цін токенів в USD.
-// Rate limit: 10-30 запитів/хвилину на безкоштовному tier.
+import type { TokenPrice } from '@/types'
 
 const COINGECKO_BASE = 'https://api.coingecko.com/api/v3'
 
-// Маппінг символів токенів на CoinGecko IDs
-// CoinGecko використовує власні ID замість символів
 const TOKEN_ID_MAP: Record<string, string> = {
 	ETH: 'ethereum',
 	WETH: 'weth',
@@ -17,19 +13,32 @@ const TOKEN_ID_MAP: Record<string, string> = {
 	UNI: 'uniswap',
 	AAVE: 'aave',
 	COMP: 'compound-governance-token',
+	ARB: 'arbitrum',
+	OP: 'optimism',
+	MATIC: 'matic-network',
 }
 
-export interface TokenPrice {
-	symbol: string
-	priceUSD: number
-	change24h: number
+async function fetchWithTimeout(
+	url: string,
+	options: RequestInit = {},
+	timeoutMs = 5000,
+): Promise<Response> {
+	const controller = new AbortController()
+	const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+	try {
+		return await fetch(url, {
+			...options,
+			signal: controller.signal,
+		})
+	} finally {
+		clearTimeout(timeoutId)
+	}
 }
 
-// Отримуємо ціни для масиву токенів одним запитом
 export async function getTokenPrices(
 	symbols: string[],
 ): Promise<Record<string, TokenPrice>> {
-	// Конвертуємо символи в CoinGecko IDs
 	const ids = symbols
 		.map(s => TOKEN_ID_MAP[s.toUpperCase()])
 		.filter(Boolean)
@@ -38,21 +47,18 @@ export async function getTokenPrices(
 	if (!ids) return {}
 
 	try {
-		const response = await fetch(
+		const response = await fetchWithTimeout(
 			`${COINGECKO_BASE}/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`,
 			{
-				// next: { revalidate: 60 } — Next.js кешує відповідь на 60 секунд.
-				// Не робимо новий запит до CoinGecko при кожному page load —
-				// це захищає від rate limit і прискорює відповідь.
 				next: { revalidate: 60 },
 			},
+			5000,
 		)
 
-		if (!response.ok) throw new Error('CoinGecko API error')
+		if (!response.ok) throw new Error(`CoinGecko error: ${response.status}`)
 
 		const data = await response.json()
 
-		// Конвертуємо відповідь назад в символи
 		const result: Record<string, TokenPrice> = {}
 		symbols.forEach(symbol => {
 			const id = TOKEN_ID_MAP[symbol.toUpperCase()]
@@ -67,12 +73,15 @@ export async function getTokenPrices(
 
 		return result
 	} catch (error) {
-		console.error('[CoinGecko] Failed to fetch prices:', error)
+		if (error instanceof Error && error.name === 'AbortError') {
+			console.warn('[CoinGecko] Timed out after 5s — returning empty prices')
+		} else {
+			console.error('[CoinGecko] Failed:', error)
+		}
 		return {}
 	}
 }
 
-// Отримати ціну одного токена
 export async function getTokenPrice(symbol: string): Promise<number> {
 	const prices = await getTokenPrices([symbol])
 	return prices[symbol.toUpperCase()]?.priceUSD ?? 0

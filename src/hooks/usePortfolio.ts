@@ -5,7 +5,6 @@ import { useWallet } from './useWallet'
 import { useChainStore } from '@/store/chainStore'
 import type { Portfolio } from '@/types'
 
-// Fetch portfolio
 async function fetchPortfolio(
 	walletAddress: string,
 	chainId: number,
@@ -22,14 +21,12 @@ export function usePortfolio() {
 	const { activeChainId } = useChainStore()
 
 	return useQuery({
-		// If address changes — automatically makes a new request.
 		queryKey: ['portfolio', address, activeChainId],
 		queryFn: () => fetchPortfolio(address!, activeChainId),
-		// Request only if the wallet is connected
 		enabled: isConnected && !!address,
-		// Refetch every 60 seconds — DeFi data changes frequently
-		refetchInterval: 60_000,
-		// staleTime: 30 seconds — not making unnecessary requests during navigation
-		staleTime: 30_000,
+		refetchInterval: 2 * 60_000,
+		staleTime: 60_000,
+		refetchOnWindowFocus: false,
+		refetchOnMount: false,
 	})
 }
