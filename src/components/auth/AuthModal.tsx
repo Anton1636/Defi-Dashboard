@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 
 interface AuthModalProps {
 	isOpen: boolean
@@ -10,6 +10,14 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
+	const { status } = useSession()
+
+	useEffect(() => {
+		if (status === 'authenticated') {
+			onClose()
+		}
+	}, [status, onClose])
+
 	useEffect(() => {
 		const handler = (e: KeyboardEvent) => {
 			if (e.key === 'Escape') onClose()
@@ -64,10 +72,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 						background: 'var(--bg-card)',
 						boxShadow:
 							'var(--shadow-card-hover), 0 0 80px rgba(99,102,241,0.12)',
+						position: 'relative',
 					}}
 					onClick={e => e.stopPropagation()}
 				>
-					{/* Close button */}
+					{/* Close */}
 					<button
 						onClick={onClose}
 						style={{
@@ -127,7 +136,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 						</p>
 					</div>
 
-					{/* Wallet connect */}
+					{/* Wallet */}
 					<div
 						style={{
 							display: 'flex',
