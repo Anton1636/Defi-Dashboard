@@ -82,14 +82,15 @@ export function Sidebar() {
 
 	return (
 		<aside
+			className='sidebar'
 			style={{
-				width: '220px',
+				width: 220,
 				minHeight: '100vh',
-				background: 'var(--bg-secondary)',
+				background: 'var(--sidebar-bg)',
 				borderRight: '1px solid var(--border-primary)',
-				display: 'flex',
 				flexDirection: 'column',
 				flexShrink: 0,
+				transition: 'background 0.25s ease',
 			}}
 		>
 			{/* Logo */}
@@ -99,12 +100,12 @@ export function Sidebar() {
 					borderBottom: '1px solid var(--border-primary)',
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 					<div
 						style={{
-							width: '32px',
-							height: '32px',
-							borderRadius: '10px',
+							width: 32,
+							height: 32,
+							borderRadius: 10,
 							background: 'var(--gradient-blue)',
 							display: 'flex',
 							alignItems: 'center',
@@ -112,7 +113,7 @@ export function Sidebar() {
 							boxShadow: '0 0 20px var(--accent-blue-glow)',
 						}}
 					>
-						<span style={{ color: 'white', fontWeight: 700, fontSize: '14px' }}>
+						<span style={{ color: 'white', fontWeight: 700, fontSize: 14 }}>
 							D
 						</span>
 					</div>
@@ -121,12 +122,12 @@ export function Sidebar() {
 							style={{
 								color: 'var(--text-primary)',
 								fontWeight: 600,
-								fontSize: '14px',
+								fontSize: 14,
 							}}
 						>
 							DeFi
 						</p>
-						<p style={{ color: 'var(--text-tertiary)', fontSize: '11px' }}>
+						<p style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
 							Dashboard
 						</p>
 					</div>
@@ -134,13 +135,13 @@ export function Sidebar() {
 			</div>
 
 			{/* Nav */}
-			<nav style={{ flex: 1, padding: '12px' }}>
+			<nav style={{ flex: 1, padding: 12 }}>
 				<ul
 					style={{
 						listStyle: 'none',
 						display: 'flex',
 						flexDirection: 'column',
-						gap: '2px',
+						gap: 2,
 					}}
 				>
 					{NAV_ITEMS.map(item => {
@@ -152,10 +153,10 @@ export function Sidebar() {
 									style={{
 										display: 'flex',
 										alignItems: 'center',
-										gap: '10px',
+										gap: 10,
 										padding: '10px 12px',
-										borderRadius: '10px',
-										fontSize: '13px',
+										borderRadius: 10,
+										fontSize: 13,
 										fontWeight: isActive ? 500 : 400,
 										color: isActive
 											? 'var(--text-primary)'
@@ -166,6 +167,18 @@ export function Sidebar() {
 											: '2px solid transparent',
 										transition: 'all 0.15s',
 										textDecoration: 'none',
+									}}
+									onMouseEnter={e => {
+										if (!isActive) {
+											e.currentTarget.style.background = 'var(--bg-elevated)'
+											e.currentTarget.style.color = 'var(--text-primary)'
+										}
+									}}
+									onMouseLeave={e => {
+										if (!isActive) {
+											e.currentTarget.style.background = 'transparent'
+											e.currentTarget.style.color = 'var(--text-secondary)'
+										}
 									}}
 								>
 									<span style={{ opacity: isActive ? 1 : 0.6 }}>
@@ -182,13 +195,13 @@ export function Sidebar() {
 			{/* Bottom */}
 			<div
 				style={{
-					padding: '16px',
+					padding: 16,
 					borderTop: '1px solid var(--border-primary)',
 				}}
 			>
 				<p
 					style={{
-						fontSize: '11px',
+						fontSize: 11,
 						color: 'var(--text-tertiary)',
 						textAlign: 'center',
 					}}

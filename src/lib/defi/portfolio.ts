@@ -3,19 +3,22 @@ import { getAavePositions } from './aave'
 import { getCompoundPositions } from './compound'
 import { getTokenPrice } from './coingecko'
 import { isProtocolSupported } from '@/lib/chains'
-import { mainnet } from 'viem/chains'
 import type { Portfolio, DeFiPosition } from '@/types'
 
-const MOCK_PORTFOLIOS: Record<number, Omit<Portfolio, 'walletAddress'>> = {
-	[mainnet.id]: {
+const MAINNET_ID = 1
+
+const MOCK_PORTFOLIOS: Record<
+	number,
+	Omit<Portfolio, 'walletAddress' | 'lastUpdated'>
+> = {
+	[MAINNET_ID]: {
 		totalValueUSD: 24_850.5,
 		change24hPercent: 3.24,
-		lastUpdated: new Date().toISOString(),
 		positions: [
 			{
 				id: 'uni-1',
 				protocol: 'uniswap',
-				chainId: mainnet.id,
+				chainId: MAINNET_ID,
 				walletAddress: '0x0000',
 				valueUSD: 12_400,
 				poolId: '0xabc123',
@@ -27,7 +30,7 @@ const MOCK_PORTFOLIOS: Record<number, Omit<Portfolio, 'walletAddress'>> = {
 			{
 				id: 'aave-1',
 				protocol: 'aave',
-				chainId: mainnet.id,
+				chainId: MAINNET_ID,
 				walletAddress: '0x0000',
 				valueUSD: 8_200,
 				healthFactor: 2.45,
@@ -42,7 +45,7 @@ const MOCK_PORTFOLIOS: Record<number, Omit<Portfolio, 'walletAddress'>> = {
 			{
 				id: 'comp-1',
 				protocol: 'compound',
-				chainId: mainnet.id,
+				chainId: MAINNET_ID,
 				walletAddress: '0x0000',
 				valueUSD: 4_250.5,
 				market: 'USDC',
@@ -53,11 +56,9 @@ const MOCK_PORTFOLIOS: Record<number, Omit<Portfolio, 'walletAddress'>> = {
 			},
 		],
 	},
-	// Arbitrum mock — без Compound
 	42161: {
 		totalValueUSD: 8_420.0,
 		change24hPercent: -1.2,
-		lastUpdated: new Date().toISOString(),
 		positions: [
 			{
 				id: 'uni-arb-1',
@@ -90,13 +91,16 @@ const MOCK_PORTFOLIOS: Record<number, Omit<Portfolio, 'walletAddress'>> = {
 
 export async function getPortfolio(
 	walletAddress: string,
-	chainId: number = mainnet.id,
+	chainId: number = MAINNET_ID,
 ): Promise<Portfolio> {
+	console.log('[Portfolio] MOCK_DATA:', process.env.NEXT_PUBLIC_USE_MOCK_DATA)
+
 	if (process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true') {
-		const mockData = MOCK_PORTFOLIOS[chainId] ?? MOCK_PORTFOLIOS[mainnet.id]
+		const mockData = MOCK_PORTFOLIOS[chainId] ?? MOCK_PORTFOLIOS[MAINNET_ID]
 		return {
 			...mockData,
 			walletAddress,
+			lastUpdated: new Date().toISOString(),
 			positions: mockData.positions.map(p => ({
 				...p,
 				walletAddress,
@@ -105,7 +109,7 @@ export async function getPortfolio(
 		}
 	}
 
-	const ethPriceUSD = await getTokenPrice('ETH')
+	const ethPriceUSD = await getTokenPrice('ETH').catch(() => 2000)
 
 	const [uniswapResult, aaveResult, compoundResult] = await Promise.allSettled([
 		isProtocolSupported(chainId, 'uniswap')
@@ -125,11 +129,9 @@ export async function getPortfolio(
 		...(compoundResult.status === 'fulfilled' ? compoundResult.value : []),
 	]
 
-	const totalValueUSD = positions.reduce((sum, p) => sum + p.valueUSD, 0)
-
 	return {
 		walletAddress,
-		totalValueUSD,
+		totalValueUSD: positions.reduce((sum, p) => sum + p.valueUSD, 0),
 		change24hPercent: 0,
 		positions,
 		lastUpdated: new Date().toISOString(),

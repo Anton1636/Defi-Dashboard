@@ -3,6 +3,10 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
 	output: 'standalone',
 
+	experimental: {
+		turbopackMemoryLimit: 4096,
+	},
+
 	turbopack: {
 		resolveAlias: {
 			'@react-native-async-storage/async-storage': './src/lib/empty-module.ts',
@@ -25,6 +29,7 @@ const nextConfig: NextConfig = {
 			"font-src 'self' data:",
 			[
 				"connect-src 'self'",
+				isDev ? 'ws://127.0.0.1:* ws://localhost:*' : '',
 				'https://api.thegraph.com',
 				'https://mainnet.infura.io',
 				'https://arbitrum-mainnet.infura.io',

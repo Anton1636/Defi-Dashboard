@@ -2,7 +2,7 @@
 
 import { WagmiProvider } from 'wagmi'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { RainbowKitProvider, lightTheme } from '@rainbow-me/rainbowkit'
+import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
 import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import type { GetSiweMessageOptions } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import { SessionProvider } from 'next-auth/react'
@@ -26,8 +26,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
 						getSiweMessageOptions={getSiweMessageOptions}
 					>
 						<RainbowKitProvider
-							theme={lightTheme({
-								accentColor: '#2563EB',
+							theme={darkTheme({
+								accentColor: '#6366f1',
 								accentColorForeground: 'white',
 								borderRadius: 'large',
 							})}

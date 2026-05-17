@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '../../../auth'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
+import { MobileNav } from '@/components/layout/MobileNav'
 
 export default async function DashboardLayout({
 	children,
@@ -20,25 +21,22 @@ export default async function DashboardLayout({
 			}}
 		>
 			<Sidebar />
+
 			<div
 				style={{
 					flex: 1,
 					display: 'flex',
 					flexDirection: 'column',
 					overflow: 'hidden',
+					minWidth: 0,
 				}}
 			>
 				<TopBar />
-				<main
-					style={{
-						flex: 1,
-						padding: '24px',
-						overflowY: 'auto',
-					}}
-				>
-					{children}
-				</main>
+				<main className='dashboard-main'>{children}</main>
 			</div>
+
+			{/* Bottom nav — visible only on mobile via CSS */}
+			<MobileNav />
 		</div>
 	)
 }

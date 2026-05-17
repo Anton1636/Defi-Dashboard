@@ -1,12 +1,3 @@
-import {
-	mainnet,
-	arbitrum,
-	base,
-	optimism,
-	polygon,
-	sepolia,
-} from 'viem/chains'
-
 export interface ChainConfig {
 	id: number
 	name: string
@@ -22,9 +13,8 @@ export interface ChainConfig {
 }
 
 export const CHAINS: Record<number, ChainConfig> = {
-	// Ethereum Mainnet
-	[mainnet.id]: {
-		id: mainnet.id,
+	1: {
+		id: 1,
 		name: 'Ethereum',
 		shortName: 'ETH',
 		icon: '⟠',
@@ -36,10 +26,8 @@ export const CHAINS: Record<number, ChainConfig> = {
 		isTestnet: false,
 		supportedProtocols: ['uniswap', 'aave', 'compound'],
 	},
-
-	// Arbitrum One
-	[arbitrum.id]: {
-		id: arbitrum.id,
+	42161: {
+		id: 42161,
 		name: 'Arbitrum',
 		shortName: 'ARB',
 		icon: '🔵',
@@ -51,10 +39,8 @@ export const CHAINS: Record<number, ChainConfig> = {
 		isTestnet: false,
 		supportedProtocols: ['uniswap', 'aave'],
 	},
-
-	// Base — Coinbase L2
-	[base.id]: {
-		id: base.id,
+	8453: {
+		id: 8453,
 		name: 'Base',
 		shortName: 'BASE',
 		icon: '🔷',
@@ -66,10 +52,8 @@ export const CHAINS: Record<number, ChainConfig> = {
 		isTestnet: false,
 		supportedProtocols: ['uniswap', 'aave'],
 	},
-
-	// Optimism
-	[optimism.id]: {
-		id: optimism.id,
+	10: {
+		id: 10,
 		name: 'Optimism',
 		shortName: 'OP',
 		icon: '🔴',
@@ -81,10 +65,8 @@ export const CHAINS: Record<number, ChainConfig> = {
 		isTestnet: false,
 		supportedProtocols: ['uniswap', 'aave'],
 	},
-
-	// Polygon
-	[polygon.id]: {
-		id: polygon.id,
+	137: {
+		id: 137,
 		name: 'Polygon',
 		shortName: 'MATIC',
 		icon: '🟣',
@@ -96,9 +78,8 @@ export const CHAINS: Record<number, ChainConfig> = {
 		isTestnet: false,
 		supportedProtocols: ['uniswap', 'aave'],
 	},
-
-	[sepolia.id]: {
-		id: sepolia.id,
+	11155111: {
+		id: 11155111,
 		name: 'Sepolia',
 		shortName: 'SEP',
 		icon: '🔬',
@@ -115,7 +96,7 @@ export const CHAINS: Record<number, ChainConfig> = {
 export const SUPPORTED_CHAIN_IDS = Object.keys(CHAINS).map(Number)
 
 export function getChainConfig(chainId: number): ChainConfig {
-	return CHAINS[chainId] ?? CHAINS[mainnet.id]
+	return CHAINS[chainId] ?? CHAINS[1]
 }
 
 export function isProtocolSupported(

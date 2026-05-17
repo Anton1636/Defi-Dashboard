@@ -1,9 +1,10 @@
 'use client'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { signOut } from 'next-auth/react'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useWallet } from '@/hooks/useWallet'
 import { ChainSelector } from './ChainSelector'
-import { signOut } from 'next-auth/react'
 
 export function TopBar() {
 	const { address, ethBalance, isLoadingBalance } = useWallet()
@@ -11,9 +12,10 @@ export function TopBar() {
 	return (
 		<header
 			style={{
-				height: '60px',
-				background: 'rgba(17, 17, 24, 0.8)',
+				height: 60,
+				background: 'var(--topbar-bg)',
 				backdropFilter: 'blur(20px)',
+				WebkitBackdropFilter: 'blur(20px)',
 				borderBottom: '1px solid var(--border-primary)',
 				display: 'flex',
 				alignItems: 'center',
@@ -22,35 +24,40 @@ export function TopBar() {
 				position: 'sticky',
 				top: 0,
 				zIndex: 50,
+				transition: 'background 0.25s ease',
 			}}
 		>
-			<div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+			{/* Left — ETH balance pill */}
+			<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
 				{address && (
 					<div
+						className='topbar-balance'
 						style={{
 							display: 'flex',
 							alignItems: 'center',
-							gap: '8px',
+							gap: 8,
 							background: 'var(--bg-elevated)',
 							border: '1px solid var(--border-primary)',
-							borderRadius: '10px',
+							borderRadius: 10,
 							padding: '6px 12px',
+							transition: 'background 0.25s ease, border-color 0.25s ease',
 						}}
 					>
 						<span
 							style={{
-								width: '6px',
-								height: '6px',
+								width: 6,
+								height: 6,
 								borderRadius: '50%',
 								background: 'var(--accent-green)',
 								boxShadow: '0 0 8px var(--accent-green)',
 								display: 'inline-block',
 								animation: 'pulse 2s infinite',
+								flexShrink: 0,
 							}}
 						/>
 						<span
 							style={{
-								fontSize: '13px',
+								fontSize: 13,
 								color: 'var(--text-secondary)',
 								fontFamily: 'monospace',
 							}}
@@ -61,8 +68,12 @@ export function TopBar() {
 				)}
 			</div>
 
-			<div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-				{/* Chain selector only if connected */}
+			{/* Right — controls */}
+			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+				{/* Theme toggle */}
+				<ThemeToggle />
+
+				{/* Chain selector — only if connected */}
 				{address && <ChainSelector />}
 
 				<ConnectButton
@@ -72,16 +83,18 @@ export function TopBar() {
 				/>
 
 				<button
+					className='topbar-signout'
 					onClick={() => signOut({ callbackUrl: '/login' })}
 					style={{
-						fontSize: '13px',
+						fontSize: 13,
 						color: 'var(--text-tertiary)',
 						background: 'transparent',
 						border: '1px solid var(--border-primary)',
-						borderRadius: '8px',
+						borderRadius: 8,
 						padding: '6px 12px',
 						cursor: 'pointer',
 						transition: 'all 0.15s',
+						whiteSpace: 'nowrap',
 					}}
 					onMouseEnter={e => {
 						e.currentTarget.style.color = 'var(--text-secondary)'

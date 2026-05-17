@@ -1,3 +1,4 @@
+import { Sparkline, generateSparkData } from '@/components/ui/Sparkline'
 import type {
 	DeFiPosition,
 	UniswapPosition,
@@ -28,17 +29,13 @@ function UniswapDetails({ position }: { position: UniswapPosition }) {
 	return (
 		<div style={{ textAlign: 'right' }}>
 			<p
-				style={{
-					fontSize: '13px',
-					fontWeight: 500,
-					color: 'var(--text-primary)',
-				}}
+				style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}
 			>
 				{position.token0.symbol}/{position.token1.symbol}
 			</p>
 			<p
 				style={{
-					fontSize: '11px',
+					fontSize: 11,
 					color: position.inRange
 						? 'var(--accent-green)'
 						: 'var(--accent-amber)',
@@ -60,10 +57,10 @@ function AaveDetails({ position }: { position: AavePosition }) {
 
 	return (
 		<div style={{ textAlign: 'right' }}>
-			<p style={{ fontSize: '12px', fontWeight: 600, color: hfColor }}>
+			<p style={{ fontSize: 12, fontWeight: 600, color: hfColor }}>
 				HF: {position.healthFactor.toFixed(2)}
 			</p>
-			<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+			<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
 				{position.netAPY.toFixed(2)}% APY
 			</p>
 		</div>
@@ -73,10 +70,10 @@ function AaveDetails({ position }: { position: AavePosition }) {
 function CompoundDetails({ position }: { position: CompoundPosition }) {
 	return (
 		<div style={{ textAlign: 'right' }}>
-			<p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+			<p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
 				{position.market}
 			</p>
-			<p style={{ fontSize: '11px', color: 'var(--accent-green)' }}>
+			<p style={{ fontSize: 11, color: 'var(--accent-green)' }}>
 				{position.supplyAPR.toFixed(2)}% APR
 			</p>
 		</div>
@@ -85,10 +82,12 @@ function CompoundDetails({ position }: { position: CompoundPosition }) {
 
 interface PositionRowProps {
 	position: DeFiPosition
+	index?: number
 }
 
-export function PositionRow({ position }: PositionRowProps) {
+export function PositionRow({ position, index = 0 }: PositionRowProps) {
 	const style = PROTOCOL_STYLES[position.protocol]
+	const sparkData = generateSparkData(`${position.id}-7d`, 7)
 
 	return (
 		<div
@@ -98,32 +97,39 @@ export function PositionRow({ position }: PositionRowProps) {
 				justifyContent: 'space-between',
 				padding: '12px 0',
 				borderBottom: '1px solid var(--border-primary)',
-				transition: 'background 0.15s',
+				transition: 'background 0.15s, padding 0.15s, margin 0.15s',
 				cursor: 'default',
+				gap: 12,
+				animationDelay: `${index * 0.06}s`,
 			}}
+			className='slide-in'
 			onMouseEnter={e => {
 				e.currentTarget.style.background = 'var(--bg-elevated)'
 				e.currentTarget.style.margin = '0 -20px'
 				e.currentTarget.style.padding = '12px 20px'
+				e.currentTarget.style.borderRadius = '10px'
 			}}
 			onMouseLeave={e => {
 				e.currentTarget.style.background = 'transparent'
 				e.currentTarget.style.margin = '0'
 				e.currentTarget.style.padding = '12px 0'
+				e.currentTarget.style.borderRadius = '0'
 			}}
 		>
-			<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+			{/* Left — protocol icon + name + value */}
+			<div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
 				<div
 					style={{
-						width: '36px',
-						height: '36px',
+						width: 36,
+						height: 36,
 						borderRadius: '50%',
 						background: `${style?.color}22`,
 						border: `1px solid ${style?.color}44`,
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						fontSize: '16px',
+						fontSize: 16,
+						flexShrink: 0,
 					}}
 				>
 					{style?.icon}
@@ -131,7 +137,7 @@ export function PositionRow({ position }: PositionRowProps) {
 				<div>
 					<p
 						style={{
-							fontSize: '13px',
+							fontSize: 13,
 							fontWeight: 500,
 							color: 'var(--text-primary)',
 						}}
@@ -141,7 +147,7 @@ export function PositionRow({ position }: PositionRowProps) {
 					</p>
 					<p
 						style={{
-							fontSize: '13px',
+							fontSize: 13,
 							fontWeight: 600,
 							color: 'var(--text-primary)',
 						}}
@@ -151,6 +157,12 @@ export function PositionRow({ position }: PositionRowProps) {
 				</div>
 			</div>
 
+			{/* Center — sparkline */}
+			<div style={{ flexShrink: 0 }}>
+				<Sparkline data={sparkData} width={64} height={24} />
+			</div>
+
+			{/* Right — protocol details */}
 			{position.protocol === 'uniswap' && (
 				<UniswapDetails position={position as UniswapPosition} />
 			)}

@@ -35,7 +35,6 @@
 	--gradient-blue: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 	--gradient-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
 
-	/* Typography scale */
 	--text-hero: 48px;
 	--text-xl: 32px;
 	--text-lg: 20px;
@@ -44,7 +43,6 @@
 	--text-xs: 12px;
 	--text-2xs: 11px;
 
-	/* Spacing */
 	--space-xs: 4px;
 	--space-sm: 8px;
 	--space-md: 16px;
@@ -52,7 +50,6 @@
 	--space-xl: 32px;
 	--space-2xl: 48px;
 
-	/* Shadows */
 	--shadow-card:
 		0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2),
 		inset 0 1px 0 rgba(255, 255, 255, 0.04);
@@ -60,6 +57,46 @@
 		0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3),
 		inset 0 1px 0 rgba(255, 255, 255, 0.06);
 	--shadow-glow-blue: 0 0 40px rgba(99, 102, 241, 0.2);
+
+	--topbar-bg: rgba(17, 17, 24, 0.85);
+	--sidebar-bg: #111118;
+}
+
+[data-theme='light'] {
+	--bg-primary: #f4f4fa;
+	--bg-secondary: #ebebf5;
+	--bg-card: #ffffff;
+	--bg-card-hover: #f5f5ff;
+	--bg-elevated: #e5e5f0;
+
+	--border-primary: rgba(0, 0, 0, 0.07);
+	--border-secondary: rgba(0, 0, 0, 0.13);
+	--border-accent: rgba(99, 102, 241, 0.35);
+
+	--text-primary: #0d0d1a;
+	--text-secondary: #44445a;
+	--text-tertiary: #88889a;
+
+	--accent-blue-glow: rgba(99, 102, 241, 0.09);
+	--accent-green-glow: rgba(16, 185, 129, 0.09);
+	--accent-red-glow: rgba(239, 68, 68, 0.07);
+
+	--uniswap-glow: rgba(255, 0, 122, 0.07);
+	--aave-glow: rgba(182, 80, 158, 0.07);
+	--compound-glow: rgba(0, 211, 149, 0.07);
+
+	--gradient-card: linear-gradient(135deg, #ffffff 0%, #f5f5fd 100%);
+
+	--shadow-card:
+		0 4px 24px rgba(0, 0, 0, 0.07), 0 1px 4px rgba(0, 0, 0, 0.05),
+		inset 0 1px 0 rgba(255, 255, 255, 0.9);
+	--shadow-card-hover:
+		0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.07),
+		inset 0 1px 0 rgba(255, 255, 255, 1);
+	--shadow-glow-blue: 0 0 40px rgba(99, 102, 241, 0.1);
+
+	--topbar-bg: rgba(235, 235, 245, 0.9);
+	--sidebar-bg: #ebebf5;
 }
 
 * {
@@ -81,9 +118,11 @@ body {
 		-apple-system,
 		sans-serif;
 	line-height: 1.5;
+	transition:
+		background 0.25s ease,
+		color 0.25s ease;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
 	width: 4px;
 }
@@ -95,7 +134,6 @@ body {
 	border-radius: 2px;
 }
 
-/* Card base */
 .card {
 	background: var(--gradient-card);
 	border: 1px solid var(--border-primary);
@@ -104,14 +142,17 @@ body {
 	transition:
 		border-color 0.2s,
 		box-shadow 0.2s,
-		transform 0.15s;
+		transform 0.2s;
 }
 .card:hover {
 	border-color: var(--border-secondary);
 	box-shadow: var(--shadow-card-hover);
 }
 
-/* Trend colors */
+.card-lift:hover {
+	transform: translateY(-2px);
+}
+
 .trend-up {
 	color: var(--accent-green);
 }
@@ -122,7 +163,6 @@ body {
 	color: var(--text-tertiary);
 }
 
-/* Trend backgrounds */
 .trend-up-bg {
 	background: var(--accent-green-glow);
 	border: 1px solid rgba(16, 185, 129, 0.2);
@@ -134,7 +174,6 @@ body {
 	color: var(--accent-red);
 }
 
-/* Animations */
 @keyframes pulse {
 	0%,
 	100% {
@@ -144,6 +183,7 @@ body {
 		opacity: 0.4;
 	}
 }
+
 @keyframes blink {
 	0%,
 	100% {
@@ -153,6 +193,7 @@ body {
 		opacity: 0;
 	}
 }
+
 @keyframes fadeIn {
 	from {
 		opacity: 0;
@@ -163,6 +204,7 @@ body {
 		transform: translateY(0);
 	}
 }
+
 @keyframes slideIn {
 	from {
 		opacity: 0;
@@ -173,11 +215,13 @@ body {
 		transform: translateX(0);
 	}
 }
+
 @keyframes spin {
 	to {
 		transform: rotate(360deg);
 	}
 }
+
 @keyframes shimmer {
 	0% {
 		background-position: -200% 0;
@@ -186,6 +230,7 @@ body {
 		background-position: 200% 0;
 	}
 }
+
 @keyframes countUp {
 	from {
 		opacity: 0;
@@ -195,6 +240,33 @@ body {
 		opacity: 1;
 		transform: translateY(0);
 	}
+}
+
+@keyframes staggerIn {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.stagger-1 {
+	animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+}
+.stagger-2 {
+	animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+.stagger-3 {
+	animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.19s both;
+}
+.stagger-4 {
+	animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.26s both;
+}
+.stagger-5 {
+	animation: staggerIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.33s both;
 }
 
 .fade-in {
@@ -207,7 +279,6 @@ body {
 	animation: countUp 0.4s ease-out;
 }
 
-/* Shimmer skeleton */
 .skeleton {
 	background: linear-gradient(
 		90deg,
@@ -218,4 +289,133 @@ body {
 	background-size: 200% 100%;
 	animation: shimmer 1.5s infinite;
 	border-radius: 6px;
+}
+
+[data-theme='light'] .skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--bg-elevated) 25%,
+		rgba(255, 255, 255, 0.6) 50%,
+		var(--bg-elevated) 75%
+	);
+	background-size: 200% 100%;
+}
+
+.sidebar {
+	display: flex;
+}
+
+.mobile-nav {
+	display: none;
+}
+
+.dashboard-main {
+	flex: 1;
+	padding: 24px;
+	overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		display: none !important;
+	}
+
+	.dashboard-main {
+		padding: 16px;
+		padding-bottom: 80px;
+	}
+
+	:root {
+		--text-hero: 32px;
+		--text-xl: 24px;
+	}
+}
+
+.grid-stats {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 16px;
+	width: 100%;
+}
+
+/* Новий клас-обгортка для стабілізації внутрішніх лімітів ширини */
+.stat-card-wrapper {
+	display: flex;
+	width: 100%;
+}
+
+/* Змушуємо Tooltip та його внутрішній контент займати весь простір грид-колонки */
+.stat-card-wrapper > *,
+.stat-card-wrapper > * > * {
+	width: 100% !important;
+	display: flex !important;
+	flex-direction: column;
+}
+
+/* Скидаємо будь-які обмеження max-width у самого компонента StatCard */
+.grid-stats .card {
+	width: 100% !important;
+	max-width: 100% !important;
+	flex: 1;
+}
+
+.grid-main {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 16px;
+}
+
+.network-full {
+	display: contents;
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		display: none !important;
+	}
+
+	.mobile-nav {
+		display: flex !important;
+	}
+
+	.dashboard-main {
+		padding: 16px;
+		padding-bottom: 80px;
+	}
+
+	:root {
+		--text-hero: 28px;
+		--text-xl: 22px;
+	}
+
+	.grid-stats {
+		grid-template-columns: repeat(2, 1fr) !important;
+		gap: 12px;
+	}
+
+	.stat-network {
+		grid-column: 1 / -1 !important;
+	}
+
+	.network-full {
+		display: block !important;
+		grid-column: 1 / -1;
+	}
+
+	.grid-main {
+		grid-template-columns: 1fr !important;
+	}
+
+	header {
+		padding: 0 12px !important;
+	}
+
+	.topbar-balance {
+		display: none !important;
+	}
+
+	.topbar-signout {
+		display: none !important;
+	}
 }

@@ -9,6 +9,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { PortfolioChart } from '@/components/dashboard/PortfolioChart'
 import { PositionRow } from '@/components/dashboard/PositionRow'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
+import { generateSparkData } from '@/components/ui/Sparkline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
 
@@ -26,6 +27,7 @@ export default function PortfolioPage() {
 	if (!isConnected) {
 		return (
 			<div
+				className='fade-in'
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
@@ -64,7 +66,6 @@ export default function PortfolioPage() {
 	if (isLoading) {
 		return (
 			<div className='fade-in'>
-				{/* Hero skeleton */}
 				<div className='card' style={{ padding: 28, marginBottom: 16 }}>
 					<div
 						className='skeleton'
@@ -79,7 +80,6 @@ export default function PortfolioPage() {
 						style={{ height: 22, width: 80, borderRadius: 20 }}
 					/>
 				</div>
-				{/* Secondary skeletons */}
 				<div
 					style={{
 						display: 'grid',
@@ -93,7 +93,11 @@ export default function PortfolioPage() {
 					))}
 				</div>
 				<div
-					style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}
+					style={{
+						display: 'grid',
+						gridTemplateColumns: '2fr 1fr',
+						gap: 16,
+					}}
 				>
 					<SkeletonCard lines={4} />
 					<SkeletonCard lines={3} />
@@ -130,22 +134,29 @@ export default function PortfolioPage() {
 
 	const protocolCount = new Set(positions.map(p => p.protocol)).size
 
+	// Sparkline data — deterministic based on wallet address seed
+	const portfolioSpark = generateSparkData(`${address}-total`, 7)
+	const apySpark = generateSparkData(`${address}-apy`, 7)
+
 	return (
 		<div className='fade-in'>
 			{/* ─── Hero block ──────────────────────── */}
 			<div
-				className='card'
+				className='card stagger-1'
 				style={{
 					padding: 28,
 					marginBottom: 16,
-					background: 'linear-gradient(135deg, #16161f 0%, #1a1a2e 100%)',
+					background:
+						'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elevated) 100%)',
 					boxShadow: `var(--shadow-card), var(--shadow-glow-blue)`,
+					position: 'relative',
+					overflow: 'hidden',
 				}}
 			>
 				{/* Accent top line */}
 				<div
 					style={{
-						position: 'absolute' as const,
+						position: 'absolute',
 						top: 0,
 						left: 0,
 						right: 0,
@@ -155,6 +166,46 @@ export default function PortfolioPage() {
 					}}
 				/>
 
+				{/* Subtle background sparkline watermark */}
+				<div
+					style={{
+						position: 'absolute',
+						right: 20,
+						bottom: 12,
+						opacity: 0.12,
+						pointerEvents: 'none',
+					}}
+				>
+					{/* Large decorative sparkline */}
+					<svg width='180' height='64' viewBox='0 0 180 64'>
+						{portfolioSpark.length >= 2 &&
+							(() => {
+								const min = Math.min(...portfolioSpark)
+								const max = Math.max(...portfolioSpark)
+								const range = max - min || 1
+								const pts = portfolioSpark.map((v, i) => ({
+									x: (i / (portfolioSpark.length - 1)) * 180,
+									y: 64 - ((v - min) / range) * 56,
+								}))
+								const path = pts.reduce((acc, pt, i) => {
+									if (i === 0) return `M ${pt.x} ${pt.y}`
+									const prev = pts[i - 1]
+									const cx = (prev.x + pt.x) / 2
+									return `${acc} C ${cx} ${prev.y}, ${cx} ${pt.y}, ${pt.x} ${pt.y}`
+								}, '')
+								return (
+									<path
+										d={path}
+										fill='none'
+										stroke='var(--accent-blue)'
+										strokeWidth='2'
+										strokeLinecap='round'
+									/>
+								)
+							})()}
+					</svg>
+				</div>
+
 				<div
 					style={{
 						display: 'flex',
@@ -163,7 +214,6 @@ export default function PortfolioPage() {
 					}}
 				>
 					<div>
-						{/* Label */}
 						<p
 							style={{
 								fontSize: 'var(--text-2xs)',
@@ -192,7 +242,6 @@ export default function PortfolioPage() {
 							{formatUSD(totalValue)}
 						</p>
 
-						{/* Trend badge */}
 						<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 							<TrendBadge value={change} suffix='24h' size='md' />
 							<span
@@ -234,38 +283,43 @@ export default function PortfolioPage() {
 			</div>
 
 			{/* ─── Secondary stats ─────────────────────────────────────────────── */}
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(3, 1fr)',
-					gap: 12,
-					marginBottom: 16,
-				}}
-			>
-				<Tooltip content='Number of open DeFi positions'>
-					<StatCard
-						label='Open positions'
-						value={positions.length.toString()}
-						subValue={`${protocolCount} protocol${protocolCount !== 1 ? 's' : ''}`}
-					/>
-				</Tooltip>
+			<div className='grid-stats'>
+				<div className='stat-card-wrapper'>
+					<Tooltip content='Number of open DeFi positions'>
+						<StatCard
+							label='Open positions'
+							value={positions.length.toString()}
+							subValue={`${protocolCount} protocol${protocolCount !== 1 ? 's' : ''}`}
+						/>
+					</Tooltip>
+				</div>
 
-				<Tooltip content='Best annual percentage yield among your positions'>
-					<StatCard
-						label='Best APY'
-						value={bestAPY > 0 ? `${bestAPY.toFixed(2)}%` : '—'}
-						trend={bestAPY > 5 ? 'up' : bestAPY > 0 ? 'neutral' : 'neutral'}
-						accent={bestAPY > 5 ? 'green' : undefined}
-					/>
-				</Tooltip>
+				<div className='stat-card-wrapper'>
+					<Tooltip content='Best annual percentage yield among your positions'>
+						<StatCard
+							label='Best APY'
+							value={bestAPY > 0 ? `${bestAPY.toFixed(2)}%` : '—'}
+							trend={bestAPY > 5 ? 'up' : 'neutral'}
+							accent={bestAPY > 5 ? 'green' : undefined}
+							sparkData={bestAPY > 0 ? apySpark : undefined}
+						/>
+					</Tooltip>
+				</div>
 
-				<Tooltip content='Current network'>
-					<StatCard label='Network' value='Ethereum' subValue='Mainnet' />
-				</Tooltip>
+				<div className='stat-card-wrapper stat-network'>
+					<Tooltip content='Current network'>
+						<StatCard
+							label='Network'
+							value='Ethereum'
+							subValue='Mainnet'
+							sparkData={portfolioSpark}
+						/>
+					</Tooltip>
+				</div>
 			</div>
 
 			{/* ─── Main content ────────────────────────────────────────────────── */}
-			<div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16 }}>
+			<div className='grid-main stagger-5'>
 				{/* Positions list */}
 				<div className='card' style={{ padding: 20 }}>
 					<div
@@ -305,8 +359,8 @@ export default function PortfolioPage() {
 							description='Start by supplying assets to Aave or adding liquidity on Uniswap'
 						/>
 					) : (
-						positions.map(position => (
-							<PositionRow key={position.id} position={position} />
+						positions.map((position, i) => (
+							<PositionRow key={position.id} position={position} index={i} />
 						))
 					)}
 				</div>

@@ -42,12 +42,12 @@ export const wagmiConfig = createConfig({
 	chains: [mainnet, arbitrum, base, optimism, polygon, sepolia],
 
 	transports: {
-		[mainnet.id]: http(`https://mainnet.infura.io/v3/${INFURA}`),
-		[arbitrum.id]: http(`https://arbitrum-mainnet.infura.io/v3/${INFURA}`),
-		[base.id]: http(`https://base-mainnet.infura.io/v3/${INFURA}`),
-		[optimism.id]: http(`https://optimism-mainnet.infura.io/v3/${INFURA}`),
-		[polygon.id]: http(`https://polygon-mainnet.infura.io/v3/${INFURA}`),
-		[sepolia.id]: http(`https://sepolia.infura.io/v3/${INFURA}`),
+		1: http(`https://mainnet.infura.io/v3/${INFURA}`),
+		42161: http(`https://arbitrum-mainnet.infura.io/v3/${INFURA}`),
+		8453: http(`https://base-mainnet.infura.io/v3/${INFURA}`),
+		10: http(`https://optimism-mainnet.infura.io/v3/${INFURA}`),
+		137: http(`https://polygon-mainnet.infura.io/v3/${INFURA}`),
+		11155111: http(`https://sepolia.infura.io/v3/${INFURA}`),
 	},
 
 	ssr: true,

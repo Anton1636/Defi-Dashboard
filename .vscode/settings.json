@@ -9,6 +9,7 @@
 		"libc",
 		"NEXTAUTH",
 		"nosniff",
-		"partialize"
+		"partialize",
+		"Sparkline"
 	]
 }

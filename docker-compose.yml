@@ -6,6 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development
+      args:
+        - NEXT_PUBLIC_USE_MOCK_DATA=true
+        - NEXT_PUBLIC_INFURA_API_KEY=${NEXT_PUBLIC_INFURA_API_KEY}
+        - NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID=${NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID}
     container_name: defi_app
     ports:
       - '3000:3000'
@@ -15,6 +19,8 @@ services:
       - /app/.next
     env_file:
       - .env.local
+    environment:
+      - NEXT_PUBLIC_USE_MOCK_DATA=true
     depends_on:
       db:
         condition: service_healthy

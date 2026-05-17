@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { mainnet } from 'viem/chains'
 import { getChainConfig, type ChainConfig } from '@/lib/chains'
+
+const MAINNET_ID = 1
 
 interface ChainState {
 	activeChainId: number
@@ -19,8 +20,8 @@ interface ChainState {
 export const useChainStore = create<ChainState>()(
 	persist(
 		(set, get) => ({
-			activeChainId: mainnet.id,
-			chainConfig: getChainConfig(mainnet.id),
+			activeChainId: MAINNET_ID,
+			chainConfig: getChainConfig(MAINNET_ID),
 			portfolioByChain: {},
 
 			setActiveChain: chainId => {
