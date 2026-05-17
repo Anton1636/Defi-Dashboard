@@ -5,10 +5,15 @@ import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { PriceTicker } from '@/components/ui/PriceTicker'
 import { useWallet } from '@/hooks/useWallet'
+import { useENS } from '@/hooks/useENS'
+import { shortAddress } from '@/lib/ens'
 import { ChainSelector } from './ChainSelector'
 
 export function TopBar() {
 	const { address, ethBalance, isLoadingBalance } = useWallet()
+	const { name: ensName, avatar: ensAvatar } = useENS(address)
+
+	const displayName = ensName ?? (address ? shortAddress(address) : null)
 
 	return (
 		<header
@@ -28,7 +33,7 @@ export function TopBar() {
 				transition: 'background 0.25s ease',
 			}}
 		>
-			{/* Left — ETH balance + live ETH price */}
+			{/* Left */}
 			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 				{address && (
 					<div
@@ -43,22 +48,53 @@ export function TopBar() {
 							padding: '6px 12px',
 						}}
 					>
-						<span
-							style={{
-								width: 6,
-								height: 6,
-								borderRadius: '50%',
-								background: 'var(--accent-green)',
-								boxShadow: '0 0 8px var(--accent-green)',
-								display: 'inline-block',
-								animation: 'pulse 2s infinite',
-								flexShrink: 0,
-							}}
-						/>
+						{ensAvatar ? (
+							// eslint-disable-next-line @next/next/no-img-element
+							<img
+								src={ensAvatar}
+								alt={ensName ?? address}
+								width={18}
+								height={18}
+								style={{
+									width: 18,
+									height: 18,
+									borderRadius: '50%',
+									objectFit: 'cover',
+									flexShrink: 0,
+								}}
+							/>
+						) : (
+							<span
+								style={{
+									width: 6,
+									height: 6,
+									borderRadius: '50%',
+									background: 'var(--accent-green)',
+									boxShadow: '0 0 8px var(--accent-green)',
+									display: 'inline-block',
+									animation: 'pulse 2s infinite',
+									flexShrink: 0,
+								}}
+							/>
+						)}
 						<span
 							style={{
 								fontSize: 13,
-								color: 'var(--text-secondary)',
+								color: ensName
+									? 'var(--text-primary)'
+									: 'var(--text-secondary)',
+								fontFamily: ensName ? 'inherit' : 'monospace',
+								fontWeight: ensName ? 500 : 400,
+							}}
+						>
+							{displayName}
+						</span>
+						<span
+							style={{
+								fontSize: 12,
+								color: 'var(--text-tertiary)',
+								borderLeft: '1px solid var(--border-primary)',
+								paddingLeft: 8,
 								fontFamily: 'monospace',
 							}}
 						>
@@ -92,7 +128,7 @@ export function TopBar() {
 				</div>
 			</div>
 
-			{/* Right — controls */}
+			{/* Right */}
 			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 				<ThemeToggle />
 				{address && <ChainSelector />}
@@ -103,7 +139,7 @@ export function TopBar() {
 				/>
 				<button
 					className='topbar-signout'
-					onClick={() => signOut({ callbackUrl: '/login' })}
+					onClick={() => signOut({ callbackUrl: '/' })}
 					style={{
 						fontSize: 13,
 						color: 'var(--text-tertiary)',

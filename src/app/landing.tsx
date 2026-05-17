@@ -2,6 +2,10 @@
 
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
+import { useWallet } from '@/hooks/useWallet'
+import { useENS } from '@/hooks/useENS'
+import { shortAddress } from '@/lib/ens'
+import { PriceTicker } from '@/components/ui/PriceTicker'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { PriceProvider } from '@/components/providers/PriceProvider'
 import PortfolioPage from '@/app/(dashboard)/portfolio/page'
@@ -51,6 +55,8 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 	const [activeTab, setActiveTab] = useState<Tab>('home')
 	const { data: session, status } = useSession()
 	const isLoggedIn = status === 'authenticated' && !!session
+	const { address } = useWallet()
+	const { name: ensName } = useENS(address)
 
 	return (
 		<div
@@ -81,6 +87,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 					gap: 16,
 				}}
 			>
+				{/* Logo */}
 				<div
 					onClick={() => setActiveTab('home')}
 					style={{
@@ -165,24 +172,96 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 				{status === 'loading' ? (
 					<div style={{ width: 100 }} />
 				) : isLoggedIn ? (
-					<button
-						onClick={() => setActiveTab('home')}
+					<div
 						style={{
-							background:
-								activeTab === 'home' ? 'var(--bg-elevated)' : 'transparent',
-							color: 'var(--text-tertiary)',
-							border: '1px solid var(--border-primary)',
-							borderRadius: 10,
-							padding: '7px 16px',
-							fontSize: 13,
-							fontWeight: 500,
-							cursor: 'pointer',
-							transition: 'all 0.15s',
+							display: 'flex',
+							alignItems: 'center',
+							gap: 8,
 							flexShrink: 0,
 						}}
 					>
-						Home
-					</button>
+						{/* ETH price */}
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								gap: 6,
+								background: 'var(--bg-elevated)',
+								border: '1px solid var(--border-primary)',
+								borderRadius: 10,
+								padding: '6px 12px',
+							}}
+						>
+							<span
+								style={{
+									fontSize: 12,
+									color: 'var(--text-tertiary)',
+									fontWeight: 500,
+								}}
+							>
+								ETH
+							</span>
+							<PriceTicker symbol='ETH' showChange size='sm' />
+						</div>
+
+						{/* ENS / address */}
+						{address && (
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									gap: 6,
+									background: 'var(--bg-elevated)',
+									border: '1px solid var(--border-primary)',
+									borderRadius: 10,
+									padding: '6px 12px',
+								}}
+							>
+								<span
+									style={{
+										width: 6,
+										height: 6,
+										borderRadius: '50%',
+										background: 'var(--accent-green)',
+										boxShadow: '0 0 8px var(--accent-green)',
+										display: 'inline-block',
+										animation: 'pulse 2s infinite',
+										flexShrink: 0,
+									}}
+								/>
+								<span
+									style={{
+										fontSize: 12,
+										color: 'var(--text-secondary)',
+										fontFamily: ensName ? 'inherit' : 'monospace',
+										fontWeight: ensName ? 500 : 400,
+									}}
+								>
+									{ensName ?? shortAddress(address)}
+								</span>
+							</div>
+						)}
+
+						{/* Home button */}
+						<button
+							onClick={() => setActiveTab('home')}
+							style={{
+								background:
+									activeTab === 'home' ? 'var(--bg-elevated)' : 'transparent',
+								color: 'var(--text-tertiary)',
+								border: '1px solid var(--border-primary)',
+								borderRadius: 10,
+								padding: '7px 16px',
+								fontSize: 13,
+								fontWeight: 500,
+								cursor: 'pointer',
+								transition: 'all 0.15s',
+								flexShrink: 0,
+							}}
+						>
+							Home
+						</button>
+					</div>
 				) : (
 					<button
 						onClick={() => setModalOpen(true)}
@@ -215,13 +294,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 
 			{/* ─── Content ──────────────────────────────────────────────────── */}
 			{activeTab !== 'home' ? (
-				<div
-					style={{
-						maxWidth: 1200,
-						margin: '0 auto',
-						padding: '32px 24px',
-					}}
-				>
+				<div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
 					{activeTab === 'portfolio' && <PortfolioPage />}
 					{activeTab === 'positions' && <PositionsPage />}
 					{activeTab === 'analytics' && <AnalyticsPage />}
