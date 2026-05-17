@@ -11,8 +11,6 @@ import { getCorsHeaders, isPreflightRequest } from '../src/lib/security/cors'
 
 const { auth } = NextAuth(authConfig)
 
-// Отримуємо реальний IP клієнта.
-// За reverse proxy (Vercel, Cloudflare) IP є в x-forwarded-for заголовку.
 function getClientIp(request: NextRequest): string {
 	return (
 		request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
@@ -28,7 +26,7 @@ export default auth(async req => {
 	// ─── CORS ────────────────────────────────────────────────────────────────────
 	const corsHeaders = getCorsHeaders(req)
 
-	// Preflight запит — відповідаємо одразу без подальшої обробки
+	// Preflight request - answer with CORS headers and no body
 	if (isPreflightRequest(req)) {
 		return new NextResponse(null, {
 			status: 204, // No Content
@@ -40,17 +38,17 @@ export default auth(async req => {
 	let rateLimitResult
 
 	if (pathname.startsWith('/api/auth')) {
-		// Auth endpoints — найсуворіший ліміт (захист від брутфорсу паролів)
+		// Auth endpoints — limit by IP to prevent brute-force attacks
 		rateLimitResult = authRateLimit(ip)
 	} else if (pathname.startsWith('/api/graphql')) {
-		// GraphQL — середній ліміт
+		// GraphQL — mid limit
 		rateLimitResult = graphqlRateLimit(ip)
 	} else if (pathname.startsWith('/api')) {
-		// Інші API endpoints
+		// Another API endpoints
 		rateLimitResult = apiRateLimit(ip)
 	}
 
-	// Якщо ліміт перевищено — повертаємо 429 Too Many Requests
+	// If rate limit exceeded, return 429 Too Many Requests
 	if (rateLimitResult && !rateLimitResult.success) {
 		return new NextResponse(
 			JSON.stringify({
@@ -61,8 +59,8 @@ export default auth(async req => {
 				status: 429,
 				headers: {
 					'Content-Type': 'application/json',
-					// Стандартні заголовки для rate limiting
-					// Клієнт знає коли можна повторити запит
+					// Standard headers for rate limiting
+					// Client knows when they can retry the request
 					'X-RateLimit-Remaining': '0',
 					'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
 					'Retry-After': Math.ceil(
@@ -84,8 +82,8 @@ export default auth(async req => {
 	const isAuthOnly = AUTH_ONLY.some(p => pathname.startsWith(p))
 
 	if (isProtected && !isAuthenticated) {
-		const url = new URL('/login', req.url)
-		url.searchParams.set('callbackUrl', pathname)
+		const url = new URL('/', req.url)
+		url.searchParams.set('modal', 'signin')
 		return NextResponse.redirect(url)
 	}
 
@@ -93,14 +91,13 @@ export default auth(async req => {
 		return NextResponse.redirect(new URL('/portfolio', req.url))
 	}
 
-	// ─── Додаємо CORS і security заголовки до відповіді ──────────────────────────
+	// ───  CORS and security  ──────────────────────────
 	const response = NextResponse.next()
 
 	Object.entries(corsHeaders).forEach(([key, value]) => {
 		response.headers.set(key, value)
 	})
 
-	// Додатковий захист — повідомляємо клієнту скільки запитів залишилось
 	if (rateLimitResult) {
 		response.headers.set(
 			'X-RateLimit-Remaining',
@@ -121,7 +118,6 @@ export const config = {
 		'/positions/:path*',
 		'/analytics/:path*',
 		'/ai-insights/:path*',
-		'/login',
 		'/api/:path*',
 	],
 }

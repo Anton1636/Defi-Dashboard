@@ -419,3 +419,23 @@ body {
 		display: none !important;
 	}
 }
+
+@keyframes modalIn {
+	from {
+		opacity: 0;
+		transform: translate(-50%, calc(-50% + 16px));
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%);
+	}
+}
+
+@media (max-width: 768px) {
+	.landing-stats {
+		grid-template-columns: 1fr !important;
+	}
+	.landing-features {
+		grid-template-columns: 1fr !important;
+	}
+}

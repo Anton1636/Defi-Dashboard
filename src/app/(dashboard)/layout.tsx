@@ -3,6 +3,7 @@ import { auth } from '../../../auth'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { MobileNav } from '@/components/layout/MobileNav'
+import { PriceProvider } from '@/components/providers/PriceProvider'
 
 export default async function DashboardLayout({
 	children,
@@ -20,6 +21,7 @@ export default async function DashboardLayout({
 				background: 'var(--bg-primary)',
 			}}
 		>
+			<PriceProvider />
 			<Sidebar />
 
 			<div
@@ -35,7 +37,6 @@ export default async function DashboardLayout({
 				<main className='dashboard-main'>{children}</main>
 			</div>
 
-			{/* Bottom nav — visible only on mobile via CSS */}
 			<MobileNav />
 		</div>
 	)

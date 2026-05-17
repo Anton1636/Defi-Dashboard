@@ -1,4 +1,5 @@
 import { Sparkline, generateSparkData } from '@/components/ui/Sparkline'
+import { PriceTicker } from '@/components/ui/PriceTicker'
 import type {
 	DeFiPosition,
 	UniswapPosition,
@@ -12,17 +13,24 @@ function formatUSD(value: number): string {
 	return `$${value.toFixed(2)}`
 }
 
-const PROTOCOL_STYLES: Record<
-	string,
-	{ color: string; glow: string; icon: string }
-> = {
-	uniswap: { color: 'var(--uniswap)', glow: 'var(--uniswap-glow)', icon: '🦄' },
-	aave: { color: 'var(--aave)', glow: 'var(--aave-glow)', icon: '👻' },
-	compound: {
-		color: 'var(--compound)',
-		glow: 'var(--compound-glow)',
-		icon: '🏦',
-	},
+function getPrimaryToken(position: DeFiPosition): string {
+	if (position.protocol === 'uniswap') {
+		return (position as UniswapPosition).token0.symbol
+	}
+	if (position.protocol === 'aave') {
+		const aave = position as AavePosition
+		return aave.supplies[0]?.symbol ?? 'ETH'
+	}
+	if (position.protocol === 'compound') {
+		return (position as CompoundPosition).market.replace('c', '').split('-')[0]
+	}
+	return 'ETH'
+}
+
+const PROTOCOL_STYLES: Record<string, { color: string; icon: string }> = {
+	uniswap: { color: 'var(--uniswap)', icon: '🦄' },
+	aave: { color: 'var(--aave)', icon: '👻' },
+	compound: { color: 'var(--compound)', icon: '🏦' },
 }
 
 function UniswapDetails({ position }: { position: UniswapPosition }) {
@@ -88,9 +96,11 @@ interface PositionRowProps {
 export function PositionRow({ position, index = 0 }: PositionRowProps) {
 	const style = PROTOCOL_STYLES[position.protocol]
 	const sparkData = generateSparkData(`${position.id}-7d`, 7)
+	const primaryToken = getPrimaryToken(position)
 
 	return (
 		<div
+			className='slide-in'
 			style={{
 				display: 'flex',
 				alignItems: 'center',
@@ -102,7 +112,6 @@ export function PositionRow({ position, index = 0 }: PositionRowProps) {
 				gap: 12,
 				animationDelay: `${index * 0.06}s`,
 			}}
-			className='slide-in'
 			onMouseEnter={e => {
 				e.currentTarget.style.background = 'var(--bg-elevated)'
 				e.currentTarget.style.margin = '0 -20px'
@@ -116,8 +125,16 @@ export function PositionRow({ position, index = 0 }: PositionRowProps) {
 				e.currentTarget.style.borderRadius = '0'
 			}}
 		>
-			{/* Left — protocol icon + name + value */}
-			<div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
+			{/* Left — icon + protocol + value */}
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					gap: 12,
+					flex: 1,
+					minWidth: 0,
+				}}
+			>
 				<div
 					style={{
 						width: 36,
@@ -134,7 +151,7 @@ export function PositionRow({ position, index = 0 }: PositionRowProps) {
 				>
 					{style?.icon}
 				</div>
-				<div>
+				<div style={{ minWidth: 0 }}>
 					<p
 						style={{
 							fontSize: 13,
@@ -145,15 +162,19 @@ export function PositionRow({ position, index = 0 }: PositionRowProps) {
 						{position.protocol.charAt(0).toUpperCase() +
 							position.protocol.slice(1)}
 					</p>
-					<p
-						style={{
-							fontSize: 13,
-							fontWeight: 600,
-							color: 'var(--text-primary)',
-						}}
-					>
-						{formatUSD(position.valueUSD)}
-					</p>
+					<div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+						<p
+							style={{
+								fontSize: 13,
+								fontWeight: 600,
+								color: 'var(--text-primary)',
+							}}
+						>
+							{formatUSD(position.valueUSD)}
+						</p>
+						{/* Live price */}
+						<PriceTicker symbol={primaryToken} showChange={false} size='sm' />
+					</div>
 				</div>
 			</div>
 

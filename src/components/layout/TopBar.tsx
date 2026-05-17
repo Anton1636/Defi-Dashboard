@@ -3,6 +3,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { PriceTicker } from '@/components/ui/PriceTicker'
 import { useWallet } from '@/hooks/useWallet'
 import { ChainSelector } from './ChainSelector'
 
@@ -27,8 +28,8 @@ export function TopBar() {
 				transition: 'background 0.25s ease',
 			}}
 		>
-			{/* Left — ETH balance pill */}
-			<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+			{/* Left — ETH balance + live ETH price */}
+			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 				{address && (
 					<div
 						className='topbar-balance'
@@ -40,7 +41,6 @@ export function TopBar() {
 							border: '1px solid var(--border-primary)',
 							borderRadius: 10,
 							padding: '6px 12px',
-							transition: 'background 0.25s ease, border-color 0.25s ease',
 						}}
 					>
 						<span
@@ -66,22 +66,41 @@ export function TopBar() {
 						</span>
 					</div>
 				)}
+
+				{/* Live ETH price */}
+				<div
+					style={{
+						display: 'flex',
+						alignItems: 'center',
+						gap: 6,
+						background: 'var(--bg-elevated)',
+						border: '1px solid var(--border-primary)',
+						borderRadius: 10,
+						padding: '6px 12px',
+					}}
+				>
+					<span
+						style={{
+							fontSize: 12,
+							color: 'var(--text-tertiary)',
+							fontWeight: 500,
+						}}
+					>
+						ETH
+					</span>
+					<PriceTicker symbol='ETH' showChange size='sm' />
+				</div>
 			</div>
 
 			{/* Right — controls */}
 			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-				{/* Theme toggle */}
 				<ThemeToggle />
-
-				{/* Chain selector — only if connected */}
 				{address && <ChainSelector />}
-
 				<ConnectButton
 					showBalance={false}
 					accountStatus='avatar'
 					chainStatus='none'
 				/>
-
 				<button
 					className='topbar-signout'
 					onClick={() => signOut({ callbackUrl: '/login' })}
