@@ -1,3 +1,6 @@
+'use client'
+
+import { useModeStore } from '@/store/modeStore'
 import type { AavePosition } from '@/types'
 
 function formatUSD(v: number) {
@@ -6,6 +9,9 @@ function formatUSD(v: number) {
 }
 
 export function AaveCard({ position }: { position: AavePosition }) {
+	const { mode } = useModeStore()
+	const isSimple = mode === 'simple'
+
 	const hfColor =
 		position.healthFactor > 2
 			? 'var(--accent-green)'
@@ -20,14 +26,16 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				? 'rgba(245, 158, 11, 0.1)'
 				: 'rgba(239, 68, 68, 0.1)'
 
-	const hfBarColor =
-		position.healthFactor > 2
-			? 'var(--accent-green)'
-			: position.healthFactor > 1.5
-				? 'var(--accent-amber)'
-				: 'var(--accent-red)'
-
 	const hfPercent = Math.min((position.healthFactor / 3) * 100, 100)
+
+	// Simple mode labels
+	const hfLabel = isSimple
+		? position.healthFactor > 2
+			? '✅ Very safe'
+			: position.healthFactor > 1.5
+				? '⚠️ Monitor closely'
+				: '🚨 At risk!'
+		: `HF: ${position.healthFactor.toFixed(2)}`
 
 	return (
 		<div
@@ -78,10 +86,12 @@ export function AaveCard({ position }: { position: AavePosition }) {
 								fontSize: '14px',
 							}}
 						>
-							Aave V3
+							{isSimple ? 'Aave — Lending & Borrowing' : 'Aave V3'}
 						</p>
 						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-							Lending · Ethereum
+							{isSimple
+								? 'You lend crypto and earn interest'
+								: 'Lending · Ethereum'}
 						</p>
 					</div>
 				</div>
@@ -95,7 +105,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 						color: hfColor,
 					}}
 				>
-					HF: {position.healthFactor.toFixed(2)}
+					{hfLabel}
 				</span>
 			</div>
 
@@ -110,7 +120,9 @@ export function AaveCard({ position }: { position: AavePosition }) {
 						marginBottom: '6px',
 					}}
 				>
-					<span>Health factor</span>
+					<span>
+						{isSimple ? 'Safety buffer — higher is better' : 'Health factor'}
+					</span>
 					<span
 						style={{
 							color:
@@ -119,7 +131,13 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									: 'var(--text-tertiary)',
 						}}
 					>
-						{position.healthFactor < 1.5 ? '⚠ Liquidation risk' : 'Safe'}
+						{position.healthFactor < 1.5
+							? isSimple
+								? '🚨 Add more collateral!'
+								: '⚠ Liquidation risk'
+							: isSimple
+								? 'Safe zone'
+								: 'Safe'}
 					</span>
 				</div>
 				<div
@@ -134,9 +152,9 @@ export function AaveCard({ position }: { position: AavePosition }) {
 						style={{
 							height: '100%',
 							width: `${hfPercent}%`,
-							background: hfBarColor,
+							background: hfColor,
 							borderRadius: '2px',
-							boxShadow: `0 0 8px ${hfBarColor}`,
+							boxShadow: `0 0 8px ${hfColor}`,
 							transition: 'width 0.4s ease',
 						}}
 					/>
@@ -154,17 +172,17 @@ export function AaveCard({ position }: { position: AavePosition }) {
 			>
 				{[
 					{
-						label: 'Net worth',
+						label: isSimple ? 'Your profit' : 'Net worth',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: 'Collateral',
+						label: isSimple ? 'You put in' : 'Collateral',
 						value: formatUSD(position.totalCollateralUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: 'Debt',
+						label: isSimple ? 'You owe' : 'Debt',
 						value: formatUSD(position.totalDebtUSD),
 						color: 'var(--accent-red)',
 					},
@@ -204,7 +222,9 @@ export function AaveCard({ position }: { position: AavePosition }) {
 							marginBottom: '8px',
 						}}
 					>
-						SUPPLIED
+						{isSimple
+							? "💰 MONEY YOU'RE LENDING (EARNING INTEREST)"
+							: 'SUPPLIED'}
 					</p>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
 						{position.supplies.map(s => (
@@ -244,7 +264,9 @@ export function AaveCard({ position }: { position: AavePosition }) {
 											fontWeight: 500,
 										}}
 									>
-										{s.apy.toFixed(2)}% APY
+										{isSimple
+											? `+${s.apy.toFixed(2)}% yearly`
+											: `${s.apy.toFixed(2)}% APY`}
 									</span>
 								</div>
 							</div>
@@ -264,7 +286,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 							marginBottom: '8px',
 						}}
 					>
-						BORROWED
+						{isSimple ? '📤 MONEY YOU BORROWED (PAYING INTEREST)' : 'BORROWED'}
 					</p>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
 						{position.borrows.map(b => (
@@ -304,7 +326,9 @@ export function AaveCard({ position }: { position: AavePosition }) {
 											fontWeight: 500,
 										}}
 									>
-										{b.apy.toFixed(2)}% APR
+										{isSimple
+											? `-${b.apy.toFixed(2)}% yearly`
+											: `${b.apy.toFixed(2)}% APR`}
 									</span>
 								</div>
 							</div>

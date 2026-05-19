@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { useAI } from '@/hooks/useAI'
 import { useWallet } from '@/hooks/useWallet'
+import { useMode } from '@/hooks/useMode'
+import { ModeToggle } from '@/components/ui/ModeToggle'
 import { StreamingText } from '@/components/ai/StreamingText'
 import { AnalysisCard } from '@/components/ai/AnalysisCard'
 import { QuestionInput } from '@/components/ai/QuestionInput'
@@ -26,6 +28,8 @@ export default function AIInsightsPage() {
 			fetchHistory()
 		}
 	}, [isConnected, fetchHistory])
+
+	const { isSimple } = useMode()
 
 	if (!isConnected) {
 		return (
@@ -106,6 +110,7 @@ export default function AIInsightsPage() {
 						</p>
 					</div>
 				</div>
+				<ModeToggle />
 			</div>
 
 			{/* Analyze button */}
@@ -142,7 +147,13 @@ export default function AIInsightsPage() {
 						</p>
 					</div>
 					<button
-						onClick={() => analyze()}
+						onClick={() =>
+							analyze(
+								isSimple
+									? "Explain my portfolio in simple terms, like I'm new to DeFi. No technical jargon. Use analogies."
+									: undefined,
+							)
+						}
 						disabled={!canAnalyze}
 						style={{
 							padding: '10px 20px',

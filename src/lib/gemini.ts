@@ -121,3 +121,21 @@ Please answer the user's specific question based on their portfolio data above.`
 Keep total response under 400 words. Use **bold** for important terms.`
 }`
 }
+
+export function buildSmartInsightPrompt(
+	positions: DeFiPosition[],
+	totalValueUSD: number,
+): string {
+	const positionsText = formatPositionsForPrompt(positions)
+
+	return `You are a DeFi risk monitor. Analyze this portfolio and give ONE key insight.
+
+PORTFOLIO: $${totalValueUSD.toFixed(2)} total, ${positions.length} positions
+${positionsText}
+
+Respond in exactly 2 sentences:
+1. The single most important risk or opportunity right now
+2. One specific action to take
+
+Be direct, use numbers. No markdown, no bullet points.`
+}

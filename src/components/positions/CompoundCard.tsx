@@ -1,3 +1,6 @@
+'use client'
+
+import { useModeStore } from '@/store/modeStore'
 import type { CompoundPosition } from '@/types'
 
 function formatUSD(v: number) {
@@ -6,6 +9,9 @@ function formatUSD(v: number) {
 }
 
 export function CompoundCard({ position }: { position: CompoundPosition }) {
+	const { mode } = useModeStore()
+	const isSimple = mode === 'simple'
+
 	const utilizationRate =
 		position.supplied > 0 ? (position.borrowed / position.supplied) * 100 : 0
 
@@ -58,10 +64,14 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 								fontSize: '14px',
 							}}
 						>
-							Compound V3 · {position.market}
+							{isSimple
+								? `Compound — ${position.market} savings`
+								: `Compound V3 · ${position.market}`}
 						</p>
 						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-							Money market · Ethereum
+							{isSimple
+								? 'Like a savings account but on blockchain'
+								: 'Money market · Ethereum'}
 						</p>
 					</div>
 				</div>
@@ -75,7 +85,9 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 						color: 'var(--compound)',
 					}}
 				>
-					{position.supplyAPR.toFixed(2)}% APR
+					{isSimple
+						? `Earning ${position.supplyAPR.toFixed(2)}%/yr`
+						: `${position.supplyAPR.toFixed(2)}% APR`}
 				</span>
 			</div>
 
@@ -90,17 +102,17 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 			>
 				{[
 					{
-						label: 'Net value',
+						label: isSimple ? 'Net value' : 'Net value',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: 'Supplied',
+						label: isSimple ? 'You deposited' : 'Supplied',
 						value: formatUSD(position.supplied),
 						color: 'var(--compound)',
 					},
 					{
-						label: 'Borrowed',
+						label: isSimple ? 'You borrowed' : 'Borrowed',
 						value: position.borrowed > 0 ? formatUSD(position.borrowed) : '—',
 						color: 'var(--text-secondary)',
 					},
@@ -147,7 +159,7 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 							marginBottom: '4px',
 						}}
 					>
-						Supply APR
+						{isSimple ? 'Interest you earn' : 'Supply APR'}
 					</p>
 					<p
 						style={{
@@ -174,7 +186,7 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 							marginBottom: '4px',
 						}}
 					>
-						Borrow APR
+						{isSimple ? 'Interest you pay' : 'Borrow APR'}
 					</p>
 					<p
 						style={{
@@ -186,7 +198,7 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 						{position.borrowAPR.toFixed(2)}%
 					</p>
 				</div>
-				{utilizationRate > 0 && (
+				{!isSimple && utilizationRate > 0 && (
 					<div
 						style={{
 							flex: 1,

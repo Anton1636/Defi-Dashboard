@@ -12,6 +12,7 @@ import PortfolioPage from '@/app/(dashboard)/portfolio/page'
 import PositionsPage from '@/app/(dashboard)/positions/page'
 import AnalyticsPage from '@/app/(dashboard)/analytics/page'
 import AIInsightsPage from '@/app/(dashboard)/ai-insights/page'
+import { ModeToggle } from '@/components/ui/ModeToggle'
 
 type Tab = 'home' | 'portfolio' | 'positions' | 'analytics' | 'ai-insights'
 
@@ -180,6 +181,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							flexShrink: 0,
 						}}
 					>
+						<ModeToggle />
 						{/* ETH price */}
 						<div
 							style={{

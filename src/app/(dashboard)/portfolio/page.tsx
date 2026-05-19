@@ -2,6 +2,7 @@
 
 import { usePortfolio } from '@/hooks/usePortfolio'
 import { useWallet } from '@/hooks/useWallet'
+import { useSmartInsights } from '@/hooks/useSmartInsights'
 import { StatCard } from '@/components/ui/StatCard'
 import { TrendBadge } from '@/components/ui/TrendBadge'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -9,6 +10,7 @@ import { Tooltip } from '@/components/ui/Tooltip'
 import { PortfolioChart } from '@/components/dashboard/PortfolioChart'
 import { PositionRow } from '@/components/dashboard/PositionRow'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
+import { SmartInsightsBanner } from '@/components/dashboard/SmartInsightsBanner'
 import { generateSparkData } from '@/components/ui/Sparkline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
@@ -22,6 +24,12 @@ function formatUSD(value: number): string {
 export default function PortfolioPage() {
 	const { isConnected, address } = useWallet()
 	const { data: portfolio, isLoading, error, refetch } = usePortfolio()
+
+	const totalValue = portfolio?.totalValueUSD ?? 0
+	const change = portfolio?.change24hPercent ?? 0
+	const positions = portfolio?.positions ?? []
+
+	useSmartInsights(positions, totalValue)
 
 	// ─── Not connected ────────────────────────────────────────────────────────
 	if (!isConnected) {
@@ -118,10 +126,6 @@ export default function PortfolioPage() {
 		)
 	}
 
-	const totalValue = portfolio?.totalValueUSD ?? 0
-	const change = portfolio?.change24hPercent ?? 0
-	const positions = portfolio?.positions ?? []
-
 	const bestAPY = positions.reduce((best, pos) => {
 		const apy =
 			pos.protocol === 'aave'
@@ -140,6 +144,7 @@ export default function PortfolioPage() {
 
 	return (
 		<div className='fade-in'>
+			<SmartInsightsBanner />
 			{/* ─── Hero block ──────────────────────── */}
 			<div
 				className='card stagger-1'

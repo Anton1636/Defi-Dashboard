@@ -1,3 +1,6 @@
+'use client'
+
+import { useModeStore } from '@/store/modeStore'
 import type { UniswapPosition } from '@/types'
 
 function formatUSD(v: number) {
@@ -6,6 +9,9 @@ function formatUSD(v: number) {
 }
 
 export function UniswapCard({ position }: { position: UniswapPosition }) {
+	const { mode } = useModeStore()
+	const isSimple = mode === 'simple'
+
 	return (
 		<div
 			style={{
@@ -58,7 +64,9 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 							{position.token0.symbol}/{position.token1.symbol}
 						</p>
 						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-							Uniswap V3 · Ethereum
+							{isSimple
+								? 'Uniswap — you earn fees from trades'
+								: 'Uniswap V3 · Ethereum'}
 						</p>
 					</div>
 				</div>
@@ -78,9 +86,52 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 						border: `1px solid ${position.inRange ? 'var(--accent-green)44' : 'var(--accent-amber)44'}`,
 					}}
 				>
-					{position.inRange ? '● In range' : '○ Out of range'}
+					{isSimple
+						? position.inRange
+							? '✅ Earning fees'
+							: '⚠️ Not earning'
+						: position.inRange
+							? '● In range'
+							: '○ Out of range'}
 				</span>
 			</div>
+
+			{/* Simple mode explanation */}
+			{isSimple && !position.inRange && (
+				<div
+					style={{
+						background: 'rgba(245, 158, 11, 0.08)',
+						border: '1px solid rgba(245, 158, 11, 0.2)',
+						borderRadius: '8px',
+						padding: '10px 12px',
+						marginBottom: '12px',
+						fontSize: '12px',
+						color: 'var(--accent-amber)',
+					}}
+				>
+					{
+						"💡 Your price range is too narrow. The current price moved outside it, so you're not earning fees. Consider adjusting your range."
+					}
+				</div>
+			)}
+
+			{isSimple && position.inRange && (
+				<div
+					style={{
+						background: 'rgba(16, 185, 129, 0.06)',
+						border: '1px solid rgba(16, 185, 129, 0.15)',
+						borderRadius: '8px',
+						padding: '10px 12px',
+						marginBottom: '12px',
+						fontSize: '12px',
+						color: 'var(--accent-green)',
+					}}
+				>
+					{
+						"✅ Great! Traders are using your liquidity and you're collecting a small fee on every trade."
+					}
+				</div>
+			)}
 
 			{/* Stats */}
 			<div
@@ -93,20 +144,24 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 			>
 				{[
 					{
-						label: 'Position value',
+						label: isSimple ? 'Your money' : 'Position value',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: 'Fees earned',
+						label: isSimple ? 'Fees earned' : 'Fees earned',
 						value: formatUSD(position.feesEarned),
 						color: 'var(--accent-green)',
 					},
-					{
-						label: 'Pool ID',
-						value: position.poolId.slice(0, 8) + '...',
-						color: 'var(--text-tertiary)',
-					},
+					...(!isSimple
+						? [
+								{
+									label: 'Pool ID',
+									value: position.poolId.slice(0, 8) + '...',
+									color: 'var(--text-tertiary)',
+								},
+							]
+						: []),
 				].map(stat => (
 					<div
 						key={stat.label}
@@ -125,14 +180,7 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 						>
 							{stat.label}
 						</p>
-						<p
-							style={{
-								fontSize: '13px',
-								fontWeight: 600,
-								color: stat.color,
-								fontFamily: stat.label === 'Pool ID' ? 'monospace' : 'inherit',
-							}}
-						>
+						<p style={{ fontSize: '13px', fontWeight: 600, color: stat.color }}>
 							{stat.value}
 						</p>
 					</div>
@@ -152,7 +200,9 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 							fontSize: '12px',
 						}}
 					>
-						<span style={{ color: 'var(--text-tertiary)' }}>Token {i}: </span>
+						<span style={{ color: 'var(--text-tertiary)' }}>
+							{isSimple ? `Token ${i + 1}: ` : `Token ${i}: `}
+						</span>
 						<span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
 							{token.symbol}
 						</span>
