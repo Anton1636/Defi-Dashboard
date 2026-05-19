@@ -8,6 +8,7 @@ import { UniswapCard } from '@/components/positions/UniswapCard'
 import { AaveCard } from '@/components/positions/AaveCard'
 import { CompoundCard } from '@/components/positions/CompoundCard'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
+import { RiskScanner } from '@/components/risk/RiskScanner'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type {
 	DeFiPosition,
@@ -36,12 +37,33 @@ export default function PositionsPage() {
 
 	if (!isConnected) {
 		return (
-			<div className='flex flex-col items-center justify-center min-h-[60vh] gap-4'>
-				<div className='text-4xl'>⬡</div>
-				<h2 className='text-xl font-semibold text-gray-900'>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: '60vh',
+					gap: 16,
+				}}
+			>
+				<div style={{ fontSize: 48 }}>⬡</div>
+				<h2
+					style={{
+						fontSize: 20,
+						fontWeight: 600,
+						color: 'var(--text-primary)',
+					}}
+				>
 					Connect your wallet
 				</h2>
-				<p className='text-gray-500 text-sm mb-2'>
+				<p
+					style={{
+						fontSize: 14,
+						color: 'var(--text-secondary)',
+						marginBottom: 8,
+					}}
+				>
 					Connect to see your DeFi positions
 				</p>
 				<ConnectButton />
@@ -52,10 +74,10 @@ export default function PositionsPage() {
 	if (isLoading) {
 		return (
 			<div>
-				<div className='mb-6'>
+				<div style={{ marginBottom: 24 }}>
 					<h1
 						style={{
-							fontSize: '24px',
+							fontSize: 24,
 							fontWeight: 700,
 							color: 'var(--text-primary)',
 							letterSpacing: '-0.5px',
@@ -64,7 +86,13 @@ export default function PositionsPage() {
 						Positions
 					</h1>
 				</div>
-				<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+						gap: 16,
+					}}
+				>
 					{Array.from({ length: 3 }).map((_, i) => (
 						<SkeletonCard key={i} lines={4} />
 					))}
@@ -75,8 +103,17 @@ export default function PositionsPage() {
 
 	if (error) {
 		return (
-			<div className='flex flex-col items-center justify-center min-h-[60vh] gap-3'>
-				<p className='text-red-500 font-medium'>Failed to load positions</p>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					minHeight: '60vh',
+				}}
+			>
+				<p style={{ color: 'var(--accent-red)', fontWeight: 500 }}>
+					Failed to load positions
+				</p>
 			</div>
 		)
 	}
@@ -84,19 +121,27 @@ export default function PositionsPage() {
 	return (
 		<div>
 			{/* Header */}
-			<div className='flex items-center justify-between mb-6'>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: 24,
+				}}
+			>
 				<div>
 					<h1
 						style={{
-							fontSize: '24px',
+							fontSize: 24,
 							fontWeight: 700,
 							color: 'var(--text-primary)',
 							letterSpacing: '-0.5px',
+							marginBottom: 4,
 						}}
 					>
 						Positions
 					</h1>
-					<p className='text-gray-400 text-sm mt-0.5'>
+					<p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
 						{portfolio?.positions.length ?? 0} open positions across{' '}
 						{Object.values(counts).filter(Boolean).length} protocols
 					</p>
@@ -104,7 +149,7 @@ export default function PositionsPage() {
 			</div>
 
 			{/* Protocol filter */}
-			<div className='mb-6'>
+			<div style={{ marginBottom: 20 }}>
 				<ProtocolFilter
 					active={activeFilter}
 					counts={counts}
@@ -114,43 +159,58 @@ export default function PositionsPage() {
 
 			{/* Positions grid */}
 			{filtered.length === 0 ? (
-				<div className='flex flex-col items-center justify-center py-20 text-gray-300'>
-					<p className='text-4xl mb-3'>⬡</p>
-					<p className='text-sm text-gray-400'>
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						padding: '80px 0',
+						color: 'var(--text-tertiary)',
+					}}
+				>
+					<p style={{ fontSize: 36, marginBottom: 12 }}>⬡</p>
+					<p style={{ fontSize: 13 }}>
 						No {activeFilter === 'all' ? '' : activeFilter} positions found
 					</p>
 				</div>
 			) : (
-				<div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+						gap: 16,
+					}}
+				>
 					{filtered.map((position: DeFiPosition) => {
-						if (position.protocol === 'uniswap') {
+						if (position.protocol === 'uniswap')
 							return (
 								<UniswapCard
 									key={position.id}
 									position={position as UniswapPosition}
 								/>
 							)
-						}
-						if (position.protocol === 'aave') {
+						if (position.protocol === 'aave')
 							return (
 								<AaveCard
 									key={position.id}
 									position={position as AavePosition}
 								/>
 							)
-						}
-						if (position.protocol === 'compound') {
+						if (position.protocol === 'compound')
 							return (
 								<CompoundCard
 									key={position.id}
 									position={position as CompoundPosition}
 								/>
 							)
-						}
 						return null
 					})}
 				</div>
 			)}
+
+			{/* Risk Scanner */}
+			<RiskScanner />
 		</div>
 	)
 }
