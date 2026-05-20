@@ -14,6 +14,7 @@ import { SmartInsightsBanner } from '@/components/dashboard/SmartInsightsBanner'
 import { generateSparkData } from '@/components/ui/Sparkline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
+import { IdentityCard } from '@/components/identity/IdentityCard'
 
 function formatUSD(value: number): string {
 	if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`
@@ -28,6 +29,9 @@ export default function PortfolioPage() {
 	const totalValue = portfolio?.totalValueUSD ?? 0
 	const change = portfolio?.change24hPercent ?? 0
 	const positions = portfolio?.positions ?? []
+
+	const portfolioSpark = generateSparkData(`${address}-total`, 7)
+	const apySpark = generateSparkData(`${address}-apy`, 7)
 
 	useSmartInsights(positions, totalValue)
 
@@ -138,12 +142,10 @@ export default function PortfolioPage() {
 
 	const protocolCount = new Set(positions.map(p => p.protocol)).size
 
-	// Sparkline data — deterministic based on wallet address seed
-	const portfolioSpark = generateSparkData(`${address}-total`, 7)
-	const apySpark = generateSparkData(`${address}-apy`, 7)
-
 	return (
 		<div className='fade-in'>
+			<IdentityCard />
+
 			<SmartInsightsBanner />
 			{/* ─── Hero block ──────────────────────── */}
 			<div

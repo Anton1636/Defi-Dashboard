@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import { useWallet } from '@/hooks/useWallet'
 import { useENS } from '@/hooks/useENS'
@@ -8,11 +9,43 @@ import { shortAddress } from '@/lib/ens'
 import { PriceTicker } from '@/components/ui/PriceTicker'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { PriceProvider } from '@/components/providers/PriceProvider'
-import PortfolioPage from '@/app/(dashboard)/portfolio/page'
-import PositionsPage from '@/app/(dashboard)/positions/page'
-import AnalyticsPage from '@/app/(dashboard)/analytics/page'
-import AIInsightsPage from '@/app/(dashboard)/ai-insights/page'
 import { ModeToggle } from '@/components/ui/ModeToggle'
+
+const PortfolioPage = dynamic(
+	() => import('@/app/(dashboard)/portfolio/page'),
+	{
+		loading: () => (
+			<div className='skeleton' style={{ height: 400, borderRadius: 16 }} />
+		),
+	},
+)
+
+const PositionsPage = dynamic(
+	() => import('@/app/(dashboard)/positions/page'),
+	{
+		loading: () => (
+			<div className='skeleton' style={{ height: 400, borderRadius: 16 }} />
+		),
+	},
+)
+
+const AnalyticsPage = dynamic(
+	() => import('@/app/(dashboard)/analytics/page'),
+	{
+		loading: () => (
+			<div className='skeleton' style={{ height: 300, borderRadius: 16 }} />
+		),
+	},
+)
+
+const AIInsightsPage = dynamic(
+	() => import('@/app/(dashboard)/ai-insights/page'),
+	{
+		loading: () => (
+			<div className='skeleton' style={{ height: 300, borderRadius: 16 }} />
+		),
+	},
+)
 
 type Tab = 'home' | 'portfolio' | 'positions' | 'analytics' | 'ai-insights'
 

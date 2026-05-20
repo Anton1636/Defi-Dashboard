@@ -1,10 +1,52 @@
 import type { NextConfig } from 'next'
 
+const isDev = process.env.NODE_ENV === 'development'
+
+const csp = [
+	"default-src 'self'",
+	isDev
+		? "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
+		: "script-src 'self'",
+	"style-src 'self' 'unsafe-inline'",
+	"img-src 'self' data: https: blob:",
+	"font-src 'self' data:",
+	[
+		"connect-src 'self'",
+		'https://api.thegraph.com',
+		'https://mainnet.infura.io',
+		'https://arbitrum-mainnet.infura.io',
+		'https://base-mainnet.infura.io',
+		'https://optimism-mainnet.infura.io',
+		'https://polygon-mainnet.infura.io',
+		'https://sepolia.infura.io',
+		'wss://mainnet.infura.io',
+		'https://generativelanguage.googleapis.com',
+		'https://api.web3modal.org',
+		'https://pulse.walletconnect.org',
+		'https://relay.walletconnect.org',
+		'wss://relay.walletconnect.org',
+		'https://explorer-api.walletconnect.com',
+		'wss://*.bridge.walletconnect.org',
+		'wss://stream.binance.com:9443',
+		'https://api.gopluslabs.io',
+	].join(' '),
+	"frame-ancestors 'none'",
+	"base-uri 'self'",
+	"form-action 'self'",
+].join('; ')
+
 const nextConfig: NextConfig = {
-	output: 'standalone',
+	// output: 'standalone',
 
 	experimental: {
-		turbopackMemoryLimit: 4096,
+		optimizePackageImports: [
+			'recharts',
+			'@rainbow-me/rainbowkit',
+			'wagmi',
+			'viem',
+			'@aave/contract-helpers',
+			'@aave/math-utils',
+		],
 	},
 
 	turbopack: {
@@ -17,42 +59,6 @@ const nextConfig: NextConfig = {
 	},
 
 	async headers() {
-		const isDev = process.env.NODE_ENV === 'development'
-
-		const csp = [
-			"default-src 'self'",
-			isDev
-				? "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
-				: "script-src 'self'",
-			"style-src 'self' 'unsafe-inline'",
-			"img-src 'self' data: https:",
-			"font-src 'self' data:",
-			[
-				"connect-src 'self'",
-				isDev ? 'ws://127.0.0.1:* ws://localhost:*' : '',
-				'https://api.thegraph.com',
-				'https://mainnet.infura.io',
-				'https://arbitrum-mainnet.infura.io',
-				'https://base-mainnet.infura.io',
-				'https://optimism-mainnet.infura.io',
-				'https://polygon-mainnet.infura.io',
-				'https://sepolia.infura.io',
-				'wss://mainnet.infura.io',
-				'wss://arbitrum-mainnet.infura.io',
-				'https://generativelanguage.googleapis.com',
-				'https://api.web3modal.org',
-				'https://pulse.walletconnect.org',
-				'https://relay.walletconnect.org',
-				'wss://relay.walletconnect.org',
-				'https://explorer-api.walletconnect.com',
-				'wss://*.bridge.walletconnect.org',
-			].join(' '),
-			"img-src 'self' data: https: blob:",
-			"frame-ancestors 'none'",
-			"base-uri 'self'",
-			"form-action 'self'",
-		].join('; ')
-
 		return [
 			{
 				source: '/(.*)',
