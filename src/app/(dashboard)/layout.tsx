@@ -11,7 +11,7 @@ export default async function DashboardLayout({
 	children: React.ReactNode
 }) {
 	const session = await auth()
-	if (!session) redirect('/login')
+	if (!session) redirect('/?modal=signin')
 
 	return (
 		<div

@@ -7,14 +7,29 @@ import { StatCard } from '@/components/ui/StatCard'
 import { TrendBadge } from '@/components/ui/TrendBadge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Tooltip } from '@/components/ui/Tooltip'
-import { PortfolioChart } from '@/components/dashboard/PortfolioChart'
 import { PositionRow } from '@/components/dashboard/PositionRow'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
 import { SmartInsightsBanner } from '@/components/dashboard/SmartInsightsBanner'
 import { generateSparkData } from '@/components/ui/Sparkline'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type { AavePosition, CompoundPosition } from '@/types'
-import { IdentityCard } from '@/components/identity/IdentityCard'
+import dynamic from 'next/dynamic'
+
+const IdentityCard = dynamic(
+	() => import('@/components/identity/IdentityCard').then(m => m.IdentityCard),
+	{ ssr: false },
+)
+
+const PortfolioChart = dynamic(
+	() =>
+		import('@/components/dashboard/PortfolioChart').then(m => m.PortfolioChart),
+	{
+		ssr: false,
+		loading: () => (
+			<div className='skeleton' style={{ height: 200, borderRadius: 16 }} />
+		),
+	},
+)
 
 function formatUSD(value: number): string {
 	if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`

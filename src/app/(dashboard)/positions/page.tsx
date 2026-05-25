@@ -8,14 +8,19 @@ import { UniswapCard } from '@/components/positions/UniswapCard'
 import { AaveCard } from '@/components/positions/AaveCard'
 import { CompoundCard } from '@/components/positions/CompoundCard'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
-import { RiskScanner } from '@/components/risk/RiskScanner'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import dynamic from 'next/dynamic'
 import type {
 	DeFiPosition,
 	UniswapPosition,
 	AavePosition,
 	CompoundPosition,
 } from '@/types'
+
+const RiskScanner = dynamic(
+	() => import('@/components/risk/RiskScanner').then(m => m.RiskScanner),
+	{ ssr: false },
+)
 
 type FilterProtocol = 'all' | 'uniswap' | 'aave' | 'compound'
 

@@ -146,7 +146,11 @@ export const portfolioResolvers = {
 			return ctx.prisma.alert.create({
 				data: {
 					userId: ctx.user.id,
-					type: input.type as any,
+					type: input.type as
+						| 'PRICE_ABOVE'
+						| 'PRICE_BELOW'
+						| 'HEALTH_FACTOR_LOW'
+						| 'YIELD_THRESHOLD',
 					threshold: input.threshold,
 					asset: input.asset,
 					protocol: input.protocol,

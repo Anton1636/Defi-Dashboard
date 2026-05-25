@@ -5,7 +5,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { SiweMessage } from 'siwe'
 import { prisma } from '@/lib/prisma'
 import { authConfig } from './auth.config'
-import { verifyAndConsumeNonce } from '@/app/api/auth/nonce/route'
+import { verifyAndConsumeNonce } from '@/lib/nonce'
 import type { User as NextAuthUser } from 'next-auth'
 
 interface AuthUser extends NextAuthUser {

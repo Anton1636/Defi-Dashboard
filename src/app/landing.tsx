@@ -183,6 +183,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 										whiteSpace: 'nowrap',
 									}}
 									onMouseEnter={e => {
+										import('@/app/(dashboard)/portfolio/page')
 										if (!isActive) {
 											e.currentTarget.style.color = 'var(--text-primary)'
 											e.currentTarget.style.background = 'var(--bg-elevated)'
@@ -314,6 +315,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							flexShrink: 0,
 						}}
 						onMouseEnter={e => {
+							import('@/app/(dashboard)/portfolio/page')
 							e.currentTarget.style.opacity = '0.88'
 							e.currentTarget.style.transform = 'translateY(-1px)'
 						}}

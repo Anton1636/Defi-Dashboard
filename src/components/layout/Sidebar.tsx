@@ -168,18 +168,6 @@ export function Sidebar() {
 										transition: 'all 0.15s',
 										textDecoration: 'none',
 									}}
-									onMouseEnter={e => {
-										if (!isActive) {
-											e.currentTarget.style.background = 'var(--bg-elevated)'
-											e.currentTarget.style.color = 'var(--text-primary)'
-										}
-									}}
-									onMouseLeave={e => {
-										if (!isActive) {
-											e.currentTarget.style.background = 'transparent'
-											e.currentTarget.style.color = 'var(--text-secondary)'
-										}
-									}}
 								>
 									<span style={{ opacity: isActive ? 1 : 0.6 }}>
 										{item.icon}
@@ -194,10 +182,7 @@ export function Sidebar() {
 
 			{/* Bottom */}
 			<div
-				style={{
-					padding: 16,
-					borderTop: '1px solid var(--border-primary)',
-				}}
+				style={{ padding: 16, borderTop: '1px solid var(--border-primary)' }}
 			>
 				<p
 					style={{

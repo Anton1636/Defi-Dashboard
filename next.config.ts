@@ -1,4 +1,9 @@
+import bundleAnalyzer from '@next/bundle-analyzer'
 import type { NextConfig } from 'next'
+
+const withBundleAnalyzer = bundleAnalyzer({
+	enabled: process.env.ANALYZE === 'true',
+})
 
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -58,6 +63,15 @@ const nextConfig: NextConfig = {
 		},
 	},
 
+	images: {
+		formats: ['image/avif', 'image/webp'],
+		remotePatterns: [
+			{ protocol: 'https', hostname: '**.ens.domains' },
+			{ protocol: 'https', hostname: 'ipfs.io' },
+			{ protocol: 'https', hostname: '**.ipfs.dweb.link' },
+		],
+	},
+
 	async headers() {
 		return [
 			{
@@ -82,4 +96,4 @@ const nextConfig: NextConfig = {
 	},
 }
 
-export default nextConfig
+export default withBundleAnalyzer(nextConfig)
