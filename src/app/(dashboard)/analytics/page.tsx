@@ -2,6 +2,7 @@
 
 import { GasWidget } from '@/components/analytics/GasWidget'
 import { GasSuggestions } from '@/components/analytics/GasSuggestions'
+import { TransactionSimulator } from '@/components/simulator/TransactionSimulator'
 import { useMode } from '@/hooks/useMode'
 
 export default function AnalyticsPage() {
@@ -25,7 +26,7 @@ export default function AnalyticsPage() {
 				<p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
 					{isSimple
 						? 'Gas = transaction fee on Ethereum. Lower gas = cheaper to act.'
-						: 'Gas prices and portfolio optimization suggestions'}
+						: 'Gas prices, optimization suggestions and transaction simulator'}
 				</p>
 			</div>
 
@@ -50,14 +51,16 @@ export default function AnalyticsPage() {
 				>
 					💡{' '}
 					<strong style={{ color: 'var(--text-primary)' }}>What is gas?</strong>{' '}
-					{
-						"Every action on Ethereum (like moving tokens or trading) costs a small fee can 'gas'. It's like a tip you pay to have your transaction processed faster. The price changes based on how busy the network is."
-					}
+					Every action on Ethereum costs a small fee called gas. It changes
+					based on network activity.
 				</div>
 			)}
 
-			{/* Suggestions */}
+			{/* Gas Suggestions */}
 			<GasSuggestions />
+
+			{/* Transaction Simulator */}
+			<TransactionSimulator />
 		</div>
 	)
 }
