@@ -1,9 +1,22 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { GasWidget } from '@/components/analytics/GasWidget'
 import { GasSuggestions } from '@/components/analytics/GasSuggestions'
-import { TransactionSimulator } from '@/components/simulator/TransactionSimulator'
 import { useMode } from '@/hooks/useMode'
+
+const TransactionSimulator = dynamic(
+	() =>
+		import('@/components/simulator/TransactionSimulator').then(
+			m => m.TransactionSimulator,
+		),
+	{ ssr: false },
+)
+
+const ILVisualizer = dynamic(
+	() => import('@/components/analytics/ILVisualizer').then(m => m.ILVisualizer),
+	{ ssr: false },
+)
 
 export default function AnalyticsPage() {
 	const { isSimple } = useMode()
@@ -25,15 +38,13 @@ export default function AnalyticsPage() {
 				</h1>
 				<p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
 					{isSimple
-						? 'Gas = transaction fee on Ethereum. Lower gas = cheaper to act.'
-						: 'Gas prices, optimization suggestions and transaction simulator'}
+						? 'Gas fees, transaction preview and liquidity analysis'
+						: 'Gas prices, optimization, transaction simulator and IL calculator'}
 				</p>
 			</div>
 
 			{/* Gas widget */}
-			<div style={{ marginBottom: 24 }}>
-				<GasWidget />
-			</div>
+			<GasWidget />
 
 			{/* Simple mode explainer */}
 			{isSimple && (
@@ -43,7 +54,7 @@ export default function AnalyticsPage() {
 						border: '1px solid var(--border-accent)',
 						borderRadius: 12,
 						padding: '12px 16px',
-						marginBottom: 24,
+						margin: '16px 0',
 						fontSize: 13,
 						color: 'var(--text-secondary)',
 						lineHeight: 1.6,
@@ -57,10 +68,15 @@ export default function AnalyticsPage() {
 			)}
 
 			{/* Gas Suggestions */}
-			<GasSuggestions />
+			<div style={{ marginTop: 24 }}>
+				<GasSuggestions />
+			</div>
 
 			{/* Transaction Simulator */}
 			<TransactionSimulator />
+
+			{/* IL Visualizer */}
+			<ILVisualizer />
 		</div>
 	)
 }
