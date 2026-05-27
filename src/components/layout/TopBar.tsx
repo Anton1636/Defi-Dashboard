@@ -3,15 +3,18 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { signOut } from 'next-auth/react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { PriceTicker } from '@/components/ui/PriceTicker'
 import { useWallet } from '@/hooks/useWallet'
 import { useENS } from '@/hooks/useENS'
+import { useTranslation } from '@/hooks/useTranslation'
 import { shortAddress } from '@/lib/ens'
 import { ChainSelector } from './ChainSelector'
 
 export function TopBar() {
 	const { address, ethBalance, isLoadingBalance } = useWallet()
 	const { name: ensName, avatar: ensAvatar } = useENS(address)
+	const { t } = useTranslation()
 
 	const displayName = ensName ?? (address ? shortAddress(address) : null)
 
@@ -102,8 +105,6 @@ export function TopBar() {
 						</span>
 					</div>
 				)}
-
-				{/* Live ETH price */}
 				<div
 					style={{
 						display: 'flex',
@@ -131,6 +132,7 @@ export function TopBar() {
 			{/* Right */}
 			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 				<ThemeToggle />
+				<LanguageToggle />
 				{address && <ChainSelector />}
 				<ConnectButton
 					showBalance={false}
@@ -160,7 +162,7 @@ export function TopBar() {
 						e.currentTarget.style.borderColor = 'var(--border-primary)'
 					}}
 				>
-					Sign out
+					{t.common.signOut}
 				</button>
 			</div>
 		</header>

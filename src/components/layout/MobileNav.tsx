@@ -2,83 +2,85 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const NAV_ITEMS = [
-	{
-		href: '/portfolio',
-		label: 'Portfolio',
-		icon: (
-			<svg
-				width='20'
-				height='20'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<rect x='3' y='3' width='7' height='7' rx='1' />
-				<rect x='14' y='3' width='7' height='7' rx='1' />
-				<rect x='3' y='14' width='7' height='7' rx='1' />
-				<rect x='14' y='14' width='7' height='7' rx='1' />
-			</svg>
-		),
-	},
-	{
-		href: '/positions',
-		label: 'Positions',
-		icon: (
-			<svg
-				width='20'
-				height='20'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
-			</svg>
-		),
-	},
-	{
-		href: '/analytics',
-		label: 'Analytics',
-		icon: (
-			<svg
-				width='20'
-				height='20'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path
-					d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
-					strokeLinecap='round'
-				/>
-			</svg>
-		),
-	},
-	{
-		href: '/ai-insights',
-		label: 'AI',
-		icon: (
-			<svg
-				width='20'
-				height='20'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
-				<path d='M12 8v4l3 3' strokeLinecap='round' />
-			</svg>
-		),
-	},
-]
+import { useTranslation } from '@/hooks/useTranslation'
 
 export function MobileNav() {
 	const pathname = usePathname()
+	const { t } = useTranslation()
+
+	const NAV_ITEMS = [
+		{
+			href: '/portfolio',
+			label: t.nav.portfolio,
+			icon: (
+				<svg
+					width='20'
+					height='20'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<rect x='3' y='3' width='7' height='7' rx='1' />
+					<rect x='14' y='3' width='7' height='7' rx='1' />
+					<rect x='3' y='14' width='7' height='7' rx='1' />
+					<rect x='14' y='14' width='7' height='7' rx='1' />
+				</svg>
+			),
+		},
+		{
+			href: '/positions',
+			label: t.nav.positions,
+			icon: (
+				<svg
+					width='20'
+					height='20'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
+				</svg>
+			),
+		},
+		{
+			href: '/analytics',
+			label: t.nav.analytics,
+			icon: (
+				<svg
+					width='20'
+					height='20'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path
+						d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
+						strokeLinecap='round'
+					/>
+				</svg>
+			),
+		},
+		{
+			href: '/ai-insights',
+			label: t.nav.aiInsights,
+			icon: (
+				<svg
+					width='20'
+					height='20'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
+					<path d='M12 8v4l3 3' strokeLinecap='round' />
+				</svg>
+			),
+		},
+	]
 
 	return (
 		<nav
@@ -112,10 +114,10 @@ export function MobileNav() {
 							padding: '6px 16px',
 							borderRadius: 10,
 							textDecoration: 'none',
+							minWidth: 56,
 							color: isActive ? 'var(--accent-blue)' : 'var(--text-tertiary)',
 							background: isActive ? 'var(--accent-blue-glow)' : 'transparent',
 							transition: 'all 0.15s',
-							minWidth: 56,
 						}}
 					>
 						<span>{item.icon}</span>

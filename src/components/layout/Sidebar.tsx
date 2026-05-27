@@ -2,83 +2,85 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const NAV_ITEMS = [
-	{
-		href: '/portfolio',
-		label: 'Portfolio',
-		icon: (
-			<svg
-				width='18'
-				height='18'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<rect x='3' y='3' width='7' height='7' rx='1' />
-				<rect x='14' y='3' width='7' height='7' rx='1' />
-				<rect x='3' y='14' width='7' height='7' rx='1' />
-				<rect x='14' y='14' width='7' height='7' rx='1' />
-			</svg>
-		),
-	},
-	{
-		href: '/positions',
-		label: 'Positions',
-		icon: (
-			<svg
-				width='18'
-				height='18'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
-			</svg>
-		),
-	},
-	{
-		href: '/analytics',
-		label: 'Analytics',
-		icon: (
-			<svg
-				width='18'
-				height='18'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path
-					d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
-					strokeLinecap='round'
-				/>
-			</svg>
-		),
-	},
-	{
-		href: '/ai-insights',
-		label: 'AI Insights',
-		icon: (
-			<svg
-				width='18'
-				height='18'
-				viewBox='0 0 24 24'
-				fill='none'
-				stroke='currentColor'
-				strokeWidth='1.5'
-			>
-				<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
-				<path d='M12 8v4l3 3' strokeLinecap='round' />
-			</svg>
-		),
-	},
-]
+import { useTranslation } from '@/hooks/useTranslation'
 
 export function Sidebar() {
 	const pathname = usePathname()
+	const { t } = useTranslation()
+
+	const NAV_ITEMS = [
+		{
+			href: '/portfolio',
+			label: t.nav.portfolio,
+			icon: (
+				<svg
+					width='18'
+					height='18'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<rect x='3' y='3' width='7' height='7' rx='1' />
+					<rect x='14' y='3' width='7' height='7' rx='1' />
+					<rect x='3' y='14' width='7' height='7' rx='1' />
+					<rect x='14' y='14' width='7' height='7' rx='1' />
+				</svg>
+			),
+		},
+		{
+			href: '/positions',
+			label: t.nav.positions,
+			icon: (
+				<svg
+					width='18'
+					height='18'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
+				</svg>
+			),
+		},
+		{
+			href: '/analytics',
+			label: t.nav.analytics,
+			icon: (
+				<svg
+					width='18'
+					height='18'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path
+						d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
+						strokeLinecap='round'
+					/>
+				</svg>
+			),
+		},
+		{
+			href: '/ai-insights',
+			label: t.nav.aiInsights,
+			icon: (
+				<svg
+					width='18'
+					height='18'
+					viewBox='0 0 24 24'
+					fill='none'
+					stroke='currentColor'
+					strokeWidth='1.5'
+				>
+					<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
+					<path d='M12 8v4l3 3' strokeLinecap='round' />
+				</svg>
+			),
+		},
+	]
 
 	return (
 		<aside
@@ -93,7 +95,6 @@ export function Sidebar() {
 				transition: 'background 0.25s ease',
 			}}
 		>
-			{/* Logo */}
 			<div
 				style={{
 					padding: '24px 20px',
@@ -134,7 +135,6 @@ export function Sidebar() {
 				</div>
 			</div>
 
-			{/* Nav */}
 			<nav style={{ flex: 1, padding: 12 }}>
 				<ul
 					style={{
@@ -180,7 +180,6 @@ export function Sidebar() {
 				</ul>
 			</nav>
 
-			{/* Bottom */}
 			<div
 				style={{ padding: 16, borderTop: '1px solid var(--border-primary)' }}
 			>

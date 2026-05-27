@@ -1,15 +1,24 @@
 'use client'
 
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
 import { useSession } from 'next-auth/react'
 import { useWallet } from '@/hooks/useWallet'
 import { useENS } from '@/hooks/useENS'
+import { useTranslation } from '@/hooks/useTranslation'
 import { shortAddress } from '@/lib/ens'
 import { PriceTicker } from '@/components/ui/PriceTicker'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { ModeToggle } from '@/components/ui/ModeToggle'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { PriceProvider } from '@/components/providers/PriceProvider'
-import { ModeToggle } from '@/components/ui/ModeToggle'
+import dynamic from 'next/dynamic'
+
+type Tab = 'home' | 'portfolio' | 'positions' | 'analytics' | 'ai-insights'
+
+interface LandingClientProps {
+	autoOpen: boolean
+}
 
 const PortfolioPage = dynamic(
 	() => import('@/app/(dashboard)/portfolio/page'),
@@ -19,70 +28,11 @@ const PortfolioPage = dynamic(
 		),
 	},
 )
-
-const PositionsPage = dynamic(
-	() => import('@/app/(dashboard)/positions/page'),
-	{
-		loading: () => (
-			<div className='skeleton' style={{ height: 400, borderRadius: 16 }} />
-		),
-	},
-)
-
-const AnalyticsPage = dynamic(
-	() => import('@/app/(dashboard)/analytics/page'),
-	{
-		loading: () => (
-			<div className='skeleton' style={{ height: 300, borderRadius: 16 }} />
-		),
-	},
-)
-
+const PositionsPage = dynamic(() => import('@/app/(dashboard)/positions/page'))
+const AnalyticsPage = dynamic(() => import('@/app/(dashboard)/analytics/page'))
 const AIInsightsPage = dynamic(
 	() => import('@/app/(dashboard)/ai-insights/page'),
-	{
-		loading: () => (
-			<div className='skeleton' style={{ height: 300, borderRadius: 16 }} />
-		),
-	},
 )
-
-type Tab = 'home' | 'portfolio' | 'positions' | 'analytics' | 'ai-insights'
-
-interface LandingClientProps {
-	autoOpen: boolean
-}
-
-const STATS = [
-	{ label: 'Total Value Locked', value: '$84.4B', change: '+2.1%' },
-	{ label: 'Active Protocols', value: '3,200+', change: '+12' },
-	{ label: 'Daily Volume', value: '$3.7B', change: '+8.4%' },
-]
-
-const FEATURES = [
-	{
-		icon: '⬡',
-		title: 'Multi-chain',
-		desc: 'Track positions across Ethereum, Arbitrum, Base, Optimism, Polygon and more in one place.',
-	},
-	{
-		icon: '⚡',
-		title: 'Real-time prices',
-		desc: 'Live WebSocket price feeds from Binance. Flash animations on every tick.',
-	},
-	{
-		icon: '◎',
-		title: 'AI Insights',
-		desc: 'Gemini-powered analysis of your portfolio. Ask anything about your positions.',
-	},
-]
-
-const NAV_LINKS: { tab: Tab; label: string }[] = [
-	{ tab: 'portfolio', label: 'Portfolio' },
-	{ tab: 'positions', label: 'Positions' },
-	{ tab: 'analytics', label: 'Analytics' },
-	{ tab: 'ai-insights', label: 'AI Insights' },
-]
 
 export function LandingClient({ autoOpen }: LandingClientProps) {
 	const [modalOpen, setModalOpen] = useState(autoOpen)
@@ -91,6 +41,38 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 	const isLoggedIn = status === 'authenticated' && !!session
 	const { address } = useWallet()
 	const { name: ensName } = useENS(address)
+	const { t } = useTranslation()
+
+	const NAV_LINKS: { tab: Tab; label: string }[] = [
+		{ tab: 'portfolio', label: t.nav.portfolio },
+		{ tab: 'positions', label: t.nav.positions },
+		{ tab: 'analytics', label: t.nav.analytics },
+		{ tab: 'ai-insights', label: t.nav.aiInsights },
+	]
+
+	const STATS = [
+		{ label: t.landing.stats.tvl, value: '$84.4B', change: '+2.1%' },
+		{ label: t.landing.stats.protocols, value: '3,200+', change: '+12' },
+		{ label: t.landing.stats.volume, value: '$3.7B', change: '+8.4%' },
+	]
+
+	const FEATURES = [
+		{
+			icon: '⬡',
+			title: t.landing.features.multichain.title,
+			desc: t.landing.features.multichain.desc,
+		},
+		{
+			icon: '⚡',
+			title: t.landing.features.realtime.title,
+			desc: t.landing.features.realtime.desc,
+		},
+		{
+			icon: '◎',
+			title: t.landing.features.ai.title,
+			desc: t.landing.features.ai.desc,
+		},
+	]
 
 	return (
 		<div
@@ -103,7 +85,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 		>
 			{isLoggedIn && <PriceProvider />}
 
-			{/* ─── Nav ──────────────────────────────────────────────────────── */}
+			{/* Nav */}
 			<nav
 				style={{
 					position: 'sticky',
@@ -151,6 +133,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 					<span style={{ fontWeight: 600, fontSize: 15 }}>DeFi Dashboard</span>
 				</div>
 
+				{/* Center tabs */}
 				{status !== 'loading' && isLoggedIn && (
 					<div
 						style={{
@@ -183,7 +166,6 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 										whiteSpace: 'nowrap',
 									}}
 									onMouseEnter={e => {
-										import('@/app/(dashboard)/portfolio/page')
 										if (!isActive) {
 											e.currentTarget.style.color = 'var(--text-primary)'
 											e.currentTarget.style.background = 'var(--bg-elevated)'
@@ -215,7 +197,9 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							flexShrink: 0,
 						}}
 					>
+						<ThemeToggle />
 						<ModeToggle />
+						<LanguageToggle />
 						{/* ETH price */}
 						<div
 							style={{
@@ -239,7 +223,6 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							</span>
 							<PriceTicker symbol='ETH' showChange size='sm' />
 						</div>
-
 						{/* ENS / address */}
 						{address && (
 							<div
@@ -277,8 +260,6 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								</span>
 							</div>
 						)}
-
-						{/* Home button */}
 						<button
 							onClick={() => setActiveTab('home')}
 							style={{
@@ -295,41 +276,35 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								flexShrink: 0,
 							}}
 						>
-							Home
+							{t.nav.home}
 						</button>
 					</div>
 				) : (
-					<button
-						onClick={() => setModalOpen(true)}
-						style={{
-							background: 'var(--gradient-blue)',
-							color: '#fff',
-							border: 'none',
-							borderRadius: 10,
-							padding: '8px 20px',
-							fontSize: 14,
-							fontWeight: 600,
-							cursor: 'pointer',
-							transition: 'opacity 0.15s, transform 0.15s',
-							boxShadow: '0 0 20px var(--accent-blue-glow)',
-							flexShrink: 0,
-						}}
-						onMouseEnter={e => {
-							import('@/app/(dashboard)/portfolio/page')
-							e.currentTarget.style.opacity = '0.88'
-							e.currentTarget.style.transform = 'translateY(-1px)'
-						}}
-						onMouseLeave={e => {
-							e.currentTarget.style.opacity = '1'
-							e.currentTarget.style.transform = 'translateY(0)'
-						}}
-					>
-						Sign In
-					</button>
+					<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+						<ThemeToggle />
+						<LanguageToggle />
+						<button
+							onClick={() => setModalOpen(true)}
+							style={{
+								background: 'var(--gradient-blue)',
+								color: '#fff',
+								border: 'none',
+								borderRadius: 10,
+								padding: '8px 20px',
+								fontSize: 14,
+								fontWeight: 600,
+								cursor: 'pointer',
+								boxShadow: '0 0 20px var(--accent-blue-glow)',
+								flexShrink: 0,
+							}}
+						>
+							{t.landing.signIn}
+						</button>
+					</div>
 				)}
 			</nav>
 
-			{/* ─── Content ──────────────────────────────────────────────────── */}
+			{/* Content */}
 			{activeTab !== 'home' ? (
 				<div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px' }}>
 					{activeTab === 'portfolio' && <PortfolioPage />}
@@ -339,7 +314,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 				</div>
 			) : (
 				<>
-					{/* ─── Hero ───────────────────────────────────────────────── */}
+					{/* Hero */}
 					<section
 						style={{
 							maxWidth: 900,
@@ -373,9 +348,8 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 									display: 'inline-block',
 								}}
 							/>
-							Live across 6 chains
+							{t.landing.badge}
 						</div>
-
 						<h1
 							style={{
 								fontSize: 'clamp(36px, 6vw, 64px)',
@@ -389,11 +363,13 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								WebkitTextFillColor: 'transparent',
 							}}
 						>
-							Your DeFi portfolio,
-							<br />
-							all in one place
+							{t.landing.headline.split('\n').map((line, i) => (
+								<span key={i}>
+									{line}
+									{i === 0 && <br />}
+								</span>
+							))}
 						</h1>
-
 						<p
 							style={{
 								fontSize: 17,
@@ -403,10 +379,8 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								lineHeight: 1.6,
 							}}
 						>
-							Track positions across Uniswap, Aave and Compound. Real-time
-							prices, AI insights, multi-chain support.
+							{t.landing.subtitle}
 						</p>
-
 						<div
 							style={{
 								display: 'flex',
@@ -427,11 +401,10 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 										fontSize: 15,
 										fontWeight: 600,
 										cursor: 'pointer',
-										transition: 'all 0.2s',
 										boxShadow: '0 0 30px var(--accent-blue-glow)',
 									}}
 								>
-									Go to Portfolio →
+									{t.landing.goToPortfolio}
 								</button>
 							) : (
 								<>
@@ -446,11 +419,10 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 											fontSize: 15,
 											fontWeight: 600,
 											cursor: 'pointer',
-											transition: 'all 0.2s',
 											boxShadow: '0 0 30px var(--accent-blue-glow)',
 										}}
 									>
-										Connect Wallet
+										{t.landing.connectWallet}
 									</button>
 									<button
 										onClick={() => setModalOpen(true)}
@@ -463,17 +435,16 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 											fontSize: 15,
 											fontWeight: 500,
 											cursor: 'pointer',
-											transition: 'all 0.2s',
 										}}
 									>
-										Sign in with Google
+										{t.landing.signInGoogle}
 									</button>
 								</>
 							)}
 						</div>
 					</section>
 
-					{/* ─── Stats ──────────────────────────────────────────────── */}
+					{/* Stats */}
 					<section
 						style={{
 							maxWidth: 900,
@@ -525,7 +496,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						))}
 					</section>
 
-					{/* ─── Features ───────────────────────────────────────────── */}
+					{/* Features */}
 					<section
 						style={{ maxWidth: 900, margin: '0 auto 80px', padding: '0 32px' }}
 					>
@@ -540,7 +511,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								marginBottom: 32,
 							}}
 						>
-							Everything you need
+							{t.landing.features.title}
 						</p>
 						<div
 							style={{
@@ -588,7 +559,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						</div>
 					</section>
 
-					{/* ─── Footer ─────────────────────────────────────────────── */}
+					{/* Footer */}
 					<footer
 						style={{
 							borderTop: '1px solid var(--border-primary)',
@@ -597,7 +568,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						}}
 					>
 						<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-							DeFi Dashboard · Built with Next.js, Prisma, RainbowKit
+							{t.landing.footer}
 						</p>
 					</footer>
 				</>

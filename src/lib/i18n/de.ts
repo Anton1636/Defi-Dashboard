@@ -1,0 +1,105 @@
+// import type { TranslationKeys } from './en'
+
+// export const de: TranslationKeys = {
+// 	nav: {
+// 		portfolio: 'Portfolio',
+// 		positions: 'Positionen',
+// 		analytics: 'Analytics',
+// 		aiInsights: 'KI-Einblicke',
+// 		home: 'Startseite',
+// 	},
+// 	landing: {
+// 		badge: 'Live auf 6 Blockchains',
+// 		headline: 'Dein DeFi-Portfolio,\nalles an einem Ort',
+// 		subtitle:
+// 			'Verfolge Positionen auf Uniswap, Aave und Compound. Echtzeit-Preise, KI-Einblicke, Multi-Chain.',
+// 		connectWallet: 'Wallet verbinden',
+// 		signIn: 'Anmelden',
+// 		signInGoogle: 'Mit Google anmelden',
+// 		goToPortfolio: 'Zum Portfolio →',
+// 		stats: {
+// 			tvl: 'Gesamt gesperrter Wert',
+// 			protocols: 'Aktive Protokolle',
+// 			volume: 'Tägliches Volumen',
+// 		},
+// 		features: {
+// 			title: 'Alles was du brauchst',
+// 			multichain: {
+// 				title: 'Multi-Chain',
+// 				desc: 'Verfolge Positionen auf Ethereum, Arbitrum, Base, Optimism, Polygon und mehr.',
+// 			},
+// 			realtime: {
+// 				title: 'Echtzeit-Preise',
+// 				desc: 'Live WebSocket-Preisfeeds von Binance. Flash-Animationen bei jedem Update.',
+// 			},
+// 			ai: {
+// 				title: 'KI-Einblicke',
+// 				desc: 'Gemini-basierte Analyse deines Portfolios. Stelle beliebige Fragen.',
+// 			},
+// 		},
+// 		footer: 'DeFi Dashboard · Erstellt mit Next.js, Prisma, RainbowKit',
+// 	},
+// 	portfolio: {
+// 		title: 'Portfolio',
+// 		totalValue: 'Gesamter Portfoliowert',
+// 		updated: 'Aktualisiert',
+// 		across: 'über',
+// 		protocols: 'Protokolle',
+// 		openPositions: 'Offene Positionen',
+// 		bestApy: 'Beste APY',
+// 		network: 'Netzwerk',
+// 		mainnet: 'Hauptnetz',
+// 		openPositionsList: 'Offene Positionen',
+// 		total: 'gesamt',
+// 		assetAllocation: 'Vermögensaufteilung',
+// 		noPositions: 'Keine DeFi-Positionen gefunden',
+// 		noPositionsDesc:
+// 			'Beginne mit der Einzahlung in Aave oder dem Hinzufügen von Liquidität auf Uniswap',
+// 		notConnected: 'Verfolge dein DeFi-Portfolio',
+// 		notConnectedDesc:
+// 			'Verbinde dein Wallet, um Positionen auf Uniswap, Aave und Compound zu sehen',
+// 	},
+// 	positions: {
+// 		title: 'Positionen',
+// 		openPositions: 'offene Positionen',
+// 		noPositions: 'Keine Positionen gefunden',
+// 	},
+// 	analytics: {
+// 		title: 'Analytics',
+// 		subtitle: 'Gaspreise, Optimierung, Transaktionssimulator und IL-Rechner',
+// 		gasPrice: 'Gaspreise',
+// 		gasSubtitle: 'Ethereum Hauptnetz · Aktualisierung alle 15 Sek.',
+// 		slow: 'Langsam',
+// 		standard: 'Standard',
+// 		fast: 'Schnell',
+// 		recommended: 'EMPFOHLEN',
+// 		baseFee: 'Grundgebühr',
+// 		updated: 'Aktualisiert',
+// 		suggestions: '💡 Optimierungsvorschläge',
+// 	},
+// 	aiInsights: {
+// 		title: 'KI-Einblicke',
+// 		subtitle: 'Powered by Gemini',
+// 		analyze: 'Jetzt analysieren',
+// 		analyzing: 'Analysiere...',
+// 		askPlaceholder: 'Frage zu deinem Portfolio...',
+// 	},
+// 	common: {
+// 		loading: 'Laden...',
+// 		error: 'Fehler',
+// 		signOut: 'Abmelden',
+// 		openDashboard: 'Dashboard öffnen →',
+// 		swap: 'Tausch',
+// 		yearly: 'jährlich',
+// 		inRange: 'Im Bereich',
+// 		outOfRange: 'Außerhalb',
+// 		healthy: 'Gesund',
+// 		atRisk: 'Risiko',
+// 		unlimited: 'Unbegrenzt',
+// 		lastUsed: 'Zuletzt verwendet',
+// 	},
+// 	mode: {
+// 		pro: 'PROFI',
+// 		simple: 'EINFACH',
+// 	},
+// }

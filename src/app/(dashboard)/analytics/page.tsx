@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { GasWidget } from '@/components/analytics/GasWidget'
 import { GasSuggestions } from '@/components/analytics/GasSuggestions'
 import { useMode } from '@/hooks/useMode'
+import { useTranslation } from '@/hooks/useTranslation'
 
 const TransactionSimulator = dynamic(
 	() =>
@@ -20,27 +21,14 @@ const ILVisualizer = dynamic(
 
 export default function AnalyticsPage() {
 	const { isSimple } = useMode()
+	const { t } = useTranslation()
 
 	return (
 		<div className='fade-in' style={{ maxWidth: 860 }}>
 			{/* Header */}
 			<div style={{ marginBottom: 28 }}>
-				<h1
-					style={{
-						fontSize: 24,
-						fontWeight: 700,
-						color: 'var(--text-primary)',
-						letterSpacing: '-0.5px',
-						marginBottom: 4,
-					}}
-				>
-					Analytics
-				</h1>
-				<p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
-					{isSimple
-						? 'Gas fees, transaction preview and liquidity analysis'
-						: 'Gas prices, optimization, transaction simulator and IL calculator'}
-				</p>
+				<h1>{t.analytics.title}</h1>
+				<p>{isSimple ? '...' : t.analytics.subtitle}</p>
 			</div>
 
 			{/* Gas widget */}
