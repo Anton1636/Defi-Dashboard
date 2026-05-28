@@ -1,6 +1,3 @@
-'use client'
-
-import { useModeStore } from '@/store/modeStore'
 import type { AavePosition } from '@/types'
 
 function formatUSD(v: number) {
@@ -9,45 +6,31 @@ function formatUSD(v: number) {
 }
 
 export function AaveCard({ position }: { position: AavePosition }) {
-	const { mode } = useModeStore()
-	const isSimple = mode === 'simple'
-
 	const hfColor =
 		position.healthFactor > 2
 			? 'var(--accent-green)'
 			: position.healthFactor > 1.5
 				? 'var(--accent-amber)'
 				: 'var(--accent-red)'
-
 	const hfBg =
 		position.healthFactor > 2
 			? 'var(--accent-green-glow)'
 			: position.healthFactor > 1.5
-				? 'rgba(245, 158, 11, 0.1)'
-				: 'rgba(239, 68, 68, 0.1)'
-
+				? 'rgba(255,214,10,0.1)'
+				: 'var(--accent-red-glow)'
 	const hfPercent = Math.min((position.healthFactor / 3) * 100, 100)
-
-	// Simple mode labels
-	const hfLabel = isSimple
-		? position.healthFactor > 2
-			? '✅ Very safe'
-			: position.healthFactor > 1.5
-				? '⚠️ Monitor closely'
-				: '🚨 At risk!'
-		: `HF: ${position.healthFactor.toFixed(2)}`
 
 	return (
 		<div
 			style={{
-				background: 'var(--gradient-card)',
+				background: 'var(--bg-card)',
 				border: '1px solid var(--border-primary)',
-				borderRadius: '16px',
-				padding: '20px',
+				borderRadius: 14,
+				padding: 18,
 				transition: 'border-color 0.2s',
 			}}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'var(--aave)44'
+				e.currentTarget.style.borderColor = 'rgba(182,80,158,0.3)'
 			}}
 			onMouseLeave={e => {
 				e.currentTarget.style.borderColor = 'var(--border-primary)'
@@ -59,21 +42,21 @@ export function AaveCard({ position }: { position: AavePosition }) {
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					marginBottom: '16px',
+					marginBottom: 14,
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 					<div
 						style={{
-							width: '40px',
-							height: '40px',
-							borderRadius: '50%',
+							width: 38,
+							height: 38,
+							borderRadius: 10,
 							background: 'var(--aave-glow)',
-							border: '1px solid var(--aave)44',
+							border: '1px solid rgba(182,80,158,0.2)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: '20px',
+							fontSize: 18,
 						}}
 					>
 						👻
@@ -81,47 +64,44 @@ export function AaveCard({ position }: { position: AavePosition }) {
 					<div>
 						<p
 							style={{
-								fontWeight: 600,
+								fontWeight: 700,
 								color: 'var(--text-primary)',
-								fontSize: '14px',
+								fontSize: 14,
 							}}
 						>
-							{isSimple ? 'Aave — Lending & Borrowing' : 'Aave V3'}
+							Aave V3
 						</p>
-						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-							{isSimple
-								? 'You lend crypto and earn interest'
-								: 'Lending · Ethereum'}
+						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+							Lending · Ethereum
 						</p>
 					</div>
 				</div>
 				<span
 					style={{
-						fontSize: '12px',
-						fontWeight: 600,
+						fontSize: 11,
+						fontWeight: 700,
 						padding: '4px 10px',
-						borderRadius: '20px',
+						borderRadius: 8,
 						background: hfBg,
 						color: hfColor,
 					}}
 				>
-					{hfLabel}
+					HF: {position.healthFactor.toFixed(2)}
 				</span>
 			</div>
 
-			{/* Health factor bar */}
-			<div style={{ marginBottom: '16px' }}>
+			{/* Health factor */}
+			<div style={{ marginBottom: 14 }}>
 				<div
 					style={{
 						display: 'flex',
 						justifyContent: 'space-between',
-						fontSize: '11px',
-						color: 'var(--text-tertiary)',
-						marginBottom: '6px',
+						fontSize: 11,
+						marginBottom: 5,
 					}}
 				>
-					<span>
-						{isSimple ? 'Safety buffer — higher is better' : 'Health factor'}
+					<span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>
+						Health factor
 					</span>
 					<span
 						style={{
@@ -129,22 +109,17 @@ export function AaveCard({ position }: { position: AavePosition }) {
 								position.healthFactor < 1.5
 									? 'var(--accent-red)'
 									: 'var(--text-tertiary)',
+							fontWeight: 600,
 						}}
 					>
-						{position.healthFactor < 1.5
-							? isSimple
-								? '🚨 Add more collateral!'
-								: '⚠ Liquidation risk'
-							: isSimple
-								? 'Safe zone'
-								: 'Safe'}
+						{position.healthFactor < 1.5 ? '⚠ Liquidation risk' : 'Safe'}
 					</span>
 				</div>
 				<div
 					style={{
-						height: '4px',
+						height: 4,
 						background: 'var(--bg-elevated)',
-						borderRadius: '2px',
+						borderRadius: 2,
 						overflow: 'hidden',
 					}}
 				>
@@ -153,8 +128,8 @@ export function AaveCard({ position }: { position: AavePosition }) {
 							height: '100%',
 							width: `${hfPercent}%`,
 							background: hfColor,
-							borderRadius: '2px',
-							boxShadow: `0 0 8px ${hfColor}`,
+							borderRadius: 2,
+							boxShadow: `0 0 6px ${hfColor}`,
 							transition: 'width 0.4s ease',
 						}}
 					/>
@@ -166,46 +141,49 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3, 1fr)',
-					gap: '8px',
-					marginBottom: '16px',
+					gap: 6,
+					marginBottom: 12,
 				}}
 			>
 				{[
 					{
-						label: isSimple ? 'Your profit' : 'Net worth',
+						label: 'Net worth',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: isSimple ? 'You put in' : 'Collateral',
+						label: 'Collateral',
 						value: formatUSD(position.totalCollateralUSD),
-						color: 'var(--text-primary)',
+						color: 'var(--accent-green)',
 					},
 					{
-						label: isSimple ? 'You owe' : 'Debt',
+						label: 'Debt',
 						value: formatUSD(position.totalDebtUSD),
 						color: 'var(--accent-red)',
 					},
-				].map(stat => (
+				].map(s => (
 					<div
-						key={stat.label}
+						key={s.label}
 						style={{
 							background: 'var(--bg-elevated)',
-							borderRadius: '10px',
-							padding: '10px 12px',
+							borderRadius: 8,
+							padding: '9px 10px',
 						}}
 					>
 						<p
 							style={{
-								fontSize: '11px',
+								fontSize: 10,
 								color: 'var(--text-tertiary)',
-								marginBottom: '4px',
+								marginBottom: 3,
+								fontWeight: 600,
+								textTransform: 'uppercase',
+								letterSpacing: '0.06em',
 							}}
 						>
-							{stat.label}
+							{s.label}
 						</p>
-						<p style={{ fontSize: '13px', fontWeight: 600, color: stat.color }}>
-							{stat.value}
+						<p style={{ fontSize: 13, fontWeight: 700, color: s.color }}>
+							{s.value}
 						</p>
 					</div>
 				))}
@@ -213,20 +191,20 @@ export function AaveCard({ position }: { position: AavePosition }) {
 
 			{/* Supplies */}
 			{position.supplies.length > 0 && (
-				<div style={{ marginBottom: '12px' }}>
+				<div style={{ marginBottom: 10 }}>
 					<p
 						style={{
-							fontSize: '11px',
-							fontWeight: 500,
+							fontSize: 10,
+							fontWeight: 700,
 							color: 'var(--text-tertiary)',
-							marginBottom: '8px',
+							marginBottom: 6,
+							textTransform: 'uppercase',
+							letterSpacing: '0.08em',
 						}}
 					>
-						{isSimple
-							? "💰 MONEY YOU'RE LENDING (EARNING INTEREST)"
-							: 'SUPPLIED'}
+						Supplied
 					</p>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
 						{position.supplies.map(s => (
 							<div
 								key={s.symbol}
@@ -234,39 +212,35 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									display: 'flex',
 									justifyContent: 'space-between',
 									alignItems: 'center',
-									background: 'rgba(16, 185, 129, 0.06)',
-									border: '1px solid rgba(16, 185, 129, 0.12)',
-									borderRadius: '8px',
-									padding: '8px 12px',
+									background: 'rgba(48,209,88,0.05)',
+									border: '1px solid rgba(48,209,88,0.1)',
+									borderRadius: 8,
+									padding: '7px 10px',
 								}}
 							>
 								<span
 									style={{
-										fontSize: '13px',
-										fontWeight: 500,
+										fontSize: 13,
+										fontWeight: 600,
 										color: 'var(--text-primary)',
 									}}
 								>
 									{s.symbol}
 								</span>
-								<div
-									style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
-								>
+								<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
 									<span
-										style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+										style={{ fontSize: 12, color: 'var(--text-secondary)' }}
 									>
 										{formatUSD(s.valueUSD)}
 									</span>
 									<span
 										style={{
-											fontSize: '12px',
+											fontSize: 12,
 											color: 'var(--accent-green)',
-											fontWeight: 500,
+											fontWeight: 700,
 										}}
 									>
-										{isSimple
-											? `+${s.apy.toFixed(2)}% yearly`
-											: `${s.apy.toFixed(2)}% APY`}
+										{s.apy.toFixed(2)}% APY
 									</span>
 								</div>
 							</div>
@@ -280,15 +254,17 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				<div>
 					<p
 						style={{
-							fontSize: '11px',
-							fontWeight: 500,
+							fontSize: 10,
+							fontWeight: 700,
 							color: 'var(--text-tertiary)',
-							marginBottom: '8px',
+							marginBottom: 6,
+							textTransform: 'uppercase',
+							letterSpacing: '0.08em',
 						}}
 					>
-						{isSimple ? '📤 MONEY YOU BORROWED (PAYING INTEREST)' : 'BORROWED'}
+						Borrowed
 					</p>
-					<div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
 						{position.borrows.map(b => (
 							<div
 								key={b.symbol}
@@ -296,39 +272,35 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									display: 'flex',
 									justifyContent: 'space-between',
 									alignItems: 'center',
-									background: 'rgba(239, 68, 68, 0.06)',
-									border: '1px solid rgba(239, 68, 68, 0.12)',
-									borderRadius: '8px',
-									padding: '8px 12px',
+									background: 'rgba(255,69,58,0.05)',
+									border: '1px solid rgba(255,69,58,0.1)',
+									borderRadius: 8,
+									padding: '7px 10px',
 								}}
 							>
 								<span
 									style={{
-										fontSize: '13px',
-										fontWeight: 500,
+										fontSize: 13,
+										fontWeight: 600,
 										color: 'var(--text-primary)',
 									}}
 								>
 									{b.symbol}
 								</span>
-								<div
-									style={{ display: 'flex', gap: '12px', alignItems: 'center' }}
-								>
+								<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
 									<span
-										style={{ fontSize: '12px', color: 'var(--text-secondary)' }}
+										style={{ fontSize: 12, color: 'var(--text-secondary)' }}
 									>
 										{formatUSD(b.valueUSD)}
 									</span>
 									<span
 										style={{
-											fontSize: '12px',
+											fontSize: 12,
 											color: 'var(--accent-red)',
-											fontWeight: 500,
+											fontWeight: 700,
 										}}
 									>
-										{isSimple
-											? `-${b.apy.toFixed(2)}% yearly`
-											: `${b.apy.toFixed(2)}% APR`}
+										{b.apy.toFixed(2)}% APR
 									</span>
 								</div>
 							</div>

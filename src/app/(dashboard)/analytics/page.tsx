@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import { GasWidget } from '@/components/analytics/GasWidget'
 import { GasSuggestions } from '@/components/analytics/GasSuggestions'
 import { useMode } from '@/hooks/useMode'
-import { useTranslation } from '@/hooks/useTranslation'
 
 const TransactionSimulator = dynamic(
 	() =>
@@ -13,7 +12,6 @@ const TransactionSimulator = dynamic(
 		),
 	{ ssr: false },
 )
-
 const ILVisualizer = dynamic(
 	() => import('@/components/analytics/ILVisualizer').then(m => m.ILVisualizer),
 	{ ssr: false },
@@ -21,20 +19,33 @@ const ILVisualizer = dynamic(
 
 export default function AnalyticsPage() {
 	const { isSimple } = useMode()
-	const { t } = useTranslation()
 
 	return (
 		<div className='fade-in' style={{ maxWidth: 860 }}>
 			{/* Header */}
-			<div style={{ marginBottom: 28 }}>
-				<h1>{t.analytics.title}</h1>
-				<p>{isSimple ? '...' : t.analytics.subtitle}</p>
+			<div style={{ marginBottom: 24 }}>
+				<h1
+					style={{
+						fontSize: 24,
+						fontWeight: 900,
+						color: 'var(--text-primary)',
+						letterSpacing: '-1px',
+						marginBottom: 3,
+					}}
+				>
+					Analytics
+				</h1>
+				<p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
+					{isSimple
+						? 'Gas fees, transaction preview and liquidity analysis'
+						: 'Gas prices, optimization, transaction simulator and IL calculator'}
+				</p>
 			</div>
 
-			{/* Gas widget */}
+			{/* Gas */}
 			<GasWidget />
 
-			{/* Simple mode explainer */}
+			{/* Simple explainer */}
 			{isSimple && (
 				<div
 					style={{
@@ -42,7 +53,7 @@ export default function AnalyticsPage() {
 						border: '1px solid var(--border-accent)',
 						borderRadius: 12,
 						padding: '12px 16px',
-						margin: '16px 0',
+						margin: '14px 0',
 						fontSize: 13,
 						color: 'var(--text-secondary)',
 						lineHeight: 1.6,
@@ -50,20 +61,20 @@ export default function AnalyticsPage() {
 				>
 					💡{' '}
 					<strong style={{ color: 'var(--text-primary)' }}>What is gas?</strong>{' '}
-					Every action on Ethereum costs a small fee called gas. It changes
-					based on network activity.
+					Every action on Ethereum costs a small fee called gas. Lower gas =
+					cheaper to act.
 				</div>
 			)}
 
-			{/* Gas Suggestions */}
-			<div style={{ marginTop: 24 }}>
+			{/* Suggestions */}
+			<div style={{ marginTop: 16 }}>
 				<GasSuggestions />
 			</div>
 
-			{/* Transaction Simulator */}
+			{/* Simulator */}
 			<TransactionSimulator />
 
-			{/* IL Visualizer */}
+			{/* IL */}
 			<ILVisualizer />
 		</div>
 	)

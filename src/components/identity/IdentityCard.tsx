@@ -13,27 +13,29 @@ export function IdentityCard() {
 
 	return (
 		<div
-			className='card stagger-1'
 			style={{
-				padding: 20,
-				marginBottom: 16,
+				background: 'var(--bg-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: 14,
+				padding: '16px 18px',
+				marginBottom: 12,
 				cursor: 'pointer',
 				transition: 'border-color 0.2s',
 			}}
 			onClick={() => setExpanded(e => !e)}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = identity.tierColor + '44'
+				e.currentTarget.style.borderColor = 'var(--border-accent)'
 			}}
 			onMouseLeave={e => {
 				e.currentTarget.style.borderColor = 'var(--border-primary)'
 			}}
 		>
-			{/* Compact view — always visible */}
-			<div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+			{/* Compact */}
+			<div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
 				<ReputationScore
 					score={identity.totalScore}
-					tierColor={identity.tierColor}
-					size={72}
+					tierColor='var(--accent-blue)'
+					size={64}
 				/>
 
 				<div style={{ flex: 1, minWidth: 0 }}>
@@ -42,34 +44,36 @@ export function IdentityCard() {
 							display: 'flex',
 							alignItems: 'center',
 							gap: 8,
-							marginBottom: 4,
+							marginBottom: 5,
 						}}
 					>
 						<p
 							style={{
-								fontSize: 16,
-								fontWeight: 700,
+								fontSize: 15,
+								fontWeight: 800,
 								color: 'var(--text-primary)',
+								letterSpacing: '-0.3px',
 							}}
 						>
 							{ensName ?? shortAddress(address)}
 						</p>
 						<span
 							style={{
-								fontSize: 11,
-								fontWeight: 600,
+								fontSize: 10,
+								fontWeight: 700,
 								padding: '2px 8px',
-								borderRadius: 20,
-								background: identity.tierColor + '22',
-								color: identity.tierColor,
-								border: `1px solid ${identity.tierColor}44`,
+								borderRadius: 6,
+								background: 'var(--accent-blue-glow)',
+								color: 'var(--accent-blue)',
+								border: '1px solid var(--border-accent)',
+								textTransform: 'uppercase',
+								letterSpacing: '0.06em',
 							}}
 						>
 							{identity.tier}
 						</span>
 					</div>
-
-					<div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+					<div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
 						{[
 							{ label: 'Age', value: identity.walletAge },
 							{ label: 'Txs', value: identity.txCount.toLocaleString() },
@@ -77,13 +81,19 @@ export function IdentityCard() {
 							{ label: 'ENS', value: identity.hasENS ? '✓' : '—' },
 						].map(stat => (
 							<div key={stat.label}>
-								<span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+								<span
+									style={{
+										fontSize: 10,
+										color: 'var(--text-tertiary)',
+										fontWeight: 600,
+									}}
+								>
 									{stat.label}{' '}
 								</span>
 								<span
 									style={{
-										fontSize: 12,
-										fontWeight: 600,
+										fontSize: 11,
+										fontWeight: 700,
 										color: 'var(--text-secondary)',
 									}}
 								>
@@ -95,36 +105,36 @@ export function IdentityCard() {
 				</div>
 
 				<span
-					style={{ fontSize: 12, color: 'var(--text-tertiary)', flexShrink: 0 }}
+					style={{ fontSize: 11, color: 'var(--text-tertiary)', flexShrink: 0 }}
 				>
 					{expanded ? '▲' : '▼'}
 				</span>
 			</div>
 
-			{/* Expanded view */}
+			{/* Expanded */}
 			{expanded && (
 				<div
 					style={{
-						marginTop: 20,
+						marginTop: 16,
 						borderTop: '1px solid var(--border-primary)',
-						paddingTop: 16,
+						paddingTop: 14,
 					}}
 					onClick={e => e.stopPropagation()}
 				>
 					<p
 						style={{
-							fontSize: 11,
-							fontWeight: 500,
+							fontSize: 10,
+							fontWeight: 700,
 							color: 'var(--text-tertiary)',
 							textTransform: 'uppercase',
-							letterSpacing: '0.08em',
-							marginBottom: 14,
+							letterSpacing: '0.1em',
+							marginBottom: 12,
 						}}
 					>
 						Score breakdown
 					</p>
 
-					<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 						{identity.categories.map(cat => (
 							<div key={cat.name}>
 								<div
@@ -132,7 +142,7 @@ export function IdentityCard() {
 										display: 'flex',
 										justifyContent: 'space-between',
 										alignItems: 'center',
-										marginBottom: 5,
+										marginBottom: 4,
 									}}
 								>
 									<span
@@ -158,8 +168,8 @@ export function IdentityCard() {
 										<span
 											style={{
 												fontSize: 12,
-												fontWeight: 700,
-												color: identity.tierColor,
+												fontWeight: 800,
+												color: 'var(--accent-blue)',
 												minWidth: 28,
 												textAlign: 'right',
 											}}
@@ -168,10 +178,9 @@ export function IdentityCard() {
 										</span>
 									</div>
 								</div>
-								{/* Progress bar */}
 								<div
 									style={{
-										height: 4,
+										height: 3,
 										background: 'var(--bg-elevated)',
 										borderRadius: 2,
 										overflow: 'hidden',
@@ -181,9 +190,9 @@ export function IdentityCard() {
 										style={{
 											height: '100%',
 											width: `${cat.score}%`,
-											background: identity.tierColor,
+											background: 'var(--accent-blue)',
 											borderRadius: 2,
-											boxShadow: `0 0 8px ${identity.tierColor}66`,
+											boxShadow: '0 0 6px var(--accent-blue-glow)',
 											transition: 'width 0.6s ease',
 										}}
 									/>
@@ -195,7 +204,7 @@ export function IdentityCard() {
 					{/* Tips */}
 					<div
 						style={{
-							marginTop: 16,
+							marginTop: 14,
 							padding: '12px 14px',
 							background: 'var(--bg-elevated)',
 							borderRadius: 10,
@@ -203,11 +212,11 @@ export function IdentityCard() {
 					>
 						<p
 							style={{
-								fontSize: 11,
-								fontWeight: 600,
+								fontSize: 10,
+								fontWeight: 700,
 								color: 'var(--text-tertiary)',
 								textTransform: 'uppercase',
-								letterSpacing: '0.06em',
+								letterSpacing: '0.08em',
 								marginBottom: 8,
 							}}
 						>
@@ -216,7 +225,7 @@ export function IdentityCard() {
 						<div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
 							{!identity.hasENS && (
 								<p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-									• Register an ENS name at{' '}
+									• Register ENS at{' '}
 									<a
 										href='https://app.ens.domains'
 										target='_blank'
@@ -225,7 +234,7 @@ export function IdentityCard() {
 									>
 										ens.domains
 									</a>{' '}
-									(+40 Identity pts)
+									(+40 pts)
 								</p>
 							)}
 							{identity.categories[0].score < 70 && (

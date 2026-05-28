@@ -1,6 +1,3 @@
-'use client'
-
-import { useModeStore } from '@/store/modeStore'
 import type { CompoundPosition } from '@/types'
 
 function formatUSD(v: number) {
@@ -9,23 +6,20 @@ function formatUSD(v: number) {
 }
 
 export function CompoundCard({ position }: { position: CompoundPosition }) {
-	const { mode } = useModeStore()
-	const isSimple = mode === 'simple'
-
 	const utilizationRate =
 		position.supplied > 0 ? (position.borrowed / position.supplied) * 100 : 0
 
 	return (
 		<div
 			style={{
-				background: 'var(--gradient-card)',
+				background: 'var(--bg-card)',
 				border: '1px solid var(--border-primary)',
-				borderRadius: '16px',
-				padding: '20px',
+				borderRadius: 14,
+				padding: 18,
 				transition: 'border-color 0.2s',
 			}}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'var(--compound)44'
+				e.currentTarget.style.borderColor = 'rgba(0,211,149,0.3)'
 			}}
 			onMouseLeave={e => {
 				e.currentTarget.style.borderColor = 'var(--border-primary)'
@@ -37,21 +31,21 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					marginBottom: '16px',
+					marginBottom: 14,
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 					<div
 						style={{
-							width: '40px',
-							height: '40px',
-							borderRadius: '50%',
+							width: 38,
+							height: 38,
+							borderRadius: 10,
 							background: 'var(--compound-glow)',
-							border: '1px solid var(--compound)44',
+							border: '1px solid rgba(0,211,149,0.2)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: '20px',
+							fontSize: 18,
 						}}
 					>
 						🏦
@@ -59,35 +53,30 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					<div>
 						<p
 							style={{
-								fontWeight: 600,
+								fontWeight: 700,
 								color: 'var(--text-primary)',
-								fontSize: '14px',
+								fontSize: 14,
 							}}
 						>
-							{isSimple
-								? `Compound — ${position.market} savings`
-								: `Compound V3 · ${position.market}`}
+							Compound V3 · {position.market}
 						</p>
-						<p style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
-							{isSimple
-								? 'Like a savings account but on blockchain'
-								: 'Money market · Ethereum'}
+						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+							Money market · Ethereum
 						</p>
 					</div>
 				</div>
 				<span
 					style={{
-						fontSize: '12px',
-						fontWeight: 600,
+						fontSize: 11,
+						fontWeight: 700,
 						padding: '4px 10px',
-						borderRadius: '20px',
+						borderRadius: 8,
 						background: 'var(--compound-glow)',
 						color: 'var(--compound)',
+						border: '1px solid rgba(0,211,149,0.2)',
 					}}
 				>
-					{isSimple
-						? `Earning ${position.supplyAPR.toFixed(2)}%/yr`
-						: `${position.supplyAPR.toFixed(2)}% APR`}
+					{position.supplyAPR.toFixed(2)}% APR
 				</span>
 			</div>
 
@@ -96,77 +85,79 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3, 1fr)',
-					gap: '8px',
-					marginBottom: '16px',
+					gap: 6,
+					marginBottom: 12,
 				}}
 			>
 				{[
 					{
-						label: isSimple ? 'Net value' : 'Net value',
+						label: 'Net value',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: isSimple ? 'You deposited' : 'Supplied',
+						label: 'Supplied',
 						value: formatUSD(position.supplied),
 						color: 'var(--compound)',
 					},
 					{
-						label: isSimple ? 'You borrowed' : 'Borrowed',
+						label: 'Borrowed',
 						value: position.borrowed > 0 ? formatUSD(position.borrowed) : '—',
 						color: 'var(--text-secondary)',
 					},
-				].map(stat => (
+				].map(s => (
 					<div
-						key={stat.label}
+						key={s.label}
 						style={{
 							background: 'var(--bg-elevated)',
-							borderRadius: '10px',
-							padding: '10px 12px',
+							borderRadius: 8,
+							padding: '9px 10px',
 						}}
 					>
 						<p
 							style={{
-								fontSize: '11px',
+								fontSize: 10,
 								color: 'var(--text-tertiary)',
-								marginBottom: '4px',
+								marginBottom: 3,
+								fontWeight: 600,
+								textTransform: 'uppercase',
+								letterSpacing: '0.06em',
 							}}
 						>
-							{stat.label}
+							{s.label}
 						</p>
-						<p style={{ fontSize: '13px', fontWeight: 600, color: stat.color }}>
-							{stat.value}
+						<p style={{ fontSize: 13, fontWeight: 700, color: s.color }}>
+							{s.value}
 						</p>
 					</div>
 				))}
 			</div>
 
-			{/* APR comparison */}
-			<div style={{ display: 'flex', gap: '8px' }}>
+			{/* APR bars */}
+			<div style={{ display: 'flex', gap: 6 }}>
 				<div
 					style={{
 						flex: 1,
-						background: 'rgba(0, 211, 149, 0.06)',
-						border: '1px solid rgba(0, 211, 149, 0.12)',
-						borderRadius: '8px',
-						padding: '10px 12px',
+						background: 'rgba(0,211,149,0.06)',
+						border: '1px solid rgba(0,211,149,0.12)',
+						borderRadius: 8,
+						padding: '9px 10px',
 					}}
 				>
 					<p
 						style={{
-							fontSize: '11px',
+							fontSize: 10,
 							color: 'var(--text-tertiary)',
-							marginBottom: '4px',
+							marginBottom: 3,
+							fontWeight: 600,
+							textTransform: 'uppercase',
+							letterSpacing: '0.06em',
 						}}
 					>
-						{isSimple ? 'Interest you earn' : 'Supply APR'}
+						Supply APR
 					</p>
 					<p
-						style={{
-							fontSize: '14px',
-							fontWeight: 600,
-							color: 'var(--compound)',
-						}}
+						style={{ fontSize: 16, fontWeight: 800, color: 'var(--compound)' }}
 					>
 						{position.supplyAPR.toFixed(2)}%
 					</p>
@@ -175,52 +166,58 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					style={{
 						flex: 1,
 						background: 'var(--bg-elevated)',
-						borderRadius: '8px',
-						padding: '10px 12px',
+						borderRadius: 8,
+						padding: '9px 10px',
 					}}
 				>
 					<p
 						style={{
-							fontSize: '11px',
+							fontSize: 10,
 							color: 'var(--text-tertiary)',
-							marginBottom: '4px',
+							marginBottom: 3,
+							fontWeight: 600,
+							textTransform: 'uppercase',
+							letterSpacing: '0.06em',
 						}}
 					>
-						{isSimple ? 'Interest you pay' : 'Borrow APR'}
+						Borrow APR
 					</p>
 					<p
 						style={{
-							fontSize: '14px',
-							fontWeight: 600,
+							fontSize: 16,
+							fontWeight: 800,
 							color: 'var(--text-secondary)',
 						}}
 					>
 						{position.borrowAPR.toFixed(2)}%
 					</p>
 				</div>
-				{!isSimple && utilizationRate > 0 && (
+				{utilizationRate > 0 && (
 					<div
 						style={{
 							flex: 1,
 							background: 'var(--bg-elevated)',
-							borderRadius: '8px',
-							padding: '10px 12px',
+							borderRadius: 8,
+							padding: '9px 10px',
 						}}
 					>
 						<p
 							style={{
-								fontSize: '11px',
+								fontSize: 10,
 								color: 'var(--text-tertiary)',
-								marginBottom: '4px',
+								marginBottom: 3,
+								fontWeight: 600,
+								textTransform: 'uppercase',
+								letterSpacing: '0.06em',
 							}}
 						>
 							Utilization
 						</p>
 						<p
 							style={{
-								fontSize: '14px',
-								fontWeight: 600,
-								color: 'var(--text-secondary)',
+								fontSize: 16,
+								fontWeight: 800,
+								color: 'var(--accent-blue)',
 							}}
 						>
 							{utilizationRate.toFixed(1)}%

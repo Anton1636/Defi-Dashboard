@@ -1,5 +1,3 @@
-import { Sparkline, generateSparkData } from '@/components/ui/Sparkline'
-import { PriceTicker } from '@/components/ui/PriceTicker'
 import type {
 	DeFiPosition,
 	UniswapPosition,
@@ -13,135 +11,115 @@ function formatUSD(value: number): string {
 	return `$${value.toFixed(2)}`
 }
 
-function getPrimaryToken(position: DeFiPosition): string {
-	if (position.protocol === 'uniswap') {
-		return (position as UniswapPosition).token0.symbol
-	}
-	if (position.protocol === 'aave') {
-		const aave = position as AavePosition
-		return aave.supplies[0]?.symbol ?? 'ETH'
-	}
-	if (position.protocol === 'compound') {
-		return (position as CompoundPosition).market.replace('c', '').split('-')[0]
-	}
-	return 'ETH'
+const PROTOCOL_CONFIG: Record<
+	string,
+	{ icon: string; color: string; bg: string }
+> = {
+	uniswap: { icon: '🦄', color: 'var(--uniswap)', bg: 'var(--uniswap-glow)' },
+	aave: { icon: '👻', color: 'var(--aave)', bg: 'var(--aave-glow)' },
+	compound: {
+		icon: '🏦',
+		color: 'var(--compound)',
+		bg: 'var(--compound-glow)',
+	},
 }
 
-const PROTOCOL_STYLES: Record<string, { color: string; icon: string }> = {
-	uniswap: { color: 'var(--uniswap)', icon: '🦄' },
-	aave: { color: 'var(--aave)', icon: '👻' },
-	compound: { color: 'var(--compound)', icon: '🏦' },
-}
-
-function UniswapDetails({ position }: { position: UniswapPosition }) {
+function UniswapDetails({ pos }: { pos: UniswapPosition }) {
 	return (
 		<div style={{ textAlign: 'right' }}>
 			<p
-				style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)' }}
+				style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}
 			>
-				{position.token0.symbol}/{position.token1.symbol}
+				{pos.token0.symbol}/{pos.token1.symbol}
 			</p>
 			<p
 				style={{
 					fontSize: 11,
-					color: position.inRange
-						? 'var(--accent-green)'
-						: 'var(--accent-amber)',
+					color: pos.inRange ? 'var(--accent-green)' : 'var(--accent-amber)',
+					fontWeight: 600,
+					marginTop: 1,
 				}}
 			>
-				{position.inRange ? '● In range' : '○ Out of range'}
+				{pos.inRange ? '● In range' : '○ Out of range'}
 			</p>
 		</div>
 	)
 }
 
-function AaveDetails({ position }: { position: AavePosition }) {
-	const hfColor =
-		position.healthFactor > 2
+function AaveDetails({ pos }: { pos: AavePosition }) {
+	const color =
+		pos.healthFactor > 2
 			? 'var(--accent-green)'
-			: position.healthFactor > 1.5
+			: pos.healthFactor > 1.5
 				? 'var(--accent-amber)'
 				: 'var(--accent-red)'
-
 	return (
 		<div style={{ textAlign: 'right' }}>
-			<p style={{ fontSize: 12, fontWeight: 600, color: hfColor }}>
-				HF: {position.healthFactor.toFixed(2)}
+			<p
+				style={{
+					fontSize: 13,
+					fontWeight: 700,
+					color,
+					fontVariantNumeric: 'tabular-nums',
+				}}
+			>
+				HF: {pos.healthFactor.toFixed(2)}
 			</p>
-			<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-				{position.netAPY.toFixed(2)}% APY
+			<p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 1 }}>
+				{pos.netAPY.toFixed(2)}% APY
 			</p>
 		</div>
 	)
 }
 
-function CompoundDetails({ position }: { position: CompoundPosition }) {
+function CompoundDetails({ pos }: { pos: CompoundPosition }) {
 	return (
 		<div style={{ textAlign: 'right' }}>
-			<p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
-				{position.market}
+			<p style={{ fontSize: 13, fontWeight: 600, color: 'var(--compound)' }}>
+				{pos.supplyAPR.toFixed(2)}% APR
 			</p>
-			<p style={{ fontSize: 11, color: 'var(--accent-green)' }}>
-				{position.supplyAPR.toFixed(2)}% APR
+			<p style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 1 }}>
+				{pos.market}
 			</p>
 		</div>
 	)
 }
 
-interface PositionRowProps {
-	position: DeFiPosition
-	index?: number
-}
-
-export function PositionRow({ position, index = 0 }: PositionRowProps) {
-	const style = PROTOCOL_STYLES[position.protocol]
-	const sparkData = generateSparkData(`${position.id}-7d`, 7)
-	const primaryToken = getPrimaryToken(position)
+export function PositionRow({ position }: { position: DeFiPosition }) {
+	const cfg = PROTOCOL_CONFIG[position.protocol]
 
 	return (
 		<div
-			className='slide-in'
 			style={{
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'space-between',
-				padding: '12px 0',
+				padding: '10px 0',
 				borderBottom: '1px solid var(--border-primary)',
-				transition: 'background 0.15s, padding 0.15s, margin 0.15s',
+				transition: 'all 0.15s',
 				cursor: 'default',
-				gap: 12,
-				animationDelay: `${index * 0.06}s`,
 			}}
 			onMouseEnter={e => {
 				e.currentTarget.style.background = 'var(--bg-elevated)'
 				e.currentTarget.style.margin = '0 -20px'
-				e.currentTarget.style.padding = '12px 20px'
-				e.currentTarget.style.borderRadius = '10px'
+				e.currentTarget.style.padding = '10px 20px'
+				e.currentTarget.style.borderRadius = '8px'
 			}}
 			onMouseLeave={e => {
 				e.currentTarget.style.background = 'transparent'
 				e.currentTarget.style.margin = '0'
-				e.currentTarget.style.padding = '12px 0'
+				e.currentTarget.style.padding = '10px 0'
 				e.currentTarget.style.borderRadius = '0'
 			}}
 		>
-			{/* Left — icon + protocol + value */}
-			<div
-				style={{
-					display: 'flex',
-					alignItems: 'center',
-					gap: 12,
-					flex: 1,
-					minWidth: 0,
-				}}
-			>
+			<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 				<div
 					style={{
-						width: 36,
-						height: 36,
-						borderRadius: '50%',
-						background: `${style?.color}22`,
-						border: `1px solid ${style?.color}44`,
+						width: 34,
+						height: 34,
+						borderRadius: 10,
+						background: cfg?.bg,
+						border: `1px solid ${cfg?.color}33`,
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
@@ -149,49 +127,41 @@ export function PositionRow({ position, index = 0 }: PositionRowProps) {
 						flexShrink: 0,
 					}}
 				>
-					{style?.icon}
+					{cfg?.icon}
 				</div>
-				<div style={{ minWidth: 0 }}>
+				<div>
 					<p
 						style={{
 							fontSize: 13,
-							fontWeight: 500,
+							fontWeight: 600,
 							color: 'var(--text-primary)',
 						}}
 					>
 						{position.protocol.charAt(0).toUpperCase() +
 							position.protocol.slice(1)}
 					</p>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-						<p
-							style={{
-								fontSize: 13,
-								fontWeight: 600,
-								color: 'var(--text-primary)',
-							}}
-						>
-							{formatUSD(position.valueUSD)}
-						</p>
-						{/* Live price */}
-						<PriceTicker symbol={primaryToken} showChange={false} size='sm' />
-					</div>
+					<p
+						style={{
+							fontSize: 12,
+							color: 'var(--text-secondary)',
+							fontWeight: 700,
+							marginTop: 1,
+							fontVariantNumeric: 'tabular-nums',
+						}}
+					>
+						{formatUSD(position.valueUSD)}
+					</p>
 				</div>
 			</div>
 
-			{/* Center — sparkline */}
-			<div style={{ flexShrink: 0 }}>
-				<Sparkline data={sparkData} width={64} height={24} />
-			</div>
-
-			{/* Right — protocol details */}
 			{position.protocol === 'uniswap' && (
-				<UniswapDetails position={position as UniswapPosition} />
+				<UniswapDetails pos={position as UniswapPosition} />
 			)}
 			{position.protocol === 'aave' && (
-				<AaveDetails position={position as AavePosition} />
+				<AaveDetails pos={position as AavePosition} />
 			)}
 			{position.protocol === 'compound' && (
-				<CompoundDetails position={position as CompoundPosition} />
+				<CompoundDetails pos={position as CompoundPosition} />
 			)}
 		</div>
 	)

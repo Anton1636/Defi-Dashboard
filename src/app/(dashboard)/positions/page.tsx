@@ -8,8 +8,8 @@ import { UniswapCard } from '@/components/positions/UniswapCard'
 import { AaveCard } from '@/components/positions/AaveCard'
 import { CompoundCard } from '@/components/positions/CompoundCard'
 import { SkeletonCard } from '@/components/dashboard/SkeletonCard'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
 import dynamic from 'next/dynamic'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import type {
 	DeFiPosition,
 	UniswapPosition,
@@ -56,7 +56,8 @@ export default function PositionsPage() {
 				<h2
 					style={{
 						fontSize: 20,
-						fontWeight: 600,
+						fontWeight: 800,
+						letterSpacing: '-0.5px',
 						color: 'var(--text-primary)',
 					}}
 				>
@@ -78,24 +79,19 @@ export default function PositionsPage() {
 
 	if (isLoading) {
 		return (
-			<div>
-				<div style={{ marginBottom: 24 }}>
-					<h1
-						style={{
-							fontSize: 24,
-							fontWeight: 700,
-							color: 'var(--text-primary)',
-							letterSpacing: '-0.5px',
-						}}
-					>
-						Positions
-					</h1>
+			<div className='fade-in'>
+				<div style={{ marginBottom: 20 }}>
+					<div
+						className='skeleton'
+						style={{ height: 28, width: 120, marginBottom: 6 }}
+					/>
+					<div className='skeleton' style={{ height: 14, width: 200 }} />
 				</div>
 				<div
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-						gap: 16,
+						gap: 12,
 					}}
 				>
 					{Array.from({ length: 3 }).map((_, i) => (
@@ -116,7 +112,7 @@ export default function PositionsPage() {
 					minHeight: '60vh',
 				}}
 			>
-				<p style={{ color: 'var(--accent-red)', fontWeight: 500 }}>
+				<p style={{ color: 'var(--accent-red)', fontWeight: 600 }}>
 					Failed to load positions
 				</p>
 			</div>
@@ -124,24 +120,24 @@ export default function PositionsPage() {
 	}
 
 	return (
-		<div>
+		<div className='fade-in'>
 			{/* Header */}
 			<div
 				style={{
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					marginBottom: 24,
+					marginBottom: 20,
 				}}
 			>
 				<div>
 					<h1
 						style={{
 							fontSize: 24,
-							fontWeight: 700,
+							fontWeight: 900,
 							color: 'var(--text-primary)',
-							letterSpacing: '-0.5px',
-							marginBottom: 4,
+							letterSpacing: '-1px',
+							marginBottom: 3,
 						}}
 					>
 						Positions
@@ -153,8 +149,8 @@ export default function PositionsPage() {
 				</div>
 			</div>
 
-			{/* Protocol filter */}
-			<div style={{ marginBottom: 20 }}>
+			{/* Filter */}
+			<div style={{ marginBottom: 16 }}>
 				<ProtocolFilter
 					active={activeFilter}
 					counts={counts}
@@ -162,7 +158,7 @@ export default function PositionsPage() {
 				/>
 			</div>
 
-			{/* Positions grid */}
+			{/* Cards */}
 			{filtered.length === 0 ? (
 				<div
 					style={{
@@ -184,7 +180,7 @@ export default function PositionsPage() {
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-						gap: 16,
+						gap: 12,
 					}}
 				>
 					{filtered.map((position: DeFiPosition) => {

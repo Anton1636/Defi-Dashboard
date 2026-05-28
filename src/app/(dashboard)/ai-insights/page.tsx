@@ -3,11 +3,10 @@
 import { useEffect } from 'react'
 import { useAI } from '@/hooks/useAI'
 import { useWallet } from '@/hooks/useWallet'
-import { useMode } from '@/hooks/useMode'
-import { ModeToggle } from '@/components/ui/ModeToggle'
 import { StreamingText } from '@/components/ai/StreamingText'
 import { AnalysisCard } from '@/components/ai/AnalysisCard'
 import { QuestionInput } from '@/components/ai/QuestionInput'
+import { ModeToggle } from '@/components/ui/ModeToggle'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 export default function AIInsightsPage() {
@@ -24,12 +23,8 @@ export default function AIInsightsPage() {
 	} = useAI()
 
 	useEffect(() => {
-		if (isConnected) {
-			fetchHistory()
-		}
+		if (isConnected) fetchHistory()
 	}, [isConnected, fetchHistory])
-
-	const { isSimple } = useMode()
 
 	if (!isConnected) {
 		return (
@@ -40,14 +35,15 @@ export default function AIInsightsPage() {
 					alignItems: 'center',
 					justifyContent: 'center',
 					minHeight: '60vh',
-					gap: '16px',
+					gap: 16,
 				}}
 			>
-				<div style={{ fontSize: '48px' }}>◇</div>
+				<div style={{ fontSize: 48 }}>◎</div>
 				<h2
 					style={{
-						fontSize: '20px',
-						fontWeight: 600,
+						fontSize: 20,
+						fontWeight: 800,
+						letterSpacing: '-0.5px',
 						color: 'var(--text-primary)',
 					}}
 				>
@@ -55,9 +51,9 @@ export default function AIInsightsPage() {
 				</h2>
 				<p
 					style={{
-						fontSize: '14px',
+						fontSize: 14,
 						color: 'var(--text-secondary)',
-						marginBottom: '8px',
+						marginBottom: 8,
 					}}
 				>
 					Connect to get AI-powered portfolio insights
@@ -68,44 +64,44 @@ export default function AIInsightsPage() {
 	}
 
 	return (
-		<div style={{ maxWidth: '860px' }}>
+		<div style={{ maxWidth: 860 }} className='fade-in'>
 			{/* Header */}
-			<div style={{ marginBottom: '28px' }}>
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						gap: '12px',
-						marginBottom: '8px',
-					}}
-				>
+			<div
+				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'space-between',
+					marginBottom: 24,
+				}}
+			>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 					<div
 						style={{
-							width: '36px',
-							height: '36px',
-							borderRadius: '10px',
+							width: 36,
+							height: 36,
+							borderRadius: 10,
 							background: 'var(--accent-blue-glow)',
-							border: '1px solid var(--accent-blue)44',
+							border: '1px solid var(--border-accent)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: '18px',
+							fontSize: 18,
 						}}
 					>
-						◇
+						◎
 					</div>
 					<div>
 						<h1
 							style={{
-								fontSize: '24px',
-								fontWeight: 700,
+								fontSize: 24,
+								fontWeight: 900,
 								color: 'var(--text-primary)',
-								letterSpacing: '-0.5px',
+								letterSpacing: '-1px',
 							}}
 						>
 							AI Insights
 						</h1>
-						<p style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
 							Powered by Gemini
 						</p>
 					</div>
@@ -113,60 +109,67 @@ export default function AIInsightsPage() {
 				<ModeToggle />
 			</div>
 
-			{/* Analyze button */}
+			{/* Analyze card */}
 			<div
 				style={{
-					background: 'var(--gradient-card)',
+					background: 'var(--bg-card)',
 					border: '1px solid var(--border-primary)',
-					borderRadius: '16px',
-					padding: '20px',
-					marginBottom: '20px',
+					borderRadius: 14,
+					padding: 20,
+					marginBottom: 20,
+					position: 'relative',
+					overflow: 'hidden',
 				}}
 			>
+				{/* Cyan top line */}
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						right: 0,
+						height: 2,
+						background: 'linear-gradient(90deg, var(--accent-blue), #0066cc)',
+					}}
+				/>
+
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						marginBottom: '16px',
+						marginBottom: 16,
 					}}
 				>
 					<div>
 						<p
 							style={{
-								fontSize: '14px',
-								fontWeight: 500,
+								fontSize: 14,
+								fontWeight: 700,
 								color: 'var(--text-primary)',
-								marginBottom: '4px',
+								marginBottom: 3,
 							}}
 						>
 							Portfolio Analysis
 						</p>
-						<p style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
-							Get a full breakdown of your positions, risks and opportunities
+						<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+							Full breakdown of your positions, risks and opportunities
 						</p>
 					</div>
 					<button
-						onClick={() =>
-							analyze(
-								isSimple
-									? "Explain my portfolio in simple terms, like I'm new to DeFi. No technical jargon. Use analogies."
-									: undefined,
-							)
-						}
+						onClick={() => analyze()}
 						disabled={!canAnalyze}
 						style={{
-							padding: '10px 20px',
-							borderRadius: '10px',
-							fontSize: '13px',
-							fontWeight: 500,
-							color: 'white',
+							padding: '9px 20px',
+							borderRadius: 10,
+							fontSize: 13,
+							fontWeight: 800,
+							color: canAnalyze ? '#000' : 'var(--text-tertiary)',
 							background: canAnalyze
-								? 'var(--gradient-blue)'
+								? 'var(--accent-blue)'
 								: 'var(--bg-elevated)',
 							border: 'none',
 							cursor: canAnalyze ? 'pointer' : 'not-allowed',
-							opacity: canAnalyze ? 1 : 0.5,
 							boxShadow: canAnalyze
 								? '0 0 20px var(--accent-blue-glow)'
 								: 'none',
@@ -174,57 +177,61 @@ export default function AIInsightsPage() {
 							flexShrink: 0,
 						}}
 					>
-						{isStreaming ? 'Analyzing...' : '✦ Analyze Now'}
+						{isStreaming ? '◎ Analyzing...' : '◎ Analyze Now'}
 					</button>
 				</div>
 
-				{/* Streaming response area */}
+				{/* Streaming */}
 				{(streamingText || isStreaming) && (
 					<div
 						style={{
 							background: 'var(--bg-elevated)',
-							borderRadius: '10px',
-							padding: '16px',
-							marginBottom: '16px',
-							minHeight: '80px',
+							borderRadius: 10,
+							padding: 16,
+							marginBottom: 16,
+							minHeight: 80,
 							animation: 'fadeIn 0.3s ease-out',
 						}}
 					>
-						{/* AI avatar */}
 						<div
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: '8px',
-								marginBottom: '12px',
+								gap: 8,
+								marginBottom: 10,
 							}}
 						>
 							<div
 								style={{
-									width: '24px',
-									height: '24px',
-									borderRadius: '6px',
-									background: 'var(--gradient-blue)',
+									width: 22,
+									height: 22,
+									borderRadius: 6,
+									background: 'var(--accent-blue)',
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									fontSize: '12px',
+									fontSize: 11,
+									color: '#000',
+									fontWeight: 800,
 								}}
 							>
-								◇
+								G
 							</div>
-							<span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+							<span
+								style={{
+									fontSize: 11,
+									color: 'var(--text-tertiary)',
+									fontWeight: 600,
+								}}
+							>
 								Gemini 1.5 Flash
 								{isStreaming && (
-									<span
-										style={{ color: 'var(--accent-green)', marginLeft: '6px' }}
-									>
+									<span style={{ color: 'var(--accent-green)', marginLeft: 6 }}>
 										● generating...
 									</span>
 								)}
 							</span>
 						</div>
-
 						<StreamingText text={streamingText} isStreaming={isStreaming} />
 					</div>
 				)}
@@ -233,20 +240,63 @@ export default function AIInsightsPage() {
 				{error && (
 					<div
 						style={{
-							background: 'rgba(239, 68, 68, 0.08)',
-							border: '1px solid rgba(239, 68, 68, 0.2)',
-							borderRadius: '8px',
+							background: 'var(--accent-red-glow)',
+							border: '1px solid rgba(255,69,58,0.2)',
+							borderRadius: 8,
 							padding: '10px 14px',
-							fontSize: '13px',
+							fontSize: 13,
 							color: 'var(--accent-red)',
-							marginBottom: '16px',
+							marginBottom: 14,
 						}}
 					>
 						{error}
 					</div>
 				)}
 
-				{/* Custom question input */}
+				{/* Quick questions */}
+				<div
+					style={{
+						display: 'flex',
+						gap: 6,
+						flexWrap: 'wrap',
+						marginBottom: 14,
+					}}
+				>
+					{[
+						'What are my biggest risks right now?',
+						'How can I improve my yield?',
+						'Is my Aave position safe?',
+						'Should I rebalance my portfolio?',
+					].map(q => (
+						<button
+							key={q}
+							onClick={() => analyze(q)}
+							disabled={isStreaming}
+							style={{
+								padding: '5px 12px',
+								borderRadius: 20,
+								fontSize: 11,
+								fontWeight: 600,
+								background: 'var(--bg-elevated)',
+								border: '1px solid var(--border-primary)',
+								color: 'var(--text-secondary)',
+								cursor: 'pointer',
+								transition: 'all 0.15s',
+							}}
+							onMouseEnter={e => {
+								e.currentTarget.style.borderColor = 'var(--border-accent)'
+								e.currentTarget.style.color = 'var(--accent-blue)'
+							}}
+							onMouseLeave={e => {
+								e.currentTarget.style.borderColor = 'var(--border-primary)'
+								e.currentTarget.style.color = 'var(--text-secondary)'
+							}}
+						>
+							{q}
+						</button>
+					))}
+				</div>
+
 				<QuestionInput onSubmit={q => analyze(q)} isLoading={isStreaming} />
 			</div>
 
@@ -257,55 +307,54 @@ export default function AIInsightsPage() {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						marginBottom: '14px',
+						marginBottom: 12,
 					}}
 				>
 					<p
 						style={{
-							fontSize: '13px',
-							fontWeight: 500,
-							color: 'var(--text-secondary)',
+							fontSize: 12,
+							fontWeight: 700,
+							color: 'var(--text-tertiary)',
+							textTransform: 'uppercase',
+							letterSpacing: '0.08em',
 						}}
 					>
 						Previous analyses
 					</p>
-					<span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+					<span
+						style={{
+							fontSize: 11,
+							color: 'var(--text-tertiary)',
+							background: 'var(--bg-elevated)',
+							padding: '2px 8px',
+							borderRadius: 20,
+							fontWeight: 600,
+						}}
+					>
 						{history.length} saved
 					</span>
 				</div>
 
 				{isLoadingHistory ? (
-					// Loading skeleton for history
-					<div
-						style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
-					>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 						{Array.from({ length: 3 }).map((_, i) => (
 							<div
 								key={i}
 								style={{
-									background: 'var(--gradient-card)',
+									background: 'var(--bg-card)',
 									border: '1px solid var(--border-primary)',
-									borderRadius: '12px',
-									padding: '16px',
-									height: '80px',
+									borderRadius: 12,
+									padding: 16,
+									height: 72,
 								}}
 							>
 								<div
-									style={{
-										height: '12px',
-										background: 'var(--bg-elevated)',
-										borderRadius: '4px',
-										width: '40%',
-										marginBottom: '8px',
-									}}
+									className='skeleton'
+									style={{ height: 11, width: '40%', marginBottom: 8 }}
 								/>
 								<div
-									style={{
-										height: '10px',
-										background: 'var(--bg-elevated)',
-										borderRadius: '4px',
-										width: '70%',
-									}}
+									className='skeleton'
+									style={{ height: 10, width: '70%' }}
 								/>
 							</div>
 						))}
@@ -321,16 +370,14 @@ export default function AIInsightsPage() {
 							color: 'var(--text-tertiary)',
 						}}
 					>
-						<p style={{ fontSize: '32px', marginBottom: '12px' }}>◇</p>
-						<p style={{ fontSize: '13px' }}>No analyses yet</p>
-						<p style={{ fontSize: '12px', marginTop: '4px' }}>
+						<p style={{ fontSize: 32, marginBottom: 10 }}>◎</p>
+						<p style={{ fontSize: 13 }}>No analyses yet</p>
+						<p style={{ fontSize: 12, marginTop: 4 }}>
 							{'Click "Analyze Now" to get your first AI insights'}
 						</p>
 					</div>
 				) : (
-					<div
-						style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
-					>
+					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 						{history.map((analysis, index) => (
 							<AnalysisCard
 								key={analysis.id}

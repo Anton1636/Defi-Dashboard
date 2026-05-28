@@ -11,12 +11,12 @@ const LEVEL_CONFIG = {
 	},
 	normal: {
 		color: 'var(--accent-amber)',
-		bg: 'rgba(245,158,11,0.1)',
+		bg: 'rgba(255,214,10,0.08)',
 		label: '🟡 Normal — acceptable fees',
 	},
 	high: {
-		color: '#f97316',
-		bg: 'rgba(249,115,22,0.1)',
+		color: '#ff9f0a',
+		bg: 'rgba(255,159,10,0.08)',
 		label: '🟠 High — consider waiting',
 	},
 	'very-high': {
@@ -38,23 +38,30 @@ export function GasWidget() {
 
 	if (isLoading) {
 		return (
-			<div className='card' style={{ padding: 20 }}>
+			<div
+				style={{
+					background: 'var(--bg-card)',
+					border: '1px solid var(--border-primary)',
+					borderRadius: 14,
+					padding: 18,
+				}}
+			>
 				<div
 					className='skeleton'
-					style={{ height: 14, width: '40%', marginBottom: 16 }}
+					style={{ height: 12, width: '40%', marginBottom: 14 }}
 				/>
 				<div
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(3,1fr)',
-						gap: 12,
+						gap: 8,
 					}}
 				>
 					{[0, 1, 2].map(i => (
 						<div
 							key={i}
 							className='skeleton'
-							style={{ height: 80, borderRadius: 12 }}
+							style={{ height: 80, borderRadius: 10 }}
 						/>
 					))}
 				</div>
@@ -64,26 +71,33 @@ export function GasWidget() {
 
 	if (!data) return null
 
-	const config = LEVEL_CONFIG[data.level]
+	const cfg = LEVEL_CONFIG[data.level]
 
 	return (
-		<div className='card' style={{ padding: 20 }}>
+		<div
+			style={{
+				background: 'var(--bg-card)',
+				border: '1px solid var(--border-primary)',
+				borderRadius: 14,
+				padding: 18,
+			}}
+		>
 			{/* Header */}
 			<div
 				style={{
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					marginBottom: 16,
+					marginBottom: 14,
 				}}
 			>
 				<div>
 					<p
 						style={{
 							fontSize: 14,
-							fontWeight: 600,
+							fontWeight: 700,
 							color: 'var(--text-primary)',
-							marginBottom: 4,
+							marginBottom: 2,
 						}}
 					>
 						⛽ Gas Prices
@@ -95,14 +109,15 @@ export function GasWidget() {
 				<div
 					style={{
 						padding: '4px 12px',
-						borderRadius: 20,
-						background: config.bg,
-						color: config.color,
-						fontSize: 12,
-						fontWeight: 500,
+						borderRadius: 8,
+						background: cfg.bg,
+						color: cfg.color,
+						fontSize: 11,
+						fontWeight: 700,
+						border: `1px solid ${cfg.color}33`,
 					}}
 				>
-					{config.label}
+					{cfg.label}
 				</div>
 			</div>
 
@@ -111,51 +126,55 @@ export function GasWidget() {
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3,1fr)',
-					gap: 10,
-					marginBottom: 16,
+					gap: 8,
+					marginBottom: 12,
 				}}
 			>
 				{TIERS.map(tier => {
 					const gwei = data[tier.key]
 					const costUSD = ((150_000 * gwei) / 1e9) * ethPrice
-					const isRecommended = tier.key === 'standard'
+					const isRec = tier.key === 'standard'
 
 					return (
 						<div
 							key={tier.key}
 							style={{
-								background: isRecommended ? config.bg : 'var(--bg-elevated)',
-								border: `1px solid ${isRecommended ? config.color + '44' : 'var(--border-primary)'}`,
-								borderRadius: 12,
-								padding: '12px 14px',
+								background: isRec ? `${cfg.color}10` : 'var(--bg-elevated)',
+								border: `1px solid ${isRec ? cfg.color + '33' : 'var(--border-primary)'}`,
+								borderRadius: 10,
+								padding: '12px',
 								position: 'relative',
 							}}
 						>
-							{isRecommended && (
+							{isRec && (
 								<div
 									style={{
 										position: 'absolute',
 										top: -8,
 										left: '50%',
 										transform: 'translateX(-50%)',
-										fontSize: 10,
-										fontWeight: 600,
-										color: config.color,
+										fontSize: 9,
+										fontWeight: 800,
+										color: cfg.color,
 										background: 'var(--bg-card)',
 										padding: '2px 8px',
-										borderRadius: 10,
-										border: `1px solid ${config.color}44`,
+										borderRadius: 20,
+										border: `1px solid ${cfg.color}33`,
 										whiteSpace: 'nowrap',
+										letterSpacing: '0.08em',
 									}}
 								>
 									RECOMMENDED
 								</div>
 							)}
-							<p style={{ fontSize: 16, marginBottom: 2 }}>{tier.icon}</p>
+							<p style={{ fontSize: 16, marginBottom: 4 }}>{tier.icon}</p>
 							<p
 								style={{
-									fontSize: 11,
+									fontSize: 10,
 									color: 'var(--text-tertiary)',
+									fontWeight: 600,
+									textTransform: 'uppercase',
+									letterSpacing: '0.06em',
 									marginBottom: 4,
 								}}
 							>
@@ -163,20 +182,31 @@ export function GasWidget() {
 							</p>
 							<p
 								style={{
-									fontSize: 18,
-									fontWeight: 700,
-									color: isRecommended ? config.color : 'var(--text-primary)',
+									fontSize: 20,
+									fontWeight: 800,
+									color: isRec ? cfg.color : 'var(--text-primary)',
 									fontVariantNumeric: 'tabular-nums',
+									lineHeight: 1,
+									marginBottom: 2,
 								}}
 							>
-								{gwei}{' '}
-								<span style={{ fontSize: 11, fontWeight: 400 }}>gwei</span>
+								{gwei}
+								<span
+									style={{
+										fontSize: 11,
+										fontWeight: 500,
+										color: 'var(--text-tertiary)',
+										marginLeft: 3,
+									}}
+								>
+									gwei
+								</span>
 							</p>
 							<p
 								style={{
-									fontSize: 11,
+									fontSize: 10,
 									color: 'var(--text-tertiary)',
-									marginTop: 2,
+									marginBottom: 2,
 								}}
 							>
 								{tier.desc}
@@ -185,7 +215,7 @@ export function GasWidget() {
 								style={{
 									fontSize: 11,
 									color: 'var(--text-secondary)',
-									marginTop: 4,
+									fontWeight: 600,
 								}}
 							>
 								~${costUSD.toFixed(2)} swap
@@ -195,7 +225,7 @@ export function GasWidget() {
 				})}
 			</div>
 
-			{/* Base fee */}
+			{/* Footer */}
 			<div
 				style={{
 					display: 'flex',
@@ -203,14 +233,14 @@ export function GasWidget() {
 					alignItems: 'center',
 				}}
 			>
-				<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+				<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
 					Base fee:{' '}
-					<span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+					<span style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>
 						{data.baseFee} gwei
 					</span>
 				</p>
 				{lastRefresh && (
-					<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+					<p style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>
 						Updated {lastRefresh.toLocaleTimeString()}
 					</p>
 				)}
