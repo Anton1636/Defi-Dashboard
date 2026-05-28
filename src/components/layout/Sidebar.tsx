@@ -14,17 +14,17 @@ export function Sidebar() {
 			label: t.nav.portfolio,
 			icon: (
 				<svg
-					width='18'
-					height='18'
+					width='16'
+					height='16'
 					viewBox='0 0 24 24'
 					fill='none'
 					stroke='currentColor'
-					strokeWidth='1.5'
+					strokeWidth='1.8'
 				>
-					<rect x='3' y='3' width='7' height='7' rx='1' />
-					<rect x='14' y='3' width='7' height='7' rx='1' />
-					<rect x='3' y='14' width='7' height='7' rx='1' />
-					<rect x='14' y='14' width='7' height='7' rx='1' />
+					<rect x='3' y='3' width='7' height='7' rx='1.5' />
+					<rect x='14' y='3' width='7' height='7' rx='1.5' />
+					<rect x='3' y='14' width='7' height='7' rx='1.5' />
+					<rect x='14' y='14' width='7' height='7' rx='1.5' />
 				</svg>
 			),
 		},
@@ -33,12 +33,12 @@ export function Sidebar() {
 			label: t.nav.positions,
 			icon: (
 				<svg
-					width='18'
-					height='18'
+					width='16'
+					height='16'
 					viewBox='0 0 24 24'
 					fill='none'
 					stroke='currentColor'
-					strokeWidth='1.5'
+					strokeWidth='1.8'
 				>
 					<path d='M3 9h18M3 15h18M9 3v18M15 3v18' strokeLinecap='round' />
 				</svg>
@@ -49,12 +49,12 @@ export function Sidebar() {
 			label: t.nav.analytics,
 			icon: (
 				<svg
-					width='18'
-					height='18'
+					width='16'
+					height='16'
 					viewBox='0 0 24 24'
 					fill='none'
 					stroke='currentColor'
-					strokeWidth='1.5'
+					strokeWidth='1.8'
 				>
 					<path
 						d='M3 20h18M5 20V14m4 6V10m4 10V6m4 14v-8'
@@ -68,14 +68,14 @@ export function Sidebar() {
 			label: t.nav.aiInsights,
 			icon: (
 				<svg
-					width='18'
-					height='18'
+					width='16'
+					height='16'
 					viewBox='0 0 24 24'
 					fill='none'
 					stroke='currentColor'
-					strokeWidth='1.5'
+					strokeWidth='1.8'
 				>
-					<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
+					<circle cx='12' cy='12' r='10' />
 					<path d='M12 8v4l3 3' strokeLinecap='round' />
 				</svg>
 			),
@@ -86,62 +86,35 @@ export function Sidebar() {
 		<aside
 			className='sidebar'
 			style={{
-				width: 220,
+				width: 200,
 				minHeight: '100vh',
 				background: 'var(--sidebar-bg)',
 				borderRight: '1px solid var(--border-primary)',
 				flexDirection: 'column',
 				flexShrink: 0,
-				transition: 'background 0.25s ease',
 			}}
 		>
-			<div
-				style={{
-					padding: '24px 20px',
-					borderBottom: '1px solid var(--border-primary)',
-				}}
-			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-					<div
-						style={{
-							width: 32,
-							height: 32,
-							borderRadius: 10,
-							background: 'var(--gradient-blue)',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							boxShadow: '0 0 20px var(--accent-blue-glow)',
-						}}
-					>
-						<span style={{ color: 'white', fontWeight: 700, fontSize: 14 }}>
-							D
-						</span>
-					</div>
-					<div>
-						<p
-							style={{
-								color: 'var(--text-primary)',
-								fontWeight: 600,
-								fontSize: 14,
-							}}
-						>
-							DeFi
-						</p>
-						<p style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>
-							Dashboard
-						</p>
-					</div>
-				</div>
-			</div>
-
-			<nav style={{ flex: 1, padding: 12 }}>
+			{/* Nav */}
+			<nav style={{ flex: 1, padding: '16px 10px' }}>
+				<p
+					style={{
+						fontSize: 10,
+						color: 'var(--text-tertiary)',
+						fontWeight: 700,
+						textTransform: 'uppercase',
+						letterSpacing: '0.1em',
+						padding: '0 10px',
+						marginBottom: 8,
+					}}
+				>
+					Menu
+				</p>
 				<ul
 					style={{
 						listStyle: 'none',
 						display: 'flex',
 						flexDirection: 'column',
-						gap: 2,
+						gap: 1,
 					}}
 				>
 					{NAV_ITEMS.map(item => {
@@ -153,23 +126,38 @@ export function Sidebar() {
 									style={{
 										display: 'flex',
 										alignItems: 'center',
-										gap: 10,
-										padding: '10px 12px',
-										borderRadius: 10,
+										gap: 9,
+										padding: '9px 10px',
+										borderRadius: 8,
 										fontSize: 13,
-										fontWeight: isActive ? 500 : 400,
+										fontWeight: isActive ? 600 : 400,
 										color: isActive
 											? 'var(--text-primary)'
 											: 'var(--text-secondary)',
-										background: isActive ? 'var(--bg-elevated)' : 'transparent',
-										borderLeft: isActive
-											? '2px solid var(--accent-blue)'
-											: '2px solid transparent',
+										background: isActive ? 'var(--bg-card)' : 'transparent',
+										borderLeft: `2px solid ${isActive ? 'var(--accent-blue)' : 'transparent'}`,
 										transition: 'all 0.15s',
 										textDecoration: 'none',
 									}}
+									onMouseEnter={e => {
+										if (!isActive) {
+											e.currentTarget.style.color = 'var(--text-primary)'
+											e.currentTarget.style.background = 'var(--bg-elevated)'
+										}
+									}}
+									onMouseLeave={e => {
+										if (!isActive) {
+											e.currentTarget.style.color = 'var(--text-secondary)'
+											e.currentTarget.style.background = 'transparent'
+										}
+									}}
 								>
-									<span style={{ opacity: isActive ? 1 : 0.6 }}>
+									<span
+										style={{
+											opacity: isActive ? 1 : 0.5,
+											color: isActive ? 'var(--accent-blue)' : 'currentColor',
+										}}
+									>
 										{item.icon}
 									</span>
 									{item.label}
@@ -180,14 +168,19 @@ export function Sidebar() {
 				</ul>
 			</nav>
 
+			{/* Bottom */}
 			<div
-				style={{ padding: 16, borderTop: '1px solid var(--border-primary)' }}
+				style={{
+					padding: '12px 16px',
+					borderTop: '1px solid var(--border-primary)',
+				}}
 			>
 				<p
 					style={{
-						fontSize: 11,
+						fontSize: 10,
 						color: 'var(--text-tertiary)',
 						textAlign: 'center',
+						fontWeight: 500,
 					}}
 				>
 					v0.1.0 · Mainnet

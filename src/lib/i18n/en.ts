@@ -101,6 +101,6 @@ export const en = {
 		pro: 'PRO',
 		simple: 'SIMPLE',
 	},
-} as const
+}
 
 export type TranslationKeys = typeof en

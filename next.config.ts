@@ -6,12 +6,13 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 const isDev = process.env.NODE_ENV === 'development'
+const isProd = process.env.NODE_ENV === 'production'
 
 const csp = [
 	"default-src 'self'",
 	isDev
 		? "script-src 'self' 'unsafe-eval' 'unsafe-inline'"
-		: "script-src 'self'",
+		: "script-src 'self' 'unsafe-inline'",
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data: https: blob:",
 	"font-src 'self' data:",
@@ -34,6 +35,8 @@ const csp = [
 		'wss://*.bridge.walletconnect.org',
 		'wss://stream.binance.com:9443',
 		'https://api.gopluslabs.io',
+		'https://api.tenderly.co',
+		'https://api.gopluslabs.io',
 	].join(' '),
 	"frame-ancestors 'none'",
 	"base-uri 'self'",
@@ -41,7 +44,18 @@ const csp = [
 ].join('; ')
 
 const nextConfig: NextConfig = {
-	// output: 'standalone',
+	output: isProd ? 'standalone' : undefined,
+	poweredByHeader: false,
+	compress: true,
+	productionBrowserSourceMaps: false,
+	reactStrictMode: true,
+	compiler: isProd
+		? {
+				removeConsole: {
+					exclude: ['error', 'warn'],
+				},
+			}
+		: {},
 
 	experimental: {
 		optimizePackageImports: [
@@ -51,7 +65,9 @@ const nextConfig: NextConfig = {
 			'viem',
 			'@aave/contract-helpers',
 			'@aave/math-utils',
+			'zustand',
 		],
+		typedRoutes: false,
 	},
 
 	turbopack: {
@@ -65,10 +81,12 @@ const nextConfig: NextConfig = {
 
 	images: {
 		formats: ['image/avif', 'image/webp'],
+		minimumCacheTTL: 3600,
 		remotePatterns: [
 			{ protocol: 'https', hostname: '**.ens.domains' },
 			{ protocol: 'https', hostname: 'ipfs.io' },
 			{ protocol: 'https', hostname: '**.ipfs.dweb.link' },
+			{ protocol: 'https', hostname: 'metadata.ens.domains' },
 		],
 	},
 
@@ -90,6 +108,24 @@ const nextConfig: NextConfig = {
 						value: 'max-age=63072000; includeSubDomains; preload',
 					},
 					{ key: 'Content-Security-Policy', value: csp },
+				],
+			},
+			{
+				source: '/static/(.*)',
+				headers: [
+					{
+						key: 'Cache-Control',
+						value: 'public, max-age=31536000, immutable',
+					},
+				],
+			},
+			{
+				source: '/_next/static/(.*)',
+				headers: [
+					{
+						key: 'Cache-Control',
+						value: 'public, max-age=31536000, immutable',
+					},
 				],
 			},
 		]
