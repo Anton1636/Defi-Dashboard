@@ -5,7 +5,7 @@ import { useIdentity } from '@/hooks/useIdentity'
 import { ReputationScore } from './ReputationScore'
 import { shortAddress } from '@/lib/ens'
 
-export function IdentityCard() {
+export function IdentityCard({ compact = false }: { compact?: boolean }) {
 	const { identity, ensName, address } = useIdentity()
 	const [expanded, setExpanded] = useState(false)
 
@@ -112,7 +112,7 @@ export function IdentityCard() {
 			</div>
 
 			{/* Expanded */}
-			{expanded && (
+			{!compact && expanded && (
 				<div
 					style={{
 						marginTop: 16,

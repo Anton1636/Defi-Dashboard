@@ -13,9 +13,9 @@ import { LanguageToggle } from '@/components/ui/LanguageToggle'
 import { AuthModal } from '@/components/auth/AuthModal'
 import { PriceProvider } from '@/components/providers/PriceProvider'
 import dynamic from 'next/dynamic'
+import { useIsClient } from '@/hooks/useIsClient'
 
 type Tab = 'home' | 'portfolio' | 'positions' | 'analytics' | 'ai-insights'
-
 interface LandingClientProps {
 	autoOpen: boolean
 }
@@ -23,10 +23,13 @@ interface LandingClientProps {
 const PortfolioPage = dynamic(
 	() => import('@/app/(dashboard)/portfolio/page'),
 	{
-		loading: () => (
-			<div className='skeleton' style={{ height: 400, borderRadius: 14 }} />
-		),
 		ssr: false,
+		loading: () => (
+			<div
+				className='skeleton'
+				style={{ height: 400, borderRadius: 16, margin: '20px 0' }}
+			/>
+		),
 	},
 )
 const PositionsPage = dynamic(
@@ -45,7 +48,6 @@ const AIInsightsPage = dynamic(
 function TickerStrip() {
 	const prices = usePriceStore(s => s.prices)
 	const items = ['ETH', 'BTC', 'AAVE', 'UNI', 'LINK', 'COMP']
-
 	const renderItems = () =>
 		items.map(name => {
 			const p = prices[name]
@@ -68,7 +70,6 @@ function TickerStrip() {
 				</div>
 			)
 		})
-
 	return (
 		<div className='ticker-wrap'>
 			<div className='ticker-track'>
@@ -79,45 +80,204 @@ function TickerStrip() {
 	)
 }
 
+/* Mini orbital SVG animation for hero */
+function MiniOrbital() {
+	return (
+		<div
+			style={{
+				position: 'relative',
+				width: 260,
+				height: 260,
+				margin: '0 auto',
+			}}
+		>
+			<svg
+				viewBox='0 0 260 260'
+				style={{
+					width: '100%',
+					height: '100%',
+					position: 'absolute',
+					inset: 0,
+				}}
+			>
+				{/* Rings */}
+				<circle
+					cx='130'
+					cy='130'
+					r='60'
+					fill='none'
+					stroke='rgba(255,255,255,0.06)'
+					strokeWidth='1'
+					strokeDasharray='4 4'
+				/>
+				<circle
+					cx='130'
+					cy='130'
+					r='95'
+					fill='none'
+					stroke='rgba(255,255,255,0.04)'
+					strokeWidth='1'
+					strokeDasharray='4 4'
+				/>
+				<circle
+					cx='130'
+					cy='130'
+					r='125'
+					fill='none'
+					stroke='rgba(255,255,255,0.03)'
+					strokeWidth='1'
+					strokeDasharray='4 4'
+				/>
+				{/* Ambient glow behind core */}
+				<circle cx='130' cy='130' r='40' fill='rgba(0,229,255,0.04)' />
+				<circle cx='130' cy='130' r='28' fill='rgba(123,97,255,0.06)' />
+			</svg>
+
+			{/* Core */}
+			<div
+				style={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					transform: 'translate(-50%,-50%)',
+					width: 72,
+					height: 72,
+					borderRadius: '50%',
+					background:
+						'radial-gradient(circle,rgba(0,229,255,0.10) 0%,rgba(123,97,255,0.07) 50%,transparent 70%)',
+					border: '1px solid rgba(0,229,255,0.2)',
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					animation: 'mobileBreathe 5s ease-in-out infinite',
+					zIndex: 5,
+				}}
+			>
+				<span
+					style={{
+						fontSize: 9,
+						color: 'rgba(255,255,255,0.3)',
+						letterSpacing: '0.1em',
+						marginBottom: 1,
+					}}
+				>
+					TOTAL
+				</span>
+				<span
+					style={{
+						fontSize: 14,
+						fontWeight: 900,
+						color: '#fff',
+						letterSpacing: '-0.5px',
+					}}
+				>
+					$24.8K
+				</span>
+			</div>
+
+			{/* Planet 1 — Uniswap (orbit at 60px, starting top) */}
+			<div
+				style={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					width: 0,
+					height: 0,
+					animation: 'orbitRotate 18s linear infinite',
+				}}
+			>
+				<div
+					style={{
+						position: 'absolute',
+						transform: 'translateX(60px) translate(-50%,-50%)',
+						width: 36,
+						height: 36,
+						borderRadius: '50%',
+						background: 'rgba(255,0,122,0.18)',
+						border: '1px solid rgba(255,0,122,0.35)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: 15,
+					}}
+				>
+					🦄
+				</div>
+			</div>
+			{/* Planet 2 — Aave (orbit at 95px) */}
+			<div
+				style={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					width: 0,
+					height: 0,
+					animation: 'orbitRotate 28s linear infinite reverse',
+				}}
+			>
+				<div
+					style={{
+						position: 'absolute',
+						transform: 'translateX(95px) translate(-50%,-50%)',
+						width: 32,
+						height: 32,
+						borderRadius: '50%',
+						background: 'rgba(123,97,255,0.18)',
+						border: '1px solid rgba(123,97,255,0.35)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: 14,
+					}}
+				>
+					👻
+				</div>
+			</div>
+			{/* Planet 3 — Compound (orbit at 125px) */}
+			<div
+				style={{
+					position: 'absolute',
+					top: '50%',
+					left: '50%',
+					width: 0,
+					height: 0,
+					animation: 'orbitRotate 38s linear infinite',
+					animationDelay: '-10s',
+				}}
+			>
+				<div
+					style={{
+						position: 'absolute',
+						transform: 'translateX(125px) translate(-50%,-50%)',
+						width: 28,
+						height: 28,
+						borderRadius: '50%',
+						background: 'rgba(0,211,149,0.18)',
+						border: '1px solid rgba(0,211,149,0.35)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: 13,
+					}}
+				>
+					🏦
+				</div>
+			</div>
+		</div>
+	)
+}
+
 export function LandingClient({ autoOpen }: LandingClientProps) {
 	const [modalOpen, setModalOpen] = useState(autoOpen)
 	const [activeTab, setActiveTab] = useState<Tab>('home')
+	const isClient = useIsClient()
 	const { data: session, status } = useSession()
-	const isLoggedIn = status === 'authenticated' && !!session
 	const { address } = useWallet()
 	const { name: ensName } = useENS(address)
 	const { t } = useTranslation()
 
-	const NAV_LINKS: { tab: Tab; label: string }[] = [
-		{ tab: 'portfolio', label: t.nav.portfolio },
-		{ tab: 'positions', label: t.nav.positions },
-		{ tab: 'analytics', label: t.nav.analytics },
-		{ tab: 'ai-insights', label: t.nav.aiInsights },
-	]
-
-	const STATS = [
-		{ label: t.landing.stats.tvl, value: '$84.4B', change: '+2.1%' },
-		{ label: t.landing.stats.protocols, value: '3,200+', change: '+12' },
-		{ label: t.landing.stats.volume, value: '$3.7B', change: '+8.4%' },
-	]
-
-	const FEATURES = [
-		{
-			icon: '⬡',
-			title: t.landing.features.multichain.title,
-			desc: t.landing.features.multichain.desc,
-		},
-		{
-			icon: '⚡',
-			title: t.landing.features.realtime.title,
-			desc: t.landing.features.realtime.desc,
-		},
-		{
-			icon: '◎',
-			title: t.landing.features.ai.title,
-			desc: t.landing.features.ai.desc,
-		},
-	]
+	const isLoggedIn = isClient && status === 'authenticated' && !!session
 
 	return (
 		<div
@@ -133,16 +293,17 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 			<div style={{ position: 'sticky', top: 0, zIndex: 50 }}>
 				<nav
 					style={{
-						height: 56,
+						height: 'var(--topbar-height)',
 						background: 'var(--topbar-bg)',
-						backdropFilter: 'blur(20px)',
-						WebkitBackdropFilter: 'blur(20px)',
+						backdropFilter: 'blur(24px)',
+						WebkitBackdropFilter: 'blur(24px)',
 						borderBottom: '1px solid var(--border-primary)',
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
 						padding: '0 24px',
 						gap: 16,
+						position: 'relative',
 					}}
 				>
 					{/* Logo */}
@@ -151,79 +312,56 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						style={{
 							display: 'flex',
 							alignItems: 'center',
-							gap: 8,
+							gap: 10,
 							cursor: 'pointer',
 							flexShrink: 0,
+							zIndex: 1,
 						}}
 					>
 						<div
 							style={{
-								width: 28,
-								height: 28,
-								borderRadius: 8,
-								background:
-									'linear-gradient(135deg, var(--accent-blue), #0066cc)',
+								width: 26,
+								height: 26,
+								borderRadius: '50%',
+								border: '1.5px solid rgba(0,229,255,0.5)',
 								display: 'flex',
 								alignItems: 'center',
 								justifyContent: 'center',
-								boxShadow: '0 0 16px var(--accent-blue-glow)',
+								boxShadow: '0 0 12px rgba(0,229,255,0.2)',
 							}}
 						>
-							<span style={{ color: '#000', fontWeight: 800, fontSize: 13 }}>
-								D
-							</span>
+							<div
+								style={{
+									width: 7,
+									height: 7,
+									borderRadius: '50%',
+									background: 'var(--accent-blue)',
+									boxShadow: '0 0 8px var(--accent-blue)',
+								}}
+							/>
 						</div>
-						<span
-							style={{ fontWeight: 800, fontSize: 16, letterSpacing: '-0.5px' }}
-						>
-							DEFI<span style={{ color: 'var(--accent-blue)' }}>.</span>IO
-						</span>
+						<div>
+							<p
+								style={{
+									fontSize: 13,
+									fontWeight: 900,
+									letterSpacing: '0.05em',
+									lineHeight: 1,
+								}}
+							>
+								NEXORA
+							</p>
+							<p
+								style={{
+									fontSize: 8,
+									color: 'var(--text-tertiary)',
+									letterSpacing: '0.14em',
+								}}
+							>
+								LIQUIDITY GALAXY
+							</p>
+						</div>
 					</div>
-
-					{/* Center tabs — logged in */}
-					{isLoggedIn && (
-						<div
-							style={{
-								position: 'absolute',
-								left: '50%',
-								transform: 'translateX(-50%)',
-								display: 'flex',
-								gap: 2,
-							}}
-						>
-							{NAV_LINKS.map(link => {
-								const isActive = activeTab === link.tab
-								return (
-									<button
-										key={link.tab}
-										onClick={() => setActiveTab(link.tab)}
-										onMouseEnter={() => {
-											if (!isActive)
-												import(
-													`@/app/(dashboard)/${link.tab === 'ai-insights' ? 'ai-insights' : link.tab}/page`
-												)
-										}}
-										style={{
-											background: isActive ? 'var(--bg-card)' : 'transparent',
-											border: `1px solid ${isActive ? 'var(--border-primary)' : 'transparent'}`,
-											borderRadius: 8,
-											padding: '6px 14px',
-											fontSize: 13,
-											fontWeight: isActive ? 600 : 400,
-											color: isActive
-												? 'var(--text-primary)'
-												: 'var(--text-secondary)',
-											cursor: 'pointer',
-											transition: 'all 0.15s',
-											whiteSpace: 'nowrap',
-										}}
-									>
-										{link.label}
-									</button>
-								)
-							})}
-						</div>
-					)}
 
 					{/* Right */}
 					<div
@@ -232,12 +370,12 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							alignItems: 'center',
 							gap: 8,
 							flexShrink: 0,
+							zIndex: 1,
 						}}
 					>
 						<ThemeToggle />
 						<ModeToggle />
 						<LanguageToggle />
-
 						{isLoggedIn ? (
 							<>
 								{address && (
@@ -246,27 +384,26 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 											display: 'flex',
 											alignItems: 'center',
 											gap: 6,
-											background: 'var(--bg-card)',
-											border: '1px solid var(--border-primary)',
-											borderRadius: 8,
+											background: 'rgba(123,97,255,0.07)',
+											border: '1px solid rgba(123,97,255,0.18)',
+											borderRadius: 10,
 											padding: '5px 10px',
 										}}
 									>
-										<span
+										<div
 											style={{
 												width: 5,
 												height: 5,
 												borderRadius: '50%',
-												background: 'var(--accent-green)',
-												boxShadow: '0 0 6px var(--accent-green)',
-												display: 'inline-block',
+												background: 'var(--accent-lime)',
+												boxShadow: '0 0 6px var(--accent-lime)',
 												animation: 'pulse 2s infinite',
 											}}
 										/>
 										<span
 											style={{
 												fontSize: 12,
-												color: 'var(--text-secondary)',
+												color: 'rgba(255,255,255,0.65)',
 												fontFamily: ensName ? 'inherit' : 'monospace',
 												fontWeight: ensName ? 600 : 400,
 											}}
@@ -278,8 +415,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								<button
 									onClick={() => setActiveTab('home')}
 									style={{
-										background:
-											activeTab === 'home' ? 'var(--bg-card)' : 'transparent',
+										background: 'transparent',
 										color: 'var(--text-tertiary)',
 										border: '1px solid var(--border-primary)',
 										borderRadius: 8,
@@ -297,16 +433,16 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							<button
 								onClick={() => setModalOpen(true)}
 								style={{
-									background: 'var(--accent-blue)',
-									color: '#000',
+									background:
+										'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',
+									color: '#fff',
 									border: 'none',
-									borderRadius: 8,
-									padding: '7px 18px',
+									borderRadius: 10,
+									padding: '8px 20px',
 									fontSize: 13,
 									fontWeight: 800,
 									cursor: 'pointer',
-									boxShadow: '0 0 20px var(--accent-blue-glow)',
-									transition: 'all 0.15s',
+									boxShadow: '0 0 20px rgba(0,229,255,0.2)',
 								}}
 							>
 								{t.landing.signIn}
@@ -314,14 +450,15 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						)}
 					</div>
 				</nav>
-
-				{/* Ticker */}
 				<TickerStrip />
 			</div>
 
 			{/* Dashboard tabs */}
 			{activeTab !== 'home' ? (
-				<div style={{ maxWidth: 1200, margin: '0 auto', padding: '28px 24px' }}>
+				<div
+					className='warp-in'
+					style={{ maxWidth: 1200, margin: '0 auto', padding: '24px' }}
+				>
 					{activeTab === 'portfolio' && <PortfolioPage />}
 					{activeTab === 'positions' && <PositionsPage />}
 					{activeTab === 'analytics' && <AnalyticsPage />}
@@ -332,36 +469,53 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 					{/* Hero */}
 					<section
 						style={{
-							maxWidth: 800,
+							maxWidth: 760,
 							margin: '0 auto',
-							padding: 'clamp(48px, 8vw, 96px) 24px 64px',
+							padding: 'clamp(40px,6vw,80px) 24px 40px',
 							textAlign: 'center',
+							position: 'relative',
 						}}
 					>
+						{/* Background glow */}
+						<div
+							style={{
+								position: 'absolute',
+								top: '50%',
+								left: '50%',
+								transform: 'translate(-50%,-60%)',
+								width: 500,
+								height: 500,
+								borderRadius: '50%',
+								background:
+									'radial-gradient(circle,rgba(123,97,255,0.06) 0%,transparent 60%)',
+								pointerEvents: 'none',
+							}}
+						/>
+
 						<div
 							style={{
 								display: 'inline-flex',
 								alignItems: 'center',
 								gap: 6,
-								background: 'rgba(0,212,255,0.08)',
-								border: '1px solid rgba(0,212,255,0.2)',
+								padding: '5px 14px',
 								borderRadius: 20,
-								padding: '4px 14px',
 								fontSize: 11,
+								fontWeight: 700,
+								background: 'rgba(0,229,255,0.07)',
+								border: '1px solid rgba(0,229,255,0.18)',
 								color: 'var(--accent-blue)',
-								fontWeight: 600,
-								marginBottom: 28,
-								letterSpacing: '0.02em',
+								marginBottom: 24,
+								letterSpacing: '0.04em',
+								position: 'relative',
 							}}
 						>
-							<span
+							<div
 								style={{
 									width: 5,
 									height: 5,
 									borderRadius: '50%',
 									background: 'var(--accent-blue)',
 									animation: 'pulse 2s infinite',
-									display: 'inline-block',
 								}}
 							/>
 							{t.landing.badge}
@@ -369,12 +523,12 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 
 						<h1
 							style={{
-								fontSize: 'clamp(40px, 7vw, 68px)',
+								fontSize: 'clamp(38px,6vw,60px)',
 								fontWeight: 900,
-								letterSpacing: '-3px',
+								letterSpacing: '-2.5px',
 								lineHeight: 1.05,
-								marginBottom: 20,
-								color: 'var(--text-primary)',
+								marginBottom: 18,
+								position: 'relative',
 							}}
 						>
 							{t.landing.headline.split('\n').map((line, i) => (
@@ -382,7 +536,16 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 									{i === 0 ? (
 										line
 									) : (
-										<span style={{ color: 'var(--accent-blue)' }}>{line}</span>
+										<span
+											style={{
+												background:
+													'linear-gradient(135deg,var(--accent-blue),var(--accent-purple))',
+												WebkitBackgroundClip: 'text',
+												WebkitTextFillColor: 'transparent',
+											}}
+										>
+											{line}
+										</span>
 									)}
 									{i === 0 && <br />}
 								</span>
@@ -393,9 +556,10 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 							style={{
 								fontSize: 16,
 								color: 'var(--text-secondary)',
-								maxWidth: 480,
-								margin: '0 auto 40px',
+								maxWidth: 460,
+								margin: '0 auto 32px',
 								lineHeight: 1.65,
+								position: 'relative',
 							}}
 						>
 							{t.landing.subtitle}
@@ -407,51 +571,55 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								gap: 10,
 								justifyContent: 'center',
 								flexWrap: 'wrap',
+								marginBottom: 40,
+								position: 'relative',
 							}}
 						>
 							{isLoggedIn ? (
 								<button
 									onClick={() => setActiveTab('portfolio')}
 									style={{
-										background: 'var(--accent-blue)',
-										color: '#000',
+										background:
+											'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',
+										color: '#fff',
 										border: 'none',
-										borderRadius: 10,
+										borderRadius: 12,
 										padding: '13px 32px',
 										fontSize: 15,
 										fontWeight: 800,
 										cursor: 'pointer',
-										boxShadow: '0 0 30px var(--accent-blue-glow)',
+										boxShadow: '0 0 28px rgba(0,229,255,0.2)',
 										letterSpacing: '-0.3px',
 									}}
 								>
-									{t.landing.goToPortfolio}
+									⬡ {t.landing.goToPortfolio}
 								</button>
 							) : (
 								<>
 									<button
 										onClick={() => setModalOpen(true)}
 										style={{
-											background: 'var(--accent-blue)',
-											color: '#000',
+											background:
+												'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',
+											color: '#fff',
 											border: 'none',
-											borderRadius: 10,
+											borderRadius: 12,
 											padding: '13px 32px',
 											fontSize: 15,
 											fontWeight: 800,
 											cursor: 'pointer',
-											boxShadow: '0 0 30px var(--accent-blue-glow)',
+											boxShadow: '0 0 28px rgba(0,229,255,0.2)',
 										}}
 									>
-										{t.landing.connectWallet}
+										⬡ {t.landing.connectWallet}
 									</button>
 									<button
 										onClick={() => setModalOpen(true)}
 										style={{
-											background: 'var(--bg-card)',
+											background: 'rgba(255,255,255,0.04)',
 											color: 'var(--text-secondary)',
 											border: '1px solid var(--border-secondary)',
-											borderRadius: 10,
+											borderRadius: 12,
 											padding: '13px 32px',
 											fontSize: 15,
 											fontWeight: 600,
@@ -463,27 +631,38 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								</>
 							)}
 						</div>
+
+						{/* Mini orbital */}
+						<MiniOrbital />
 					</section>
 
 					{/* Stats */}
 					<section
 						style={{
-							maxWidth: 800,
-							margin: '0 auto 72px',
+							maxWidth: 720,
+							margin: '0 auto 56px',
 							padding: '0 24px',
 							display: 'grid',
-							gridTemplateColumns: 'repeat(3, 1fr)',
+							gridTemplateColumns: 'repeat(3,1fr)',
 							gap: 10,
 						}}
 					>
-						{STATS.map(stat => (
+						{[
+							{ label: t.landing.stats.tvl, value: '$84.4B', chg: '+2.1%' },
+							{
+								label: t.landing.stats.protocols,
+								value: '3,200+',
+								chg: 'Active',
+							},
+							{ label: t.landing.stats.volume, value: '$3.7B', chg: '+8.4%' },
+						].map(s => (
 							<div
-								key={stat.label}
+								key={s.label}
 								style={{
-									background: 'var(--bg-card)',
+									background: 'rgba(255,255,255,0.02)',
 									border: '1px solid var(--border-primary)',
-									borderRadius: 12,
-									padding: '20px 20px',
+									borderRadius: 14,
+									padding: '18px 20px',
 									textAlign: 'center',
 								}}
 							>
@@ -494,30 +673,29 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 										fontWeight: 700,
 										textTransform: 'uppercase',
 										letterSpacing: '0.1em',
-										marginBottom: 10,
+										marginBottom: 8,
 									}}
 								>
-									{stat.label}
+									{s.label}
 								</p>
 								<p
 									style={{
 										fontSize: 26,
-										fontWeight: 800,
+										fontWeight: 900,
 										letterSpacing: '-1px',
-										color: 'var(--text-primary)',
 										marginBottom: 4,
 									}}
 								>
-									{stat.value}
+									{s.value}
 								</p>
 								<p
 									style={{
 										fontSize: 11,
-										color: 'var(--accent-green)',
+										color: 'var(--accent-lime)',
 										fontWeight: 600,
 									}}
 								>
-									↑ {stat.change}
+									↑ {s.chg}
 								</p>
 							</div>
 						))}
@@ -525,7 +703,7 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 
 					{/* Features */}
 					<section
-						style={{ maxWidth: 800, margin: '0 auto 80px', padding: '0 24px' }}
+						style={{ maxWidth: 720, margin: '0 auto 64px', padding: '0 24px' }}
 					>
 						<p
 							style={{
@@ -533,9 +711,9 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 								fontSize: 10,
 								fontWeight: 700,
 								textTransform: 'uppercase',
-								letterSpacing: '0.12em',
+								letterSpacing: '0.14em',
 								color: 'var(--text-tertiary)',
-								marginBottom: 24,
+								marginBottom: 20,
 							}}
 						>
 							{t.landing.features.title}
@@ -543,22 +721,38 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						<div
 							style={{
 								display: 'grid',
-								gridTemplateColumns: 'repeat(3, 1fr)',
+								gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))',
 								gap: 10,
 							}}
 						>
-							{FEATURES.map(f => (
+							{[
+								{
+									icon: '⬡',
+									title: t.landing.features.multichain.title,
+									desc: t.landing.features.multichain.desc,
+								},
+								{
+									icon: '⚡',
+									title: t.landing.features.realtime.title,
+									desc: t.landing.features.realtime.desc,
+								},
+								{
+									icon: '◎',
+									title: t.landing.features.ai.title,
+									desc: t.landing.features.ai.desc,
+								},
+							].map(f => (
 								<div
 									key={f.title}
 									style={{
-										background: 'var(--bg-card)',
+										background: 'rgba(255,255,255,0.02)',
 										border: '1px solid var(--border-primary)',
-										borderRadius: 12,
+										borderRadius: 14,
 										padding: 20,
 										transition: 'border-color 0.2s',
 									}}
 									onMouseEnter={e => {
-										e.currentTarget.style.borderColor = 'var(--border-accent)'
+										e.currentTarget.style.borderColor = 'rgba(0,229,255,0.15)'
 									}}
 									onMouseLeave={e => {
 										e.currentTarget.style.borderColor = 'var(--border-primary)'
@@ -569,8 +763,8 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 											width: 36,
 											height: 36,
 											borderRadius: 10,
-											background: 'rgba(0,212,255,0.08)',
-											border: '1px solid rgba(0,212,255,0.2)',
+											background: 'rgba(0,229,255,0.07)',
+											border: '1px solid rgba(0,229,255,0.14)',
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',
@@ -580,21 +774,14 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 									>
 										{f.icon}
 									</div>
-									<p
-										style={{
-											fontSize: 14,
-											fontWeight: 700,
-											marginBottom: 6,
-											color: 'var(--text-primary)',
-										}}
-									>
+									<p style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>
 										{f.title}
 									</p>
 									<p
 										style={{
 											fontSize: 12,
 											color: 'var(--text-secondary)',
-											lineHeight: 1.5,
+											lineHeight: 1.55,
 										}}
 									>
 										{f.desc}
@@ -604,7 +791,6 @@ export function LandingClient({ autoOpen }: LandingClientProps) {
 						</div>
 					</section>
 
-					{/* Footer */}
 					<footer
 						style={{
 							borderTop: '1px solid var(--border-primary)',

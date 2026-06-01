@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { auth } from '../../../auth'
-import { Sidebar } from '@/components/layout/Sidebar'
+import { Sidebar, MobileDrawer } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { MobileNav } from '@/components/layout/MobileNav'
 import { PriceProvider } from '@/components/providers/PriceProvider'
@@ -23,7 +23,7 @@ export default async function DashboardLayout({
 		>
 			<PriceProvider />
 			<Sidebar />
-
+			<MobileDrawer />
 			<div
 				style={{
 					flex: 1,
@@ -34,9 +34,10 @@ export default async function DashboardLayout({
 				}}
 			>
 				<TopBar />
-				<main className='dashboard-main'>{children}</main>
+				<main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+					{children}
+				</main>
 			</div>
-
 			<MobileNav />
 		</div>
 	)

@@ -9,42 +9,29 @@ import { useWallet } from '@/hooks/useWallet'
 import { useENS } from '@/hooks/useENS'
 import { useTranslation } from '@/hooks/useTranslation'
 import { usePriceStore } from '@/store/priceStore'
+import { useSidebarStore } from '@/store/sidebarStore'
 import { shortAddress } from '@/lib/ens'
 import { ChainSelector } from './ChainSelector'
 
+/* ── Ticker strip ── */
 function TickerBar() {
 	const prices = usePriceStore(s => s.prices)
-
-	const items = [
-		{ name: 'ETH', symbol: 'ETH' },
-		{ name: 'BTC', symbol: 'BTC' },
-		{ name: 'AAVE', symbol: 'AAVE' },
-		{ name: 'UNI', symbol: 'UNI' },
-		{ name: 'LINK', symbol: 'LINK' },
-		{ name: 'COMP', symbol: 'COMP' },
-	]
+	const items = ['ETH', 'BTC', 'AAVE', 'UNI', 'LINK', 'COMP']
 
 	const renderItems = () =>
-		items.map(item => {
-			const p = prices[item.name]
+		items.map(name => {
+			const p = prices[name]
 			const price = p?.price ?? 0
 			const change = p?.change24h ?? 0
 			const isUp = change >= 0
-
 			return (
-				<div key={item.name} className='ticker-item'>
-					<span className='ticker-name'>{item.name}</span>
+				<div key={name} className='ticker-item'>
+					<span className='ticker-name'>{name}</span>
 					<span className='ticker-val'>
 						$
 						{price > 1000
-							? price.toLocaleString('en-US', {
-									minimumFractionDigits: 0,
-									maximumFractionDigits: 0,
-								})
-							: price.toLocaleString('en-US', {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								})}
+							? price.toLocaleString('en-US', { maximumFractionDigits: 0 })
+							: price.toFixed(2)}
 					</span>
 					<span className={isUp ? 'ticker-up' : 'ticker-down'}>
 						{isUp ? '↑' : '↓'}
@@ -64,66 +51,115 @@ function TickerBar() {
 	)
 }
 
+/* ── Burger ── */
+function Burger() {
+	const { toggle } = useSidebarStore()
+	return (
+		<button
+			className='mobile-burger'
+			onClick={toggle}
+			style={{
+				background: 'transparent',
+				border: '1px solid var(--border-primary)',
+				borderRadius: 8,
+				color: 'var(--text-secondary)',
+				cursor: 'pointer',
+				width: 34,
+				height: 34,
+				display: 'none',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'center',
+				gap: 4,
+				flexShrink: 0,
+			}}
+		>
+			<span
+				style={{
+					display: 'block',
+					width: 14,
+					height: 1.5,
+					background: 'currentColor',
+					borderRadius: 1,
+				}}
+			/>
+			<span
+				style={{
+					display: 'block',
+					width: 14,
+					height: 1.5,
+					background: 'currentColor',
+					borderRadius: 1,
+				}}
+			/>
+			<span
+				style={{
+					display: 'block',
+					width: 9,
+					height: 1.5,
+					background: 'currentColor',
+					borderRadius: 1,
+				}}
+			/>
+		</button>
+	)
+}
+
 export function TopBar() {
 	const { address, ethBalance, isLoadingBalance } = useWallet()
 	const { name: ensName, avatar: ensAvatar } = useENS(address)
 	const { t } = useTranslation()
-
-	const displayName = ensName ?? (address ? shortAddress(address) : null)
 
 	return (
 		<div style={{ position: 'sticky', top: 0, zIndex: 50 }}>
 			{/* Main bar */}
 			<header
 				style={{
-					height: 56,
+					height: 'var(--topbar-height)',
 					background: 'var(--topbar-bg)',
-					backdropFilter: 'blur(20px)',
-					WebkitBackdropFilter: 'blur(20px)',
+					backdropFilter: 'blur(24px)',
+					WebkitBackdropFilter: 'blur(24px)',
 					borderBottom: '1px solid var(--border-primary)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					padding: '0 20px',
-					gap: 12,
+					padding: '0 16px',
+					gap: 10,
+					position: 'relative',
 				}}
 			>
-				{/* Left — logo */}
+				{/* Left */}
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
 						gap: 10,
 						flexShrink: 0,
+						zIndex: 1,
 					}}
 				>
+					<Burger />
+					{/* Search bar */}
 					<div
 						style={{
-							width: 28,
-							height: 28,
-							borderRadius: 8,
-							background:
-								'linear-gradient(135deg, var(--accent-blue), #0066cc)',
 							display: 'flex',
 							alignItems: 'center',
-							justifyContent: 'center',
-							boxShadow: '0 0 16px var(--accent-blue-glow)',
+							gap: 8,
+							background: 'rgba(255,255,255,0.04)',
+							border: '1px solid var(--border-primary)',
+							borderRadius: 10,
+							padding: '7px 14px',
+							flex: 1,
+							maxWidth: 280,
 						}}
 					>
-						<span style={{ color: '#000', fontWeight: 800, fontSize: 13 }}>
-							D
+						<span style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>
+							⌕
+						</span>
+						<span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
+							Search protocols, assets...
 						</span>
 					</div>
-					<span
-						style={{
-							fontWeight: 800,
-							fontSize: 16,
-							letterSpacing: '-0.5px',
-							color: 'var(--text-primary)',
-						}}
-					>
-						DEFI<span style={{ color: 'var(--accent-blue)' }}>.</span>IO
-					</span>
 				</div>
 
 				{/* Right */}
@@ -131,34 +167,66 @@ export function TopBar() {
 					style={{
 						display: 'flex',
 						alignItems: 'center',
-						gap: 8,
+						gap: 7,
 						flexShrink: 0,
+						zIndex: 1,
 					}}
 				>
 					<ThemeToggle />
 					<ModeToggle />
 					<LanguageToggle />
-
 					{address && <ChainSelector />}
 
-					{/* Balance */}
+					{/* Chain indicator */}
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: 6,
+							background: 'rgba(255,255,255,0.04)',
+							border: '1px solid var(--border-primary)',
+							borderRadius: 10,
+							padding: '5px 12px',
+						}}
+					>
+						<div
+							style={{
+								width: 6,
+								height: 6,
+								borderRadius: '50%',
+								background: 'var(--accent-blue)',
+								boxShadow: '0 0 6px var(--accent-blue)',
+							}}
+						/>
+						<span
+							style={{
+								fontSize: 12,
+								color: 'var(--text-secondary)',
+								fontWeight: 500,
+							}}
+						>
+							Ethereum
+						</span>
+					</div>
+
+					{/* Wallet */}
 					{address && (
 						<div
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: 6,
-								background: 'var(--bg-card)',
-								border: '1px solid var(--border-primary)',
-								borderRadius: 8,
-								padding: '5px 10px',
+								gap: 7,
+								background: 'rgba(123,97,255,0.07)',
+								border: '1px solid rgba(123,97,255,0.18)',
+								borderRadius: 10,
+								padding: '4px 10px',
 							}}
 						>
 							{ensAvatar ? (
 								// eslint-disable-next-line @next/next/no-img-element
 								<img
 									src={ensAvatar}
-									alt={ensName ?? address}
+									alt=''
 									width={16}
 									height={16}
 									style={{
@@ -169,39 +237,40 @@ export function TopBar() {
 									}}
 								/>
 							) : (
-								<span
+								<div
 									style={{
-										width: 5,
-										height: 5,
+										width: 18,
+										height: 18,
 										borderRadius: '50%',
-										background: 'var(--accent-green)',
-										boxShadow: '0 0 6px var(--accent-green)',
-										display: 'inline-block',
-										animation: 'pulse 2s infinite',
+										background:
+											'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',
+										flexShrink: 0,
 									}}
 								/>
 							)}
 							<span
 								style={{
 									fontSize: 12,
-									color: 'var(--text-secondary)',
+									color: 'rgba(255,255,255,0.7)',
 									fontFamily: ensName ? 'inherit' : 'monospace',
 									fontWeight: ensName ? 600 : 400,
 								}}
 							>
-								{displayName}
+								{ensName ?? (address ? shortAddress(address) : '')}
 							</span>
-							<span
-								style={{
-									fontSize: 11,
-									color: 'var(--text-tertiary)',
-									borderLeft: '1px solid var(--border-primary)',
-									paddingLeft: 7,
-									fontFamily: 'monospace',
-								}}
-							>
-								{isLoadingBalance ? '···' : `${ethBalance ?? '0.0000'} ETH`}
-							</span>
+							{!ensName && (
+								<span
+									style={{
+										fontSize: 10,
+										color: 'var(--text-tertiary)',
+										borderLeft: '1px solid var(--border-primary)',
+										paddingLeft: 6,
+										fontFamily: 'monospace',
+									}}
+								>
+									{isLoadingBalance ? '···' : `${ethBalance ?? '0.0000'} ETH`}
+								</span>
+							)}
 						</div>
 					)}
 
@@ -214,7 +283,7 @@ export function TopBar() {
 					<button
 						onClick={() => signOut({ callbackUrl: '/' })}
 						style={{
-							fontSize: 12,
+							fontSize: 11,
 							color: 'var(--text-tertiary)',
 							background: 'transparent',
 							border: '1px solid var(--border-primary)',
@@ -239,7 +308,7 @@ export function TopBar() {
 				</div>
 			</header>
 
-			{/* Ticker strip */}
+			{/* Ticker */}
 			<TickerBar />
 		</div>
 	)

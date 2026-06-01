@@ -2,16 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useTranslation } from '@/hooks/useTranslation'
 
 export function MobileNav() {
 	const pathname = usePathname()
-	const { t } = useTranslation()
 
-	const NAV_ITEMS = [
+	const items = [
 		{
 			href: '/portfolio',
-			label: t.nav.portfolio,
+			label: 'Portfolio',
 			icon: (
 				<svg
 					width='20'
@@ -30,7 +28,7 @@ export function MobileNav() {
 		},
 		{
 			href: '/positions',
-			label: t.nav.positions,
+			label: 'Positions',
 			icon: (
 				<svg
 					width='20'
@@ -46,7 +44,7 @@ export function MobileNav() {
 		},
 		{
 			href: '/analytics',
-			label: t.nav.analytics,
+			label: 'Analytics',
 			icon: (
 				<svg
 					width='20'
@@ -65,7 +63,7 @@ export function MobileNav() {
 		},
 		{
 			href: '/ai-insights',
-			label: t.nav.aiInsights,
+			label: 'AI Lab',
 			icon: (
 				<svg
 					width='20'
@@ -75,7 +73,7 @@ export function MobileNav() {
 					stroke='currentColor'
 					strokeWidth='1.5'
 				>
-					<path d='M12 2a10 10 0 110 20A10 10 0 0112 2z' />
+					<circle cx='12' cy='12' r='10' />
 					<path d='M12 8v4l3 3' strokeLinecap='round' />
 				</svg>
 			),
@@ -90,40 +88,121 @@ export function MobileNav() {
 				bottom: 0,
 				left: 0,
 				right: 0,
-				height: 64,
-				background: 'var(--bg-secondary)',
+				height: 'var(--mobile-nav-height)',
+				background: 'rgba(5,6,10,0.97)',
 				borderTop: '1px solid var(--border-primary)',
-				alignItems: 'center',
-				justifyContent: 'space-around',
-				zIndex: 100,
 				backdropFilter: 'blur(20px)',
 				WebkitBackdropFilter: 'blur(20px)',
+				zIndex: 100,
+				display: 'none',
+				alignItems: 'center',
 			}}
 		>
-			{NAV_ITEMS.map(item => {
+			{/* First 2 items */}
+			{items.slice(0, 2).map(item => {
 				const isActive = pathname === item.href
 				return (
 					<Link
 						key={item.href}
 						href={item.href}
 						style={{
+							flex: 1,
 							display: 'flex',
 							flexDirection: 'column',
 							alignItems: 'center',
-							gap: 2,
-							padding: '6px 16px',
-							borderRadius: 10,
+							gap: 3,
 							textDecoration: 'none',
-							minWidth: 56,
-							color: isActive ? 'var(--accent-blue)' : 'var(--text-tertiary)',
-							background: isActive ? 'var(--accent-blue-glow)' : 'transparent',
-							transition: 'all 0.15s',
+							paddingTop: 8,
+							color: isActive ? 'var(--accent-blue)' : 'rgba(255,255,255,0.25)',
+							fontWeight: 700,
+							fontSize: 9,
+							textTransform: 'uppercase',
+							letterSpacing: '0.06em',
 						}}
 					>
-						<span>{item.icon}</span>
-						<span style={{ fontSize: 10, fontWeight: isActive ? 600 : 400 }}>
-							{item.label}
-						</span>
+						<span style={{ opacity: isActive ? 1 : 0.6 }}>{item.icon}</span>
+						<span>{item.label}</span>
+						{isActive && (
+							<div
+								style={{
+									width: 16,
+									height: 2,
+									borderRadius: 1,
+									background: 'var(--accent-blue)',
+									marginTop: 1,
+								}}
+							/>
+						)}
+					</Link>
+				)
+			})}
+
+			{/* Center + button */}
+			<div
+				style={{
+					flex: 1,
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<button
+					style={{
+						width: 44,
+						height: 44,
+						borderRadius: '50%',
+						background:
+							'linear-gradient(135deg,var(--accent-purple),var(--accent-blue))',
+						border: 'none',
+						cursor: 'pointer',
+						fontSize: 22,
+						color: '#fff',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						boxShadow: '0 0 20px rgba(0,229,255,0.25)',
+						transform: 'translateY(-8px)',
+					}}
+				>
+					+
+				</button>
+			</div>
+
+			{/* Last 2 items */}
+			{items.slice(2).map(item => {
+				const isActive = pathname === item.href
+				return (
+					<Link
+						key={item.href}
+						href={item.href}
+						style={{
+							flex: 1,
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							gap: 3,
+							textDecoration: 'none',
+							paddingTop: 8,
+							color: isActive ? 'var(--accent-blue)' : 'rgba(255,255,255,0.25)',
+							fontWeight: 700,
+							fontSize: 9,
+							textTransform: 'uppercase',
+							letterSpacing: '0.06em',
+						}}
+					>
+						<span style={{ opacity: isActive ? 1 : 0.6 }}>{item.icon}</span>
+						<span>{item.label}</span>
+						{isActive && (
+							<div
+								style={{
+									width: 16,
+									height: 2,
+									borderRadius: 1,
+									background: 'var(--accent-blue)',
+									marginTop: 1,
+								}}
+							/>
+						)}
 					</Link>
 				)
 			})}

@@ -9,6 +9,13 @@ import { QuestionInput } from '@/components/ai/QuestionInput'
 import { ModeToggle } from '@/components/ui/ModeToggle'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 
+const QUICK_QUESTIONS = [
+	'What are my biggest risks right now?',
+	'How can I improve my yield?',
+	'Is my Aave position safe?',
+	'Should I rebalance my portfolio?',
+]
+
 export default function AIInsightsPage() {
 	const { isConnected } = useWallet()
 	const {
@@ -109,7 +116,7 @@ export default function AIInsightsPage() {
 				<ModeToggle />
 			</div>
 
-			{/* Analyze card */}
+			{/* Main card */}
 			<div
 				style={{
 					background: 'var(--bg-card)',
@@ -133,10 +140,11 @@ export default function AIInsightsPage() {
 					}}
 				/>
 
+				{/* Top row */}
 				<div
 					style={{
 						display: 'flex',
-						alignItems: 'center',
+						alignItems: 'flex-start',
 						justifyContent: 'space-between',
 						marginBottom: 16,
 					}}
@@ -153,7 +161,7 @@ export default function AIInsightsPage() {
 							Portfolio Analysis
 						</p>
 						<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-							Full breakdown of your positions, risks and opportunities
+							Full breakdown of positions, risks and opportunities
 						</p>
 					</div>
 					<button
@@ -179,6 +187,47 @@ export default function AIInsightsPage() {
 					>
 						{isStreaming ? '◎ Analyzing...' : '◎ Analyze Now'}
 					</button>
+				</div>
+
+				{/* Quick questions */}
+				<div
+					style={{
+						display: 'flex',
+						gap: 6,
+						flexWrap: 'wrap',
+						marginBottom: 16,
+					}}
+				>
+					{QUICK_QUESTIONS.map(q => (
+						<button
+							key={q}
+							onClick={() => analyze(q)}
+							disabled={isStreaming}
+							style={{
+								padding: '5px 12px',
+								borderRadius: 20,
+								fontSize: 11,
+								fontWeight: 600,
+								background: 'var(--bg-elevated)',
+								border: '1px solid var(--border-primary)',
+								color: 'var(--text-secondary)',
+								cursor: isStreaming ? 'not-allowed' : 'pointer',
+								transition: 'all 0.15s',
+							}}
+							onMouseEnter={e => {
+								if (!isStreaming) {
+									e.currentTarget.style.borderColor = 'var(--border-accent)'
+									e.currentTarget.style.color = 'var(--accent-blue)'
+								}
+							}}
+							onMouseLeave={e => {
+								e.currentTarget.style.borderColor = 'var(--border-primary)'
+								e.currentTarget.style.color = 'var(--text-secondary)'
+							}}
+						>
+							{q}
+						</button>
+					))}
 				</div>
 
 				{/* Streaming */}
@@ -212,7 +261,7 @@ export default function AIInsightsPage() {
 									justifyContent: 'center',
 									fontSize: 11,
 									color: '#000',
-									fontWeight: 800,
+									fontWeight: 900,
 								}}
 							>
 								G
@@ -253,50 +302,6 @@ export default function AIInsightsPage() {
 					</div>
 				)}
 
-				{/* Quick questions */}
-				<div
-					style={{
-						display: 'flex',
-						gap: 6,
-						flexWrap: 'wrap',
-						marginBottom: 14,
-					}}
-				>
-					{[
-						'What are my biggest risks right now?',
-						'How can I improve my yield?',
-						'Is my Aave position safe?',
-						'Should I rebalance my portfolio?',
-					].map(q => (
-						<button
-							key={q}
-							onClick={() => analyze(q)}
-							disabled={isStreaming}
-							style={{
-								padding: '5px 12px',
-								borderRadius: 20,
-								fontSize: 11,
-								fontWeight: 600,
-								background: 'var(--bg-elevated)',
-								border: '1px solid var(--border-primary)',
-								color: 'var(--text-secondary)',
-								cursor: 'pointer',
-								transition: 'all 0.15s',
-							}}
-							onMouseEnter={e => {
-								e.currentTarget.style.borderColor = 'var(--border-accent)'
-								e.currentTarget.style.color = 'var(--accent-blue)'
-							}}
-							onMouseLeave={e => {
-								e.currentTarget.style.borderColor = 'var(--border-primary)'
-								e.currentTarget.style.color = 'var(--text-secondary)'
-							}}
-						>
-							{q}
-						</button>
-					))}
-				</div>
-
 				<QuestionInput onSubmit={q => analyze(q)} isLoading={isStreaming} />
 			</div>
 
@@ -312,11 +317,11 @@ export default function AIInsightsPage() {
 				>
 					<p
 						style={{
-							fontSize: 12,
+							fontSize: 10,
 							fontWeight: 700,
 							color: 'var(--text-tertiary)',
 							textTransform: 'uppercase',
-							letterSpacing: '0.08em',
+							letterSpacing: '0.1em',
 						}}
 					>
 						Previous analyses
@@ -365,7 +370,6 @@ export default function AIInsightsPage() {
 							display: 'flex',
 							flexDirection: 'column',
 							alignItems: 'center',
-							justifyContent: 'center',
 							padding: '48px 0',
 							color: 'var(--text-tertiary)',
 						}}
