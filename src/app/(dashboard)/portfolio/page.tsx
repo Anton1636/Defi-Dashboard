@@ -35,14 +35,23 @@ function fmt(v: number) {
 }
 
 /* ── Generate mock chart data ── */
+function seededRand(seed: number) {
+	const x = Math.sin(seed + 1) * 10000
+	return x - Math.floor(x)
+}
+
 function genChartData(base: number, points = 24) {
 	const data = []
-	let v = base * 0.78
+	let v = base * 0.88
 	for (let i = 0; i < points; i++) {
-		v += (Math.random() - 0.42) * base * 0.02
+		const trend = base * (0.88 + (i / points) * 0.12)
+		v =
+			v * 0.82 +
+			trend * 0.18 +
+			(seededRand(base * 0.001 + i * 7.3) - 0.5) * base * 0.012
 		data.push({
 			time: `${String(i).padStart(2, '0')}:00`,
-			value: Math.max(v, base * 0.7),
+			value: Math.max(v, base * 0.75),
 		})
 	}
 	data[data.length - 1].value = base

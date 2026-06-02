@@ -1,44 +1,8 @@
 import type { AavePosition } from '@/types'
 
-function formatUSD(v: number) {
+function fmt(v: number) {
 	if (v >= 1000) return `$${(v / 1000).toFixed(2)}K`
 	return `$${v.toFixed(2)}`
-}
-
-const COIN_ICONS: Record<string, { bg: string; color: string; char: string }> =
-	{
-		ETH: { bg: 'rgba(98,126,234,0.2)', color: '#627eea', char: 'Ξ' },
-		USDC: { bg: 'rgba(39,117,202,0.2)', color: '#2775ca', char: '$' },
-		USDT: { bg: 'rgba(38,161,123,0.2)', color: '#26a17b', char: '₮' },
-		WBTC: { bg: 'rgba(247,147,26,0.2)', color: '#f7931a', char: '₿' },
-		DAI: { bg: 'rgba(249,176,28,0.2)', color: '#f9b01c', char: '◈' },
-	}
-
-function CoinIcon({ symbol }: { symbol: string }) {
-	const cfg = COIN_ICONS[symbol] ?? {
-		bg: 'rgba(255,255,255,0.1)',
-		color: 'rgba(255,255,255,0.5)',
-		char: symbol.slice(0, 1),
-	}
-	return (
-		<div
-			style={{
-				width: 26,
-				height: 26,
-				borderRadius: '50%',
-				background: cfg.bg,
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				fontSize: 11,
-				fontWeight: 800,
-				color: cfg.color,
-				flexShrink: 0,
-			}}
-		>
-			{cfg.char}
-		</div>
-	)
 }
 
 export function AaveCard({ position }: { position: AavePosition }) {
@@ -50,35 +14,36 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				: 'var(--accent-red)'
 	const hfBg =
 		position.healthFactor > 2
-			? 'rgba(74,222,128,0.1)'
+			? 'var(--accent-green-glow)'
 			: position.healthFactor > 1.5
-				? 'rgba(251,191,36,0.1)'
-				: 'rgba(248,113,113,0.1)'
-	const hfPercent = Math.min((position.healthFactor / 3) * 100, 100)
+				? 'rgba(251,191,36,.1)'
+				: 'var(--accent-red-glow)'
+	const hfPct = Math.min((position.healthFactor / 3) * 100, 100)
 
 	return (
 		<div
 			style={{
-				background: 'rgba(255,255,255,0.02)',
-				border: '1px solid rgba(255,255,255,0.07)',
-				borderRadius: 16,
-				padding: 20,
+				background: 'var(--card-bg)',
+				border: '1px solid var(--card-border)',
+				borderRadius: 'var(--card-radius)',
+				padding: 'var(--card-padding-lg)',
 				position: 'relative',
 				overflow: 'hidden',
-				transition: 'all 0.2s',
+				transition: 'border-color .2s, box-shadow .2s, transform .15s',
+				boxShadow: 'var(--shadow-card)',
 			}}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'rgba(123,97,255,0.25)'
+				e.currentTarget.style.borderColor = 'rgba(182,80,158,.3)'
+				e.currentTarget.style.boxShadow = 'var(--shadow-hover)'
 				e.currentTarget.style.transform = 'translateY(-2px)'
-				e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,0,0,0.5)'
 			}}
 			onMouseLeave={e => {
-				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+				e.currentTarget.style.borderColor = 'var(--card-border)'
+				e.currentTarget.style.boxShadow = 'var(--shadow-card)'
 				e.currentTarget.style.transform = 'translateY(0)'
-				e.currentTarget.style.boxShadow = 'none'
 			}}
 		>
-			{/* Top line */}
+			{/* Aave accent line */}
 			<div
 				style={{
 					position: 'absolute',
@@ -87,7 +52,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 					right: 0,
 					height: 2,
 					background:
-						'linear-gradient(90deg,#b6509e,rgba(182,80,158,0.1),transparent)',
+						'linear-gradient(90deg,var(--aave),rgba(182,80,158,.15),transparent)',
 				}}
 			/>
 
@@ -103,15 +68,15 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 					<div
 						style={{
-							width: 44,
-							height: 44,
+							width: 40,
+							height: 40,
 							borderRadius: '50%',
-							background: 'rgba(182,80,158,0.12)',
-							border: '1px solid rgba(182,80,158,0.25)',
+							background: 'var(--aave-glow)',
+							border: '1px solid rgba(182,80,158,.25)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: 22,
+							fontSize: 20,
 						}}
 					>
 						👻
@@ -119,22 +84,21 @@ export function AaveCard({ position }: { position: AavePosition }) {
 					<div>
 						<p
 							style={{
-								fontSize: 15,
+								fontSize: 14,
 								fontWeight: 800,
 								color: 'var(--text-primary)',
-								letterSpacing: '-0.3px',
 							}}
 						>
-							AAVE V3
+							Aave V3
 						</p>
 						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-							Ethereum
+							Lending · Ethereum
 						</p>
 					</div>
 				</div>
 				<span
 					style={{
-						fontSize: 12,
+						fontSize: 11,
 						fontWeight: 700,
 						padding: '4px 10px',
 						borderRadius: 20,
@@ -142,7 +106,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 						color: hfColor,
 					}}
 				>
-					HF {position.healthFactor.toFixed(2)}
+					HF: {position.healthFactor.toFixed(2)}
 				</span>
 			</div>
 
@@ -154,8 +118,8 @@ export function AaveCard({ position }: { position: AavePosition }) {
 						justifyContent: 'space-between',
 						fontSize: 10,
 						color: 'var(--text-tertiary)',
-						marginBottom: 5,
 						fontWeight: 600,
+						marginBottom: 5,
 					}}
 				>
 					<span>Health Factor</span>
@@ -167,25 +131,25 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									: 'var(--text-tertiary)',
 						}}
 					>
-						{position.healthFactor < 1.5 ? '⚠ Risk' : 'Safe'}
+						{position.healthFactor < 1.5 ? '⚠ Liquidation risk' : 'Safe'}
 					</span>
 				</div>
 				<div
 					style={{
-						height: 5,
-						background: 'rgba(255,255,255,0.06)',
-						borderRadius: 3,
+						height: 4,
+						background: 'var(--surface-3)',
+						borderRadius: 2,
 						overflow: 'hidden',
 					}}
 				>
 					<div
 						style={{
 							height: '100%',
-							width: `${hfPercent}%`,
-							background: `linear-gradient(90deg,${hfColor},${hfColor}88)`,
-							borderRadius: 3,
-							boxShadow: `0 0 8px ${hfColor}`,
-							transition: 'width 0.4s ease',
+							width: `${hfPct}%`,
+							background: hfColor,
+							borderRadius: 2,
+							boxShadow: `0 0 6px ${hfColor}`,
+							transition: 'width .4s ease',
 						}}
 					/>
 				</div>
@@ -203,34 +167,36 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				{[
 					{
 						label: 'Net Worth',
-						value: formatUSD(position.valueUSD),
+						value: fmt(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
 						label: 'Collateral',
-						value: formatUSD(position.totalCollateralUSD),
+						value: fmt(position.totalCollateralUSD),
 						color: 'var(--text-primary)',
 					},
 					{
 						label: 'Debt',
-						value: formatUSD(position.totalDebtUSD),
+						value: fmt(position.totalDebtUSD),
 						color: 'var(--accent-red)',
 					},
 				].map(s => (
 					<div
 						key={s.label}
 						style={{
-							background: 'rgba(255,255,255,0.04)',
-							borderRadius: 10,
+							background: 'var(--surface-2)',
+							borderRadius: 'var(--card-radius-sm)',
 							padding: '10px 12px',
 						}}
 					>
 						<p
 							style={{
-								fontSize: 10,
+								fontSize: 9,
 								color: 'var(--text-tertiary)',
+								fontWeight: 700,
+								textTransform: 'uppercase',
+								letterSpacing: '.07em',
 								marginBottom: 5,
-								fontWeight: 600,
 							}}
 						>
 							{s.label}
@@ -242,7 +208,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				))}
 			</div>
 
-			{/* Supplied */}
+			{/* Supplies */}
 			{position.supplies.length > 0 && (
 				<div style={{ marginBottom: 10 }}>
 					<p
@@ -250,8 +216,8 @@ export function AaveCard({ position }: { position: AavePosition }) {
 							fontSize: 9,
 							fontWeight: 800,
 							color: 'var(--text-tertiary)',
-							letterSpacing: '0.14em',
-							marginBottom: 7,
+							letterSpacing: '.12em',
+							marginBottom: 6,
 						}}
 					>
 						SUPPLIED
@@ -264,29 +230,26 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'space-between',
-									background: 'rgba(74,222,128,0.05)',
-									border: '1px solid rgba(74,222,128,0.12)',
-									borderRadius: 9,
-									padding: '8px 11px',
+									background: 'rgba(74,222,128,.05)',
+									border: '1px solid rgba(74,222,128,.12)',
+									borderRadius: 'var(--card-radius-xs)',
+									padding: '7px 11px',
 								}}
 							>
-								<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-									<CoinIcon symbol={s.symbol} />
-									<span
-										style={{
-											fontSize: 13,
-											fontWeight: 700,
-											color: 'var(--text-primary)',
-										}}
-									>
-										{s.symbol}
-									</span>
-								</div>
-								<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+								<span
+									style={{
+										fontSize: 13,
+										fontWeight: 700,
+										color: 'var(--text-primary)',
+									}}
+								>
+									{s.symbol}
+								</span>
+								<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
 									<span
 										style={{ fontSize: 12, color: 'var(--text-secondary)' }}
 									>
-										{formatUSD(s.valueUSD)}
+										{fmt(s.valueUSD)}
 									</span>
 									<span
 										style={{
@@ -295,7 +258,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 											fontWeight: 700,
 										}}
 									>
-										+ {s.apy.toFixed(2)}% APY
+										{s.apy.toFixed(2)}% APY
 									</span>
 								</div>
 							</div>
@@ -304,7 +267,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 				</div>
 			)}
 
-			{/* Borrowed */}
+			{/* Borrows */}
 			{position.borrows.length > 0 && (
 				<div>
 					<p
@@ -312,8 +275,8 @@ export function AaveCard({ position }: { position: AavePosition }) {
 							fontSize: 9,
 							fontWeight: 800,
 							color: 'var(--text-tertiary)',
-							letterSpacing: '0.14em',
-							marginBottom: 7,
+							letterSpacing: '.12em',
+							marginBottom: 6,
 						}}
 					>
 						BORROWED
@@ -326,29 +289,26 @@ export function AaveCard({ position }: { position: AavePosition }) {
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'space-between',
-									background: 'rgba(248,113,113,0.05)',
-									border: '1px solid rgba(248,113,113,0.12)',
-									borderRadius: 9,
-									padding: '8px 11px',
+									background: 'rgba(248,113,113,.05)',
+									border: '1px solid rgba(248,113,113,.12)',
+									borderRadius: 'var(--card-radius-xs)',
+									padding: '7px 11px',
 								}}
 							>
-								<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-									<CoinIcon symbol={b.symbol} />
-									<span
-										style={{
-											fontSize: 13,
-											fontWeight: 700,
-											color: 'var(--text-primary)',
-										}}
-									>
-										{b.symbol}
-									</span>
-								</div>
-								<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+								<span
+									style={{
+										fontSize: 13,
+										fontWeight: 700,
+										color: 'var(--text-primary)',
+									}}
+								>
+									{b.symbol}
+								</span>
+								<div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
 									<span
 										style={{ fontSize: 12, color: 'var(--text-secondary)' }}
 									>
-										{formatUSD(b.valueUSD)}
+										{fmt(b.valueUSD)}
 									</span>
 									<span
 										style={{
@@ -357,7 +317,7 @@ export function AaveCard({ position }: { position: AavePosition }) {
 											fontWeight: 700,
 										}}
 									>
-										+ {b.apy.toFixed(2)}% APR
+										{b.apy.toFixed(2)}% APR
 									</span>
 								</div>
 							</div>

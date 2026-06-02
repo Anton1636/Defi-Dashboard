@@ -6,83 +6,52 @@ import { useWallet } from '@/hooks/useWallet'
 import { StreamingText } from '@/components/ai/StreamingText'
 import { QuestionInput } from '@/components/ai/QuestionInput'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { usePortfolio } from '@/hooks/usePortfolio'
-import type { AavePosition } from '@/types'
 
-const QUICK_QUESTIONS = [
+const QUICK_Q = [
 	{ icon: '🛡', label: 'What are my highest risk positions?' },
 	{ icon: '📈', label: 'How can I improve my yield?' },
 	{ icon: '🔒', label: 'Is my Aave position safe?' },
 	{ icon: '⚖', label: 'Should I rebalance my portfolio?' },
 ]
 
-/* Decorative sparkline */
-function Sparkline({ color, index = 0 }: { color: string; index?: number }) {
-	const variants = [
-		'M0,18 C20,14 40,10 60,12 C80,14 100,8 120,10 C140,12 155,6 170,4',
-		'M0,14 C20,18 40,10 60,16 C80,20 100,12 120,8 C140,6 155,10 170,6',
-		'M0,10 C20,14 40,18 60,12 C80,8 100,14 120,10 C140,6 155,12 170,8',
-	]
-	const path = variants[index % variants.length]
-	return (
-		<svg
-			viewBox='0 0 170 24'
-			preserveAspectRatio='none'
-			style={{ width: 120, height: 28 }}
-		>
-			<path
-				d={path}
-				fill='none'
-				stroke={color}
-				strokeWidth='1.5'
-				opacity='.8'
-				strokeLinecap='round'
-			/>
-		</svg>
-	)
-}
-
-const ANALYSIS_ICONS = [
+const HISTORY_ICONS = [
 	{
 		icon: '📊',
 		bg: 'linear-gradient(135deg,rgba(0,229,255,.3),rgba(0,229,255,.1))',
-		color: '#00e5ff',
 	},
 	{
 		icon: '🛡',
 		bg: 'linear-gradient(135deg,rgba(123,97,255,.3),rgba(123,97,255,.1))',
-		color: '#7b61ff',
 	},
 	{
 		icon: '🥧',
 		bg: 'linear-gradient(135deg,rgba(0,229,255,.2),rgba(74,222,128,.2))',
-		color: '#4ade80',
 	},
 ]
 
+const SPARK_PATHS_AI = [
+	'M0,18 C30,14 60,10 90,12 C120,14 150,8 170,5',
+	'M0,14 C30,18 60,10 90,16 C120,19 150,8 170,6',
+	'M0,12 C30,16 60,18 90,12 C120,8 150,14 170,8',
+]
+
 function formatDate(d: string) {
-	const date = new Date(d)
-	const now = new Date()
-	const diff = now.getTime() - date.getTime()
-	const hours = Math.floor(diff / 3_600_000)
-	if (hours < 24)
+	const date = new Date(d),
+		now = new Date()
+	const h = Math.floor((now.getTime() - date.getTime()) / 3_600_000)
+	if (h < 24)
 		return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-	if (hours < 48)
+	if (h < 48)
 		return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-	return (
-		date.toLocaleDateString('en-US', {
-			month: 'short',
-			day: 'numeric',
-			year: 'numeric',
-		}) +
-		', ' +
-		date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-	)
+	return date.toLocaleDateString('en-US', {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+	})
 }
 
 export default function AIInsightsPage() {
 	const { isConnected } = useWallet()
-	const { data: portfolio } = usePortfolio()
 	const {
 		analyze,
 		fetchHistory,
@@ -97,11 +66,6 @@ export default function AIInsightsPage() {
 	useEffect(() => {
 		if (isConnected) fetchHistory()
 	}, [isConnected, fetchHistory])
-
-	const aaveHF = portfolio?.positions.find(p => p.protocol === 'aave')
-		? (portfolio.positions.find(p => p.protocol === 'aave') as AavePosition)
-				.healthFactor
-		: null
 
 	if (!isConnected) {
 		return (
@@ -121,8 +85,8 @@ export default function AIInsightsPage() {
 						width: 48,
 						height: 48,
 						borderRadius: '50%',
-						background: 'rgba(123,97,255,.1)',
-						border: '1px solid rgba(123,97,255,.2)',
+						background: 'var(--accent-purple-glow)',
+						border: '1px solid rgba(123,97,255,.25)',
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
@@ -131,7 +95,14 @@ export default function AIInsightsPage() {
 				>
 					✦
 				</div>
-				<h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.5px' }}>
+				<h2
+					style={{
+						fontSize: 20,
+						fontWeight: 800,
+						letterSpacing: '-.5px',
+						color: 'var(--text-primary)',
+					}}
+				>
 					Connect your wallet
 				</h2>
 				<p
@@ -141,7 +112,7 @@ export default function AIInsightsPage() {
 						marginBottom: 8,
 					}}
 				>
-					Connect to get AI-powered portfolio insights
+					Get AI-powered portfolio insights
 				</p>
 				<ConnectButton />
 			</div>
@@ -149,7 +120,7 @@ export default function AIInsightsPage() {
 	}
 
 	return (
-		<div className='fade-in' style={{ maxWidth: 860 }}>
+		<div className='layout-analytics fade-in'>
 			{/* Header */}
 			<div
 				style={{
@@ -168,8 +139,8 @@ export default function AIInsightsPage() {
 							height: 44,
 							borderRadius: 12,
 							background:
-								'linear-gradient(135deg,rgba(0,229,255,.15),rgba(123,97,255,.15))',
-							border: '1px solid rgba(123,97,255,.25)',
+								'linear-gradient(135deg,rgba(0,229,255,.12),rgba(123,97,255,.12))',
+							border: '1px solid rgba(123,97,255,.2)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
@@ -189,24 +160,23 @@ export default function AIInsightsPage() {
 						>
 							<h1
 								style={{
-									fontSize: 24,
+									fontSize: 22,
 									fontWeight: 900,
 									color: 'var(--text-primary)',
-									letterSpacing: '-0.8px',
+									letterSpacing: '-.8px',
 								}}
 							>
 								AI Insights
 							</h1>
 							<span
 								style={{
-									padding: '2px 10px',
+									padding: '2px 9px',
 									borderRadius: 20,
-									background: 'rgba(123,97,255,.12)',
-									border: '1px solid rgba(123,97,255,.25)',
+									background: 'var(--accent-purple-glow)',
+									border: '1px solid rgba(123,97,255,.22)',
 									fontSize: 10,
 									fontWeight: 800,
 									color: 'var(--accent-blue)',
-									letterSpacing: '.05em',
 								}}
 							>
 								✦ Powered by GenAI
@@ -218,12 +188,12 @@ export default function AIInsightsPage() {
 						</p>
 					</div>
 				</div>
-				{/* PRO / SIMPLE toggle */}
+				{/* PRO/SIMPLE toggle */}
 				<div
 					style={{
 						display: 'flex',
-						background: 'rgba(255,255,255,.04)',
-						border: '1px solid rgba(255,255,255,.08)',
+						background: 'var(--surface-2)',
+						border: '1px solid var(--border-1)',
 						borderRadius: 10,
 						padding: 3,
 					}}
@@ -234,8 +204,7 @@ export default function AIInsightsPage() {
 							borderRadius: 8,
 							fontSize: 12,
 							fontWeight: 800,
-							background:
-								'linear-gradient(135deg,var(--accent-purple),#5b44d4)',
+							background: 'var(--gradient-purple)',
 							color: '#fff',
 							border: 'none',
 							cursor: 'pointer',
@@ -260,16 +229,17 @@ export default function AIInsightsPage() {
 				</div>
 			</div>
 
-			{/* Portfolio Analysis card */}
+			{/* Analysis card */}
 			<div
 				style={{
-					background: 'rgba(255,255,255,.02)',
-					border: '1px solid rgba(255,255,255,.08)',
-					borderRadius: 16,
-					padding: '20px 22px',
+					background: 'var(--card-bg)',
+					border: '1px solid var(--card-border)',
+					borderRadius: 'var(--card-radius)',
+					padding: 'var(--card-padding-lg)',
 					marginBottom: 20,
 					position: 'relative',
 					overflow: 'hidden',
+					boxShadow: 'var(--shadow-card)',
 				}}
 			>
 				{/* Top gradient */}
@@ -285,41 +255,40 @@ export default function AIInsightsPage() {
 					}}
 				/>
 
-				{/* Decorative wave top-right */}
+				{/* Wave decoration */}
 				<div
 					style={{
 						position: 'absolute',
 						top: 0,
 						right: 0,
-						width: 220,
-						height: 120,
+						width: 200,
+						height: 110,
 						pointerEvents: 'none',
-						opacity: 0.25,
+						opacity: 0.2,
 					}}
 				>
-					<svg viewBox='0 0 220 120' style={{ width: '100%', height: '100%' }}>
+					<svg viewBox='0 0 200 110' style={{ width: '100%', height: '100%' }}>
 						<defs>
-							<radialGradient id='wg' cx='80%' cy='20%' r='60%'>
-								<stop offset='0%' stopColor='#7b61ff' stopOpacity='.6' />
+							<radialGradient id='wg2' cx='70%' cy='30%' r='60%'>
+								<stop offset='0%' stopColor='#7b61ff' stopOpacity='.8' />
 								<stop offset='100%' stopColor='#00e5ff' stopOpacity='0' />
 							</radialGradient>
 						</defs>
 						<path
-							d='M40,100 Q80,20 140,50 Q180,70 220,10'
+							d='M30,100 Q80,20 140,50 Q180,70 200,10'
 							fill='none'
-							stroke='url(#wg)'
+							stroke='url(#wg2)'
 							strokeWidth='1.5'
 						/>
 						<path
-							d='M60,110 Q100,40 160,60 Q200,75 220,30'
+							d='M50,110 Q100,40 160,60 Q195,74 200,30'
 							fill='none'
 							stroke='#7b61ff'
 							strokeWidth='1'
-							opacity='.4'
+							opacity='.5'
 						/>
 						<circle cx='140' cy='50' r='3' fill='#00e5ff' opacity='.6' />
 						<circle cx='80' cy='20' r='2' fill='#7b61ff' opacity='.5' />
-						<circle cx='200' cy='35' r='1.5' fill='#00e5ff' opacity='.4' />
 					</svg>
 				</div>
 
@@ -335,10 +304,10 @@ export default function AIInsightsPage() {
 					<div>
 						<p
 							style={{
-								fontSize: 16,
+								fontSize: 15,
 								fontWeight: 800,
 								color: 'var(--text-primary)',
-								marginBottom: 4,
+								marginBottom: 3,
 							}}
 						>
 							Portfolio Analysis
@@ -353,26 +322,25 @@ export default function AIInsightsPage() {
 						disabled={!canAnalyze}
 						style={{
 							padding: '10px 22px',
-							borderRadius: 10,
+							borderRadius: 'var(--card-radius-sm)',
 							fontSize: 13,
 							fontWeight: 800,
+							flexShrink: 0,
 							color: canAnalyze ? '#fff' : 'var(--text-tertiary)',
 							background: canAnalyze
 								? 'linear-gradient(135deg,var(--accent-blue),var(--accent-purple))'
-								: 'var(--bg-elevated)',
+								: 'var(--surface-3)',
 							border: 'none',
 							cursor: canAnalyze ? 'pointer' : 'not-allowed',
-							boxShadow: canAnalyze ? '0 0 20px rgba(0,229,255,.2)' : 'none',
+							boxShadow: canAnalyze ? 'var(--glow-blue)' : 'none',
 							transition: 'all .2s',
-							flexShrink: 0,
 							display: 'flex',
 							alignItems: 'center',
 							gap: 7,
 						}}
 					>
 						<span style={{ fontSize: 14 }}>✦</span>
-						{isStreaming ? 'Analyzing...' : 'Analyze Now'}{' '}
-						{!isStreaming && <span>›</span>}
+						{isStreaming ? 'Analyzing...' : 'Analyze Now →'}
 					</button>
 				</div>
 
@@ -380,8 +348,8 @@ export default function AIInsightsPage() {
 				{(streamingText || isStreaming) && (
 					<div
 						style={{
-							background: 'rgba(255,255,255,.03)',
-							borderRadius: 12,
+							background: 'var(--surface-2)',
+							borderRadius: 'var(--card-radius-sm)',
 							padding: 16,
 							marginBottom: 14,
 							animation: 'fadeIn .3s ease-out',
@@ -391,7 +359,7 @@ export default function AIInsightsPage() {
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: 7,
+								gap: 8,
 								marginBottom: 10,
 							}}
 						>
@@ -428,9 +396,9 @@ export default function AIInsightsPage() {
 				{error && (
 					<div
 						style={{
-							background: 'rgba(248,113,113,.08)',
+							background: 'var(--accent-red-glow)',
 							border: '1px solid rgba(248,113,113,.2)',
-							borderRadius: 8,
+							borderRadius: 'var(--card-radius-xs)',
 							padding: '10px 14px',
 							fontSize: 12,
 							color: 'var(--accent-red)',
@@ -450,18 +418,18 @@ export default function AIInsightsPage() {
 						marginBottom: 14,
 					}}
 				>
-					{QUICK_QUESTIONS.map(q => (
+					{QUICK_Q.map(q => (
 						<button
 							key={q.label}
 							onClick={() => analyze(q.label)}
 							disabled={isStreaming}
 							style={{
-								padding: '6px 14px',
+								padding: '5px 12px',
 								borderRadius: 20,
 								fontSize: 11,
 								fontWeight: 600,
-								background: 'rgba(255,255,255,.04)',
-								border: '1px solid rgba(255,255,255,.08)',
+								background: 'var(--surface-2)',
+								border: '1px solid var(--border-1)',
 								color: 'var(--text-secondary)',
 								cursor: isStreaming ? 'not-allowed' : 'pointer',
 								transition: 'all .15s',
@@ -476,7 +444,7 @@ export default function AIInsightsPage() {
 								}
 							}}
 							onMouseLeave={e => {
-								e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'
+								e.currentTarget.style.borderColor = 'var(--border-1)'
 								e.currentTarget.style.color = 'var(--text-secondary)'
 							}}
 						>
@@ -485,11 +453,10 @@ export default function AIInsightsPage() {
 					))}
 				</div>
 
-				{/* Input */}
 				<QuestionInput onSubmit={q => analyze(q)} isLoading={isStreaming} />
 			</div>
 
-			{/* Previous analyses */}
+			{/* History */}
 			<div>
 				<div
 					style={{
@@ -517,7 +484,7 @@ export default function AIInsightsPage() {
 							color: 'var(--text-tertiary)',
 						}}
 					>
-						<span>⏱</span> {history.length} saved
+						⏱ {history.length} saved
 					</div>
 				</div>
 
@@ -527,9 +494,9 @@ export default function AIInsightsPage() {
 							<div
 								key={i}
 								style={{
-									background: 'rgba(255,255,255,.02)',
-									border: '1px solid rgba(255,255,255,.07)',
-									borderRadius: 14,
+									background: 'var(--card-bg)',
+									border: '1px solid var(--card-border)',
+									borderRadius: 'var(--card-radius)',
 									padding: 16,
 									display: 'flex',
 									gap: 12,
@@ -557,10 +524,6 @@ export default function AIInsightsPage() {
 								</div>
 								<div
 									className='skeleton'
-									style={{ width: 120, height: 28, borderRadius: 6 }}
-								/>
-								<div
-									className='skeleton'
 									style={{ width: 80, height: 10, borderRadius: 4 }}
 								/>
 							</div>
@@ -576,73 +539,62 @@ export default function AIInsightsPage() {
 							color: 'var(--text-tertiary)',
 						}}
 					>
-						<div style={{ fontSize: 40, marginBottom: 12 }}>✦</div>
+						<div style={{ fontSize: 36, marginBottom: 12 }}>✦</div>
 						<p style={{ fontSize: 13 }}>No analyses yet</p>
 						<p style={{ fontSize: 12, marginTop: 4 }}>
-							{'Click "Analyze Now" to get your first AI insights'}
+							{'"Click "Analyze Now" to get your first AI insights"'}
 						</p>
 					</div>
 				) : (
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 						{history.map((analysis, i) => {
-							const iconCfg = ANALYSIS_ICONS[i % ANALYSIS_ICONS.length]
-							const sparkColors = ['#00e5ff', '#7b61ff', '#4ade80']
-							const sparkColor = sparkColors[i % sparkColors.length]
-
-							// Parse outcome from prompt
+							const iconCfg = HISTORY_ICONS[i % HISTORY_ICONS.length]
+							const colors = [
+								'var(--accent-blue)',
+								'var(--accent-purple)',
+								'var(--accent-green)',
+							]
+							const col = colors[i % colors.length]
 							const isYield = analysis.prompt.toLowerCase().includes('yield')
 							const isRisk =
 								analysis.prompt.toLowerCase().includes('risk') ||
 								analysis.prompt.toLowerCase().includes('safe')
-							const isRebalance = analysis.prompt
-								.toLowerCase()
-								.includes('rebalance')
 							const label = isYield
 								? 'Yield Optimization'
 								: isRisk
 									? 'Risk Assessment'
-									: isRebalance
-										? 'Portfolio Rebalance'
-										: 'Portfolio Analysis'
-							const metric = isYield
-								? '+2.34%'
-								: isRisk
-									? aaveHF
-										? `HF ${aaveHF.toFixed(2)}`
-										: 'Low Risk'
-									: '+1.87%'
-							const metricLabel = isYield
+									: 'Portfolio Rebalance'
+							const metric = isYield ? '+2.34%' : isRisk ? 'Low Risk' : '+1.87%'
+							const metricSub = isYield
 								? 'Potential uplift'
 								: isRisk
-									? 'Health factor'
+									? 'Health factor 2.45'
 									: 'Expected yield boost'
-							const metricColor =
-								isRisk && aaveHF && aaveHF < 2 ? '#fbbf24' : '#4ade80'
 
 							return (
 								<div
 									key={analysis.id}
 									style={{
-										background: 'rgba(255,255,255,.02)',
-										border: '1px solid rgba(255,255,255,.07)',
-										borderRadius: 14,
-										padding: '14px 16px',
+										background: 'var(--card-bg)',
+										border: '1px solid var(--card-border)',
+										borderRadius: 'var(--card-radius)',
+										padding: '13px 16px',
 										display: 'flex',
 										alignItems: 'center',
 										gap: 12,
 										cursor: 'pointer',
 										transition: 'all .15s',
+										boxShadow: 'var(--shadow-card)',
 									}}
 									onMouseEnter={e => {
 										e.currentTarget.style.borderColor = 'rgba(0,229,255,.15)'
-										e.currentTarget.style.background = 'rgba(255,255,255,.03)'
+										e.currentTarget.style.boxShadow = 'var(--shadow-hover)'
 									}}
 									onMouseLeave={e => {
-										e.currentTarget.style.borderColor = 'rgba(255,255,255,.07)'
-										e.currentTarget.style.background = 'rgba(255,255,255,.02)'
+										e.currentTarget.style.borderColor = 'var(--card-border)'
+										e.currentTarget.style.boxShadow = 'var(--shadow-card)'
 									}}
 								>
-									{/* Icon */}
 									<div
 										style={{
 											width: 44,
@@ -658,8 +610,6 @@ export default function AIInsightsPage() {
 									>
 										{iconCfg.icon}
 									</div>
-
-									{/* Info */}
 									<div style={{ flex: 1, minWidth: 0 }}>
 										<div
 											style={{
@@ -682,12 +632,11 @@ export default function AIInsightsPage() {
 												style={{
 													padding: '1px 7px',
 													borderRadius: 10,
-													background: 'rgba(123,97,255,.12)',
+													background: 'var(--accent-purple-glow)',
 													border: '1px solid rgba(123,97,255,.2)',
 													fontSize: 9,
 													fontWeight: 800,
 													color: 'var(--accent-blue)',
-													letterSpacing: '.04em',
 												}}
 											>
 												PRO
@@ -705,21 +654,31 @@ export default function AIInsightsPage() {
 											{analysis.prompt}
 										</p>
 									</div>
-
-									{/* Sparkline */}
-									<div style={{ flexShrink: 0 }}>
-										<Sparkline color={sparkColor} index={i} />
-									</div>
-
-									{/* Metric */}
+									<svg
+										viewBox='0 0 170 24'
+										style={{
+											width: 100,
+											height: 22,
+											flexShrink: 0,
+											opacity: 0.8,
+										}}
+									>
+										<path
+											d={SPARK_PATHS_AI[i % SPARK_PATHS_AI.length]}
+											fill='none'
+											stroke={col}
+											strokeWidth='1.5'
+											strokeLinecap='round'
+										/>
+									</svg>
 									<div
-										style={{ textAlign: 'right', flexShrink: 0, minWidth: 90 }}
+										style={{ textAlign: 'right', flexShrink: 0, minWidth: 80 }}
 									>
 										<p
 											style={{
 												fontSize: 13,
 												fontWeight: 800,
-												color: metricColor,
+												color: 'var(--accent-green)',
 											}}
 										>
 											{metric}
@@ -731,27 +690,23 @@ export default function AIInsightsPage() {
 												marginTop: 1,
 											}}
 										>
-											{metricLabel}
+											{metricSub}
 										</p>
 									</div>
-
-									{/* Date */}
 									<div
-										style={{ textAlign: 'right', flexShrink: 0, minWidth: 120 }}
+										style={{ textAlign: 'right', flexShrink: 0, minWidth: 100 }}
 									>
 										<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
 											{formatDate(analysis.createdAt)}
 										</p>
 									</div>
-
-									{/* Arrow */}
 									<div
 										style={{
-											width: 30,
-											height: 30,
+											width: 28,
+											height: 28,
 											borderRadius: 8,
-											background: 'rgba(255,255,255,.04)',
-											border: '1px solid rgba(255,255,255,.07)',
+											background: 'var(--surface-2)',
+											border: '1px solid var(--border-1)',
 											display: 'flex',
 											alignItems: 'center',
 											justifyContent: 'center',

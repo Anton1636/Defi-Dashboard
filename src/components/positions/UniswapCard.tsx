@@ -1,70 +1,35 @@
 import type { UniswapPosition } from '@/types'
 
-function formatUSD(v: number) {
+function fmt(v: number) {
 	if (v >= 1000) return `$${(v / 1000).toFixed(2)}K`
 	return `$${v.toFixed(2)}`
-}
-
-const COIN_ICONS: Record<string, { bg: string; color: string; char: string }> =
-	{
-		ETH: { bg: 'rgba(98,126,234,0.2)', color: '#627eea', char: 'Ξ' },
-		USDC: { bg: 'rgba(39,117,202,0.2)', color: '#2775ca', char: '$' },
-		USDT: { bg: 'rgba(38,161,123,0.2)', color: '#26a17b', char: '₮' },
-		WBTC: { bg: 'rgba(247,147,26,0.2)', color: '#f7931a', char: '₿' },
-		DAI: { bg: 'rgba(249,176,28,0.2)', color: '#f9b01c', char: '◈' },
-	}
-
-function CoinIcon({ symbol }: { symbol: string }) {
-	const cfg = COIN_ICONS[symbol] ?? {
-		bg: 'rgba(255,255,255,0.1)',
-		color: 'rgba(255,255,255,0.5)',
-		char: symbol.slice(0, 1),
-	}
-	return (
-		<div
-			style={{
-				width: 28,
-				height: 28,
-				borderRadius: '50%',
-				background: cfg.bg,
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				fontSize: 12,
-				fontWeight: 800,
-				color: cfg.color,
-				flexShrink: 0,
-			}}
-		>
-			{cfg.char}
-		</div>
-	)
 }
 
 export function UniswapCard({ position }: { position: UniswapPosition }) {
 	return (
 		<div
 			style={{
-				background: 'rgba(255,255,255,0.02)',
-				border: '1px solid rgba(255,255,255,0.07)',
-				borderRadius: 16,
-				padding: 20,
+				background: 'var(--card-bg)',
+				border: '1px solid var(--card-border)',
+				borderRadius: 'var(--card-radius)',
+				padding: 'var(--card-padding-lg)',
 				position: 'relative',
 				overflow: 'hidden',
-				transition: 'all 0.2s',
+				transition: 'border-color .2s, box-shadow .2s, transform .15s',
+				boxShadow: 'var(--shadow-card)',
 			}}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'rgba(255,0,122,0.25)'
+				e.currentTarget.style.borderColor = 'rgba(255,0,122,.3)'
+				e.currentTarget.style.boxShadow = 'var(--shadow-hover)'
 				e.currentTarget.style.transform = 'translateY(-2px)'
-				e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,0,0,0.5)'
 			}}
 			onMouseLeave={e => {
-				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+				e.currentTarget.style.borderColor = 'var(--card-border)'
+				e.currentTarget.style.boxShadow = 'var(--shadow-card)'
 				e.currentTarget.style.transform = 'translateY(0)'
-				e.currentTarget.style.boxShadow = 'none'
 			}}
 		>
-			{/* Top colored line */}
+			{/* Uniswap accent line */}
 			<div
 				style={{
 					position: 'absolute',
@@ -73,22 +38,7 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 					right: 0,
 					height: 2,
 					background:
-						'linear-gradient(90deg,#ff007a,rgba(255,0,122,0.1),transparent)',
-				}}
-			/>
-
-			{/* Decorative background orb */}
-			<div
-				style={{
-					position: 'absolute',
-					top: -20,
-					right: -20,
-					width: 180,
-					height: 180,
-					borderRadius: '50%',
-					background:
-						'radial-gradient(circle,rgba(255,0,122,0.08) 0%,transparent 70%)',
-					pointerEvents: 'none',
+						'linear-gradient(90deg,#ff007a,rgba(255,0,122,.15),transparent)',
 				}}
 			/>
 
@@ -99,21 +49,20 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					marginBottom: 16,
-					position: 'relative',
 				}}
 			>
 				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 					<div
 						style={{
-							width: 44,
-							height: 44,
+							width: 40,
+							height: 40,
 							borderRadius: '50%',
-							background: 'rgba(255,0,122,0.12)',
-							border: '1px solid rgba(255,0,122,0.25)',
+							background: 'var(--uniswap-glow)',
+							border: '1px solid rgba(255,0,122,.25)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: 22,
+							fontSize: 20,
 						}}
 					>
 						🦄
@@ -121,16 +70,15 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 					<div>
 						<p
 							style={{
-								fontSize: 15,
+								fontSize: 14,
 								fontWeight: 800,
 								color: 'var(--text-primary)',
-								letterSpacing: '-0.3px',
 							}}
 						>
-							UNISWAP V3
+							{position.token0.symbol}/{position.token1.symbol}
 						</p>
 						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-							Ethereum
+							Uniswap V3 · Ethereum
 						</p>
 					</div>
 				</div>
@@ -141,41 +89,40 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 						padding: '4px 10px',
 						borderRadius: 20,
 						background: position.inRange
-							? 'rgba(74,222,128,0.1)'
-							: 'rgba(251,191,36,0.1)',
+							? 'var(--accent-green-glow)'
+							: 'rgba(251,191,36,.1)',
 						color: position.inRange
 							? 'var(--accent-green)'
 							: 'var(--accent-amber)',
-						border: `1px solid ${position.inRange ? 'rgba(74,222,128,0.2)' : 'rgba(251,191,36,0.2)'}`,
+						border: `1px solid ${position.inRange ? 'rgba(74,222,128,.25)' : 'rgba(251,191,36,.25)'}`,
 					}}
 				>
 					{position.inRange ? '● In range' : '○ Out of range'}
 				</span>
 			</div>
 
-			{/* Stats grid */}
+			{/* Stats */}
 			<div
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3,1fr)',
 					gap: 8,
-					marginBottom: 10,
-					position: 'relative',
+					marginBottom: 12,
 				}}
 			>
 				{[
 					{
-						label: 'Position Value',
-						value: formatUSD(position.valueUSD),
+						label: 'Position value',
+						value: fmt(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
 					{
-						label: 'Fees Earned',
-						value: formatUSD(position.feesEarned),
+						label: 'Fees earned',
+						value: fmt(position.feesEarned),
 						color: 'var(--accent-green)',
 					},
 					{
-						label: 'Pool',
+						label: 'Pool ID',
 						value: position.poolId.slice(0, 8) + '…',
 						color: 'var(--text-tertiary)',
 						mono: true,
@@ -184,17 +131,19 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 					<div
 						key={s.label}
 						style={{
-							background: 'rgba(255,255,255,0.04)',
-							borderRadius: 10,
+							background: 'var(--surface-2)',
+							borderRadius: 'var(--card-radius-sm)',
 							padding: '10px 12px',
 						}}
 					>
 						<p
 							style={{
-								fontSize: 10,
+								fontSize: 9,
 								color: 'var(--text-tertiary)',
+								fontWeight: 700,
+								textTransform: 'uppercase',
+								letterSpacing: '.07em',
 								marginBottom: 5,
-								fontWeight: 600,
 							}}
 						>
 							{s.label}
@@ -214,46 +163,47 @@ export function UniswapCard({ position }: { position: UniswapPosition }) {
 			</div>
 
 			{/* Token rows */}
-			<div style={{ display: 'flex', gap: 8, position: 'relative' }}>
+			<div style={{ display: 'flex', gap: 8 }}>
 				{[position.token0, position.token1].map((token, i) => (
 					<div
 						key={i}
 						style={{
 							flex: 1,
-							background: 'rgba(255,255,255,0.03)',
-							borderRadius: 10,
-							padding: '9px 12px',
+							background: 'var(--surface-2)',
+							borderRadius: 'var(--card-radius-xs)',
+							padding: '8px 12px',
 							display: 'flex',
 							alignItems: 'center',
 							gap: 8,
 						}}
 					>
-						<CoinIcon symbol={token.symbol} />
-						<div>
-							<p
-								style={{
-									fontSize: 10,
-									color: 'var(--text-tertiary)',
-									marginBottom: 1,
-									fontWeight: 600,
-								}}
-							>
-								Token {i}
-							</p>
-							<p
-								style={{
-									fontSize: 12,
-									fontWeight: 700,
-									color: 'var(--text-primary)',
-								}}
-							>
-								{token.symbol}{' '}
-								<span
-									style={{ color: 'var(--text-tertiary)', fontWeight: 400 }}
-								>
-									${token.priceUSD.toFixed(2)}
-								</span>
-							</p>
+						<div
+							style={{
+								fontSize: 11,
+								color: 'var(--text-tertiary)',
+								fontWeight: 600,
+							}}
+						>
+							Token {i}:
+						</div>
+						<div
+							style={{
+								fontSize: 12,
+								fontWeight: 700,
+								color: 'var(--text-primary)',
+							}}
+						>
+							{token.symbol}
+						</div>
+						<div
+							style={{
+								fontSize: 11,
+								color: 'var(--accent-blue)',
+								marginLeft: 'auto',
+								fontWeight: 600,
+							}}
+						>
+							${token.priceUSD.toFixed(2)}
 						</div>
 					</div>
 				))}

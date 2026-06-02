@@ -59,17 +59,18 @@ export default function PositionsPage() {
 					padding: 24,
 				}}
 			>
-				<div style={{ fontSize: 40, marginBottom: 4 }}>⬡</div>
-				<h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.5px' }}>
-					Connect your wallet
-				</h2>
-				<p
+				<div style={{ fontSize: 40 }}>⬡</div>
+				<h2
 					style={{
-						fontSize: 14,
-						color: 'var(--text-secondary)',
-						marginBottom: 8,
+						fontSize: 20,
+						fontWeight: 800,
+						letterSpacing: '-.5px',
+						color: 'var(--text-primary)',
 					}}
 				>
+					Connect your wallet
+				</h2>
+				<p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
 					Connect to see your DeFi positions
 				</p>
 				<ConnectButton />
@@ -79,20 +80,20 @@ export default function PositionsPage() {
 
 	if (isLoading) {
 		return (
-			<div style={{ padding: 24 }} className='fade-in'>
+			<div className='layout-analytics fade-in'>
 				<div
-					style={{ height: 28, width: 160, marginBottom: 6 }}
+					style={{ height: 28, width: 140, marginBottom: 6 }}
 					className='skeleton'
 				/>
 				<div
-					style={{ height: 14, width: 240, marginBottom: 24 }}
+					style={{ height: 14, width: 220, marginBottom: 22 }}
 					className='skeleton'
 				/>
 				<div
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))',
-						gap: 14,
+						gap: 12,
 					}}
 				>
 					{[0, 1, 2].map(i => (
@@ -111,7 +112,6 @@ export default function PositionsPage() {
 					alignItems: 'center',
 					justifyContent: 'center',
 					minHeight: '60vh',
-					padding: 24,
 				}}
 			>
 				<p style={{ color: 'var(--accent-red)', fontWeight: 600 }}>
@@ -124,7 +124,7 @@ export default function PositionsPage() {
 	const totalProtocols = Object.values(counts).filter(Boolean).length
 
 	return (
-		<div className='fade-in' style={{ padding: 24 }}>
+		<div className='layout-analytics fade-in'>
 			{/* Header */}
 			<div
 				style={{
@@ -132,15 +132,17 @@ export default function PositionsPage() {
 					alignItems: 'center',
 					justifyContent: 'space-between',
 					marginBottom: 20,
+					flexWrap: 'wrap',
+					gap: 10,
 				}}
 			>
 				<div>
 					<h1
 						style={{
-							fontSize: 24,
+							fontSize: 22,
 							fontWeight: 900,
 							color: 'var(--text-primary)',
-							letterSpacing: '-0.8px',
+							letterSpacing: '-.8px',
 							marginBottom: 3,
 						}}
 					>
@@ -157,14 +159,14 @@ export default function PositionsPage() {
 						alignItems: 'center',
 						gap: 6,
 						padding: '9px 18px',
-						borderRadius: 10,
-						fontSize: 13,
+						borderRadius: 'var(--card-radius-sm)',
+						fontSize: 12,
 						fontWeight: 800,
 						background: 'linear-gradient(135deg,var(--accent-purple),#5b44d4)',
 						color: '#fff',
 						border: 'none',
 						cursor: 'pointer',
-						boxShadow: '0 0 16px rgba(123,97,255,0.3)',
+						boxShadow: 'var(--glow-purple)',
 					}}
 				>
 					+ Add Position
@@ -173,10 +175,10 @@ export default function PositionsPage() {
 
 			{/* Filter pills */}
 			<div
-				style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}
+				style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}
 			>
 				{FILTERS.map(f => {
-					const isActive = active === f.key
+					const isAct = active === f.key
 					const count =
 						f.key === 'all' ? (portfolio?.positions.length ?? 0) : counts[f.key]
 					return (
@@ -187,14 +189,12 @@ export default function PositionsPage() {
 								padding: '5px 14px',
 								borderRadius: 20,
 								fontSize: 12,
-								fontWeight: isActive ? 700 : 500,
-								background: isActive
-									? 'rgba(123,97,255,0.15)'
-									: 'rgba(255,255,255,0.03)',
-								border: `1px solid ${isActive ? 'rgba(123,97,255,0.4)' : 'rgba(255,255,255,0.08)'}`,
-								color: isActive ? '#fff' : 'var(--text-secondary)',
+								fontWeight: isAct ? 700 : 400,
+								background: isAct ? 'rgba(123,97,255,.15)' : 'var(--surface-1)',
+								border: `1px solid ${isAct ? 'rgba(123,97,255,.35)' : 'var(--border-1)'}`,
+								color: isAct ? '#fff' : 'var(--text-secondary)',
 								cursor: 'pointer',
-								transition: 'all 0.15s',
+								transition: 'all .15s',
 								display: 'flex',
 								alignItems: 'center',
 								gap: 5,
@@ -204,14 +204,14 @@ export default function PositionsPage() {
 							{f.label}
 							<span
 								style={{
-									fontSize: 10,
+									fontSize: 9,
 									fontWeight: 800,
 									padding: '1px 6px',
 									borderRadius: 10,
-									background: isActive
-										? 'rgba(255,255,255,0.15)'
-										: 'rgba(255,255,255,0.06)',
-									color: isActive ? '#fff' : 'var(--text-tertiary)',
+									background: isAct
+										? 'rgba(255,255,255,.15)'
+										: 'var(--surface-3)',
+									color: isAct ? '#fff' : 'var(--text-tertiary)',
 								}}
 							>
 								{count}
@@ -221,7 +221,7 @@ export default function PositionsPage() {
 				})}
 			</div>
 
-			{/* Cards */}
+			{/* Cards grid */}
 			{filtered.length === 0 ? (
 				<div
 					style={{
@@ -242,31 +242,20 @@ export default function PositionsPage() {
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))',
-						gap: 14,
-						marginBottom: 24,
+						gap: 12,
+						marginBottom: 20,
 					}}
 				>
-					{filtered.map((position: DeFiPosition) => {
-						if (position.protocol === 'uniswap')
+					{filtered.map((pos: DeFiPosition) => {
+						if (pos.protocol === 'uniswap')
 							return (
-								<UniswapCard
-									key={position.id}
-									position={position as UniswapPosition}
-								/>
+								<UniswapCard key={pos.id} position={pos as UniswapPosition} />
 							)
-						if (position.protocol === 'aave')
+						if (pos.protocol === 'aave')
+							return <AaveCard key={pos.id} position={pos as AavePosition} />
+						if (pos.protocol === 'compound')
 							return (
-								<AaveCard
-									key={position.id}
-									position={position as AavePosition}
-								/>
-							)
-						if (position.protocol === 'compound')
-							return (
-								<CompoundCard
-									key={position.id}
-									position={position as CompoundPosition}
-								/>
+								<CompoundCard key={pos.id} position={pos as CompoundPosition} />
 							)
 						return null
 					})}
