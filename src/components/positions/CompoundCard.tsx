@@ -12,40 +12,75 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 	return (
 		<div
 			style={{
-				background: 'var(--bg-card)',
-				border: '1px solid var(--border-primary)',
-				borderRadius: 14,
-				padding: 18,
-				transition: 'border-color 0.2s',
+				background: 'rgba(255,255,255,0.02)',
+				border: '1px solid rgba(255,255,255,0.07)',
+				borderRadius: 16,
+				padding: 20,
+				position: 'relative',
+				overflow: 'hidden',
+				transition: 'all 0.2s',
 			}}
 			onMouseEnter={e => {
-				e.currentTarget.style.borderColor = 'rgba(0,211,149,0.3)'
+				e.currentTarget.style.borderColor = 'rgba(0,211,149,0.25)'
+				e.currentTarget.style.transform = 'translateY(-2px)'
+				e.currentTarget.style.boxShadow = '0 12px 36px rgba(0,0,0,0.5)'
 			}}
 			onMouseLeave={e => {
-				e.currentTarget.style.borderColor = 'var(--border-primary)'
+				e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+				e.currentTarget.style.transform = 'translateY(0)'
+				e.currentTarget.style.boxShadow = 'none'
 			}}
 		>
+			{/* Top line */}
+			<div
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					right: 0,
+					height: 2,
+					background:
+						'linear-gradient(90deg,#00d395,rgba(0,211,149,0.1),transparent)',
+				}}
+			/>
+
+			{/* Decorative orb */}
+			<div
+				style={{
+					position: 'absolute',
+					bottom: -30,
+					right: -30,
+					width: 140,
+					height: 140,
+					borderRadius: '50%',
+					background:
+						'radial-gradient(circle,rgba(0,211,149,0.06) 0%,transparent 70%)',
+					pointerEvents: 'none',
+				}}
+			/>
+
 			{/* Header */}
 			<div
 				style={{
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'space-between',
-					marginBottom: 14,
+					marginBottom: 16,
+					position: 'relative',
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
 					<div
 						style={{
-							width: 38,
-							height: 38,
-							borderRadius: 10,
-							background: 'var(--compound-glow)',
-							border: '1px solid rgba(0,211,149,0.2)',
+							width: 44,
+							height: 44,
+							borderRadius: '50%',
+							background: 'rgba(0,211,149,0.12)',
+							border: '1px solid rgba(0,211,149,0.25)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: 18,
+							fontSize: 22,
 						}}
 					>
 						🏦
@@ -53,25 +88,26 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					<div>
 						<p
 							style={{
-								fontWeight: 700,
+								fontSize: 15,
+								fontWeight: 800,
 								color: 'var(--text-primary)',
-								fontSize: 14,
+								letterSpacing: '-0.3px',
 							}}
 						>
-							Compound V3 · {position.market}
+							COMPOUND V3 - {position.market}
 						</p>
 						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-							Money market · Ethereum
+							Ethereum
 						</p>
 					</div>
 				</div>
 				<span
 					style={{
-						fontSize: 11,
+						fontSize: 12,
 						fontWeight: 700,
 						padding: '4px 10px',
-						borderRadius: 8,
-						background: 'var(--compound-glow)',
+						borderRadius: 20,
+						background: 'rgba(0,211,149,0.1)',
 						color: 'var(--compound)',
 						border: '1px solid rgba(0,211,149,0.2)',
 					}}
@@ -84,14 +120,15 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 			<div
 				style={{
 					display: 'grid',
-					gridTemplateColumns: 'repeat(3, 1fr)',
-					gap: 6,
+					gridTemplateColumns: 'repeat(3,1fr)',
+					gap: 8,
 					marginBottom: 12,
+					position: 'relative',
 				}}
 			>
 				{[
 					{
-						label: 'Net value',
+						label: 'Net Value',
 						value: formatUSD(position.valueUSD),
 						color: 'var(--text-primary)',
 					},
@@ -109,19 +146,17 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					<div
 						key={s.label}
 						style={{
-							background: 'var(--bg-elevated)',
-							borderRadius: 8,
-							padding: '9px 10px',
+							background: 'rgba(255,255,255,0.04)',
+							borderRadius: 10,
+							padding: '10px 12px',
 						}}
 					>
 						<p
 							style={{
 								fontSize: 10,
 								color: 'var(--text-tertiary)',
-								marginBottom: 3,
+								marginBottom: 5,
 								fontWeight: 600,
-								textTransform: 'uppercase',
-								letterSpacing: '0.06em',
 							}}
 						>
 							{s.label}
@@ -133,31 +168,29 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 				))}
 			</div>
 
-			{/* APR bars */}
-			<div style={{ display: 'flex', gap: 6 }}>
+			{/* APR comparison */}
+			<div style={{ display: 'flex', gap: 8, position: 'relative' }}>
 				<div
 					style={{
 						flex: 1,
 						background: 'rgba(0,211,149,0.06)',
 						border: '1px solid rgba(0,211,149,0.12)',
-						borderRadius: 8,
-						padding: '9px 10px',
+						borderRadius: 10,
+						padding: '10px 12px',
 					}}
 				>
 					<p
 						style={{
 							fontSize: 10,
 							color: 'var(--text-tertiary)',
-							marginBottom: 3,
+							marginBottom: 5,
 							fontWeight: 600,
-							textTransform: 'uppercase',
-							letterSpacing: '0.06em',
 						}}
 					>
 						Supply APR
 					</p>
 					<p
-						style={{ fontSize: 16, fontWeight: 800, color: 'var(--compound)' }}
+						style={{ fontSize: 18, fontWeight: 800, color: 'var(--compound)' }}
 					>
 						{position.supplyAPR.toFixed(2)}%
 					</p>
@@ -165,26 +198,24 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 				<div
 					style={{
 						flex: 1,
-						background: 'var(--bg-elevated)',
-						borderRadius: 8,
-						padding: '9px 10px',
+						background: 'rgba(255,255,255,0.03)',
+						borderRadius: 10,
+						padding: '10px 12px',
 					}}
 				>
 					<p
 						style={{
 							fontSize: 10,
 							color: 'var(--text-tertiary)',
-							marginBottom: 3,
+							marginBottom: 5,
 							fontWeight: 600,
-							textTransform: 'uppercase',
-							letterSpacing: '0.06em',
 						}}
 					>
 						Borrow APR
 					</p>
 					<p
 						style={{
-							fontSize: 16,
+							fontSize: 18,
 							fontWeight: 800,
 							color: 'var(--text-secondary)',
 						}}
@@ -196,26 +227,24 @@ export function CompoundCard({ position }: { position: CompoundPosition }) {
 					<div
 						style={{
 							flex: 1,
-							background: 'var(--bg-elevated)',
-							borderRadius: 8,
-							padding: '9px 10px',
+							background: 'rgba(255,255,255,0.03)',
+							borderRadius: 10,
+							padding: '10px 12px',
 						}}
 					>
 						<p
 							style={{
 								fontSize: 10,
 								color: 'var(--text-tertiary)',
-								marginBottom: 3,
+								marginBottom: 5,
 								fontWeight: 600,
-								textTransform: 'uppercase',
-								letterSpacing: '0.06em',
 							}}
 						>
 							Utilization
 						</p>
 						<p
 							style={{
-								fontSize: 16,
+								fontSize: 18,
 								fontWeight: 800,
 								color: 'var(--accent-blue)',
 							}}

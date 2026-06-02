@@ -3,34 +3,85 @@
 import { useGas } from '@/hooks/useGas'
 import { usePriceStore } from '@/store/priceStore'
 
-const LEVEL_CONFIG = {
+const LEVEL_CFG = {
 	low: {
-		color: 'var(--accent-green)',
-		bg: 'var(--accent-green-glow)',
-		label: '🟢 Low — great time to transact',
+		color: '#4ade80',
+		bg: 'rgba(74,222,128,.08)',
+		border: 'rgba(74,222,128,.2)',
+		label: '● Normal — acceptable fees',
 	},
 	normal: {
-		color: 'var(--accent-amber)',
-		bg: 'rgba(255,214,10,0.08)',
-		label: '🟡 Normal — acceptable fees',
+		color: '#fbbf24',
+		bg: 'rgba(251,191,36,.08)',
+		border: 'rgba(251,191,36,.2)',
+		label: '● Normal — acceptable fees',
 	},
 	high: {
-		color: '#ff9f0a',
-		bg: 'rgba(255,159,10,0.08)',
-		label: '🟠 High — consider waiting',
+		color: '#f97316',
+		bg: 'rgba(249,115,22,.08)',
+		border: 'rgba(249,115,22,.2)',
+		label: '● High — consider waiting',
 	},
 	'very-high': {
-		color: 'var(--accent-red)',
-		bg: 'var(--accent-red-glow)',
-		label: '🔴 Very high — wait if possible',
+		color: '#f87171',
+		bg: 'rgba(248,113,113,.08)',
+		border: 'rgba(248,113,113,.2)',
+		label: '● Very high — wait if possible',
 	},
 }
 
 const TIERS = [
-	{ key: 'slow' as const, icon: '🐢', label: 'Slow', desc: '~5 min' },
-	{ key: 'standard' as const, icon: '⚡', label: 'Standard', desc: '~1 min' },
-	{ key: 'fast' as const, icon: '🚀', label: 'Fast', desc: '~15 sec' },
+	{
+		key: 'slow' as const,
+		icon: '🏳',
+		label: 'Low',
+		desc: '~5 min',
+		sparkType: 'low' as const,
+	},
+	{
+		key: 'standard' as const,
+		icon: '⚡',
+		label: 'Normal',
+		desc: '~1 min',
+		sparkType: 'normal' as const,
+	},
+	{
+		key: 'fast' as const,
+		icon: '🚀',
+		label: 'High',
+		desc: '~15 sec',
+		sparkType: 'high' as const,
+	},
 ]
+
+function Sparkline({
+	color,
+	type,
+}: {
+	color: string
+	type: 'low' | 'normal' | 'high'
+}) {
+	const paths = {
+		low: 'M0,18 C20,16 40,20 60,14 C80,8 100,12 120,10 C140,8 155,6 170,4',
+		normal: 'M0,14 C20,10 40,16 60,8 C80,4 100,10 120,12 C140,14 155,6 170,8',
+		high: 'M0,10 C20,14 40,6 60,18 C80,20 100,8 120,14 C140,18 155,6 170,12',
+	}
+	return (
+		<svg
+			viewBox='0 0 170 24'
+			preserveAspectRatio='none'
+			style={{ width: '100%', height: 36, opacity: 0.75 }}
+		>
+			<path
+				d={paths[type]}
+				fill='none'
+				stroke={color}
+				strokeWidth='1.5'
+				strokeLinecap='round'
+			/>
+		</svg>
+	)
+}
 
 export function GasWidget() {
 	const { data, isLoading, lastRefresh } = useGas()
@@ -40,109 +91,162 @@ export function GasWidget() {
 		return (
 			<div
 				style={{
-					background: 'var(--bg-card)',
-					border: '1px solid var(--border-primary)',
-					borderRadius: 14,
-					padding: 18,
+					background: 'rgba(255,255,255,.02)',
+					border: '1px solid rgba(255,255,255,.07)',
+					borderRadius: 16,
+					padding: 20,
 				}}
 			>
 				<div
 					className='skeleton'
-					style={{ height: 12, width: '40%', marginBottom: 14 }}
+					style={{ height: 14, width: '40%', marginBottom: 16 }}
 				/>
 				<div
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(3,1fr)',
-						gap: 8,
+						gap: 12,
 					}}
 				>
 					{[0, 1, 2].map(i => (
 						<div
 							key={i}
 							className='skeleton'
-							style={{ height: 80, borderRadius: 10 }}
+							style={{ height: 120, borderRadius: 12 }}
 						/>
 					))}
 				</div>
 			</div>
 		)
 	}
-
 	if (!data) return null
 
-	const cfg = LEVEL_CONFIG[data.level]
+	const cfg = LEVEL_CFG[data.level]
 
 	return (
 		<div
 			style={{
-				background: 'var(--bg-card)',
-				border: '1px solid var(--border-primary)',
-				borderRadius: 14,
-				padding: 18,
+				background: 'rgba(255,255,255,.02)',
+				border: '1px solid rgba(255,255,255,.07)',
+				borderRadius: 16,
+				padding: 20,
+				position: 'relative',
+				overflow: 'hidden',
 			}}
 		>
+			{/* Top gradient line */}
+			<div
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					right: 0,
+					height: 2,
+					background:
+						'linear-gradient(90deg,var(--accent-blue),var(--accent-purple),transparent)',
+					opacity: 0.6,
+				}}
+			/>
+
 			{/* Header */}
 			<div
 				style={{
 					display: 'flex',
-					alignItems: 'center',
+					alignItems: 'flex-start',
 					justifyContent: 'space-between',
-					marginBottom: 14,
+					marginBottom: 18,
 				}}
 			>
 				<div>
-					<p
+					<div
 						style={{
-							fontSize: 14,
-							fontWeight: 700,
-							color: 'var(--text-primary)',
-							marginBottom: 2,
+							display: 'flex',
+							alignItems: 'center',
+							gap: 8,
+							marginBottom: 4,
 						}}
 					>
-						⛽ Gas Prices
-					</p>
+						<p
+							style={{
+								fontSize: 15,
+								fontWeight: 800,
+								color: 'var(--text-primary)',
+							}}
+						>
+							⛽ Gas Prices
+						</p>
+						<div
+							style={{
+								width: 16,
+								height: 16,
+								borderRadius: '50%',
+								border: '1px solid rgba(255,255,255,.2)',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								fontSize: 9,
+								color: 'var(--text-tertiary)',
+								cursor: 'pointer',
+							}}
+						>
+							i
+						</div>
+					</div>
 					<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-						Ethereum Mainnet · updates every 15s
+						Real-time network conditions on Ethereum
 					</p>
 				</div>
 				<div
 					style={{
 						padding: '4px 12px',
-						borderRadius: 8,
+						borderRadius: 20,
 						background: cfg.bg,
-						color: cfg.color,
+						border: `1px solid ${cfg.border}`,
 						fontSize: 11,
 						fontWeight: 700,
-						border: `1px solid ${cfg.color}33`,
+						color: cfg.color,
+						whiteSpace: 'nowrap',
 					}}
 				>
 					{cfg.label}
 				</div>
 			</div>
 
-			{/* Tiers */}
+			{/* Tier cards */}
 			<div
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3,1fr)',
-					gap: 8,
-					marginBottom: 12,
+					gap: 10,
+					marginBottom: 14,
 				}}
 			>
 				{TIERS.map(tier => {
 					const gwei = data[tier.key]
 					const costUSD = ((150_000 * gwei) / 1e9) * ethPrice
 					const isRec = tier.key === 'standard'
+					const tierCfg = {
+						slow: {
+							color: '#4ade80',
+							border: 'rgba(74,222,128,.2)',
+							bg: 'rgba(74,222,128,.06)',
+						},
+						standard: { color: cfg.color, border: cfg.border, bg: cfg.bg },
+						fast: {
+							color: '#f87171',
+							border: 'rgba(248,113,113,.2)',
+							bg: 'rgba(248,113,113,.06)',
+						},
+					}[tier.key]
 
 					return (
 						<div
 							key={tier.key}
 							style={{
-								background: isRec ? `${cfg.color}10` : 'var(--bg-elevated)',
-								border: `1px solid ${isRec ? cfg.color + '33' : 'var(--border-primary)'}`,
-								borderRadius: 10,
-								padding: '12px',
+								background: tierCfg.bg,
+								border: `1px solid ${tierCfg.border}`,
+								borderRadius: 12,
+								padding: '14px 14px 8px',
 								position: 'relative',
 							}}
 						>
@@ -150,76 +254,77 @@ export function GasWidget() {
 								<div
 									style={{
 										position: 'absolute',
-										top: -8,
+										top: -9,
 										left: '50%',
 										transform: 'translateX(-50%)',
 										fontSize: 9,
 										fontWeight: 800,
-										color: cfg.color,
-										background: 'var(--bg-card)',
+										color: tierCfg.color,
+										background: 'var(--bg-primary)',
 										padding: '2px 8px',
-										borderRadius: 20,
-										border: `1px solid ${cfg.color}33`,
+										borderRadius: 10,
+										border: `1px solid ${tierCfg.border}`,
 										whiteSpace: 'nowrap',
-										letterSpacing: '0.08em',
+										letterSpacing: '.08em',
 									}}
 								>
 									RECOMMENDED
 								</div>
 							)}
-							<p style={{ fontSize: 16, marginBottom: 4 }}>{tier.icon}</p>
-							<p
+							<div style={{ fontSize: 18, marginBottom: 5 }}>{tier.icon}</div>
+							<div
 								style={{
-									fontSize: 10,
-									color: 'var(--text-tertiary)',
-									fontWeight: 600,
-									textTransform: 'uppercase',
-									letterSpacing: '0.06em',
+									fontSize: 11,
+									fontWeight: 700,
+									color: tierCfg.color,
 									marginBottom: 4,
 								}}
 							>
 								{tier.label}
-							</p>
-							<p
+							</div>
+							<div
 								style={{
-									fontSize: 20,
-									fontWeight: 800,
-									color: isRec ? cfg.color : 'var(--text-primary)',
-									fontVariantNumeric: 'tabular-nums',
+									fontSize: 26,
+									fontWeight: 900,
+									color: 'var(--text-primary)',
+									letterSpacing: '-1px',
 									lineHeight: 1,
-									marginBottom: 2,
+									fontVariantNumeric: 'tabular-nums',
 								}}
 							>
-								{gwei}
+								{gwei}{' '}
 								<span
 									style={{
 										fontSize: 11,
-										fontWeight: 500,
+										fontWeight: 400,
 										color: 'var(--text-tertiary)',
-										marginLeft: 3,
 									}}
 								>
 									gwei
 								</span>
+							</div>
+							<p
+								style={{
+									fontSize: 11,
+									color: 'var(--text-tertiary)',
+									marginTop: 4,
+								}}
+							>
+								~${costUSD.toFixed(2)}
 							</p>
 							<p
 								style={{
 									fontSize: 10,
-									color: 'var(--text-tertiary)',
-									marginBottom: 2,
+									color: isRec ? tierCfg.color : 'var(--text-tertiary)',
+									fontWeight: isRec ? 600 : 400,
+									marginTop: 1,
 								}}
 							>
-								{tier.desc}
+								{isRec
+									? 'Mid Market'
+									: `Save ~${tier.key === 'slow' ? '35' : '15'}%`}
 							</p>
-							<p
-								style={{
-									fontSize: 11,
-									color: 'var(--text-secondary)',
-									fontWeight: 600,
-								}}
-							>
-								~${costUSD.toFixed(2)} swap
-							</p>
+							<Sparkline color={tierCfg.color} type={tier.sparkType} />
 						</div>
 					)
 				})}
@@ -231,17 +336,28 @@ export function GasWidget() {
 					display: 'flex',
 					justifyContent: 'space-between',
 					alignItems: 'center',
+					paddingTop: 10,
+					borderTop: '1px solid rgba(255,255,255,.06)',
 				}}
 			>
-				<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+				<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
 					Base fee:{' '}
-					<span style={{ color: 'var(--text-secondary)', fontWeight: 700 }}>
+					<span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>
 						{data.baseFee} gwei
 					</span>
 				</p>
 				{lastRefresh && (
-					<p style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>
-						Updated {lastRefresh.toLocaleTimeString()}
+					<p
+						style={{
+							fontSize: 11,
+							color: 'var(--text-tertiary)',
+							display: 'flex',
+							alignItems: 'center',
+							gap: 5,
+						}}
+					>
+						Updated: {lastRefresh.toLocaleTimeString()}{' '}
+						<span style={{ cursor: 'pointer' }}>↻</span>
 					</p>
 				)}
 			</div>

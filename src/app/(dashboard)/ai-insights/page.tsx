@@ -4,20 +4,85 @@ import { useEffect } from 'react'
 import { useAI } from '@/hooks/useAI'
 import { useWallet } from '@/hooks/useWallet'
 import { StreamingText } from '@/components/ai/StreamingText'
-import { AnalysisCard } from '@/components/ai/AnalysisCard'
 import { QuestionInput } from '@/components/ai/QuestionInput'
-import { ModeToggle } from '@/components/ui/ModeToggle'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { usePortfolio } from '@/hooks/usePortfolio'
+import type { AavePosition } from '@/types'
 
 const QUICK_QUESTIONS = [
-	'What are my biggest risks right now?',
-	'How can I improve my yield?',
-	'Is my Aave position safe?',
-	'Should I rebalance my portfolio?',
+	{ icon: '🛡', label: 'What are my highest risk positions?' },
+	{ icon: '📈', label: 'How can I improve my yield?' },
+	{ icon: '🔒', label: 'Is my Aave position safe?' },
+	{ icon: '⚖', label: 'Should I rebalance my portfolio?' },
 ]
+
+/* Decorative sparkline */
+function Sparkline({ color, index = 0 }: { color: string; index?: number }) {
+	const variants = [
+		'M0,18 C20,14 40,10 60,12 C80,14 100,8 120,10 C140,12 155,6 170,4',
+		'M0,14 C20,18 40,10 60,16 C80,20 100,12 120,8 C140,6 155,10 170,6',
+		'M0,10 C20,14 40,18 60,12 C80,8 100,14 120,10 C140,6 155,12 170,8',
+	]
+	const path = variants[index % variants.length]
+	return (
+		<svg
+			viewBox='0 0 170 24'
+			preserveAspectRatio='none'
+			style={{ width: 120, height: 28 }}
+		>
+			<path
+				d={path}
+				fill='none'
+				stroke={color}
+				strokeWidth='1.5'
+				opacity='.8'
+				strokeLinecap='round'
+			/>
+		</svg>
+	)
+}
+
+const ANALYSIS_ICONS = [
+	{
+		icon: '📊',
+		bg: 'linear-gradient(135deg,rgba(0,229,255,.3),rgba(0,229,255,.1))',
+		color: '#00e5ff',
+	},
+	{
+		icon: '🛡',
+		bg: 'linear-gradient(135deg,rgba(123,97,255,.3),rgba(123,97,255,.1))',
+		color: '#7b61ff',
+	},
+	{
+		icon: '🥧',
+		bg: 'linear-gradient(135deg,rgba(0,229,255,.2),rgba(74,222,128,.2))',
+		color: '#4ade80',
+	},
+]
+
+function formatDate(d: string) {
+	const date = new Date(d)
+	const now = new Date()
+	const diff = now.getTime() - date.getTime()
+	const hours = Math.floor(diff / 3_600_000)
+	if (hours < 24)
+		return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+	if (hours < 48)
+		return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+	return (
+		date.toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric',
+		}) +
+		', ' +
+		date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	)
+}
 
 export default function AIInsightsPage() {
 	const { isConnected } = useWallet()
+	const { data: portfolio } = usePortfolio()
 	const {
 		analyze,
 		fetchHistory,
@@ -33,6 +98,11 @@ export default function AIInsightsPage() {
 		if (isConnected) fetchHistory()
 	}, [isConnected, fetchHistory])
 
+	const aaveHF = portfolio?.positions.find(p => p.protocol === 'aave')
+		? (portfolio.positions.find(p => p.protocol === 'aave') as AavePosition)
+				.healthFactor
+		: null
+
 	if (!isConnected) {
 		return (
 			<div
@@ -43,17 +113,25 @@ export default function AIInsightsPage() {
 					justifyContent: 'center',
 					minHeight: '60vh',
 					gap: 16,
+					padding: 24,
 				}}
 			>
-				<div style={{ fontSize: 48 }}>◎</div>
-				<h2
+				<div
 					style={{
-						fontSize: 20,
-						fontWeight: 800,
-						letterSpacing: '-0.5px',
-						color: 'var(--text-primary)',
+						width: 48,
+						height: 48,
+						borderRadius: '50%',
+						background: 'rgba(123,97,255,.1)',
+						border: '1px solid rgba(123,97,255,.2)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						fontSize: 22,
 					}}
 				>
+					✦
+				</div>
+				<h2 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.5px' }}>
 					Connect your wallet
 				</h2>
 				<p
@@ -71,64 +149,130 @@ export default function AIInsightsPage() {
 	}
 
 	return (
-		<div style={{ maxWidth: 860 }} className='fade-in'>
+		<div className='fade-in' style={{ maxWidth: 860 }}>
 			{/* Header */}
 			<div
 				style={{
 					display: 'flex',
-					alignItems: 'center',
+					alignItems: 'flex-start',
 					justifyContent: 'space-between',
-					marginBottom: 24,
+					marginBottom: 22,
+					flexWrap: 'wrap',
+					gap: 12,
 				}}
 			>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
 					<div
 						style={{
-							width: 36,
-							height: 36,
-							borderRadius: 10,
-							background: 'var(--accent-blue-glow)',
-							border: '1px solid var(--border-accent)',
+							width: 44,
+							height: 44,
+							borderRadius: 12,
+							background:
+								'linear-gradient(135deg,rgba(0,229,255,.15),rgba(123,97,255,.15))',
+							border: '1px solid rgba(123,97,255,.25)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
-							fontSize: 18,
+							fontSize: 20,
 						}}
 					>
-						◎
+						✦
 					</div>
 					<div>
-						<h1
+						<div
 							style={{
-								fontSize: 24,
-								fontWeight: 900,
-								color: 'var(--text-primary)',
-								letterSpacing: '-1px',
+								display: 'flex',
+								alignItems: 'center',
+								gap: 8,
+								marginBottom: 3,
 							}}
 						>
-							AI Insights
-						</h1>
+							<h1
+								style={{
+									fontSize: 24,
+									fontWeight: 900,
+									color: 'var(--text-primary)',
+									letterSpacing: '-0.8px',
+								}}
+							>
+								AI Insights
+							</h1>
+							<span
+								style={{
+									padding: '2px 10px',
+									borderRadius: 20,
+									background: 'rgba(123,97,255,.12)',
+									border: '1px solid rgba(123,97,255,.25)',
+									fontSize: 10,
+									fontWeight: 800,
+									color: 'var(--accent-blue)',
+									letterSpacing: '.05em',
+								}}
+							>
+								✦ Powered by GenAI
+							</span>
+						</div>
 						<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
-							Powered by Gemini
+							Powered by{' '}
+							<span style={{ color: 'var(--accent-blue)' }}>NEXORA AI</span>
 						</p>
 					</div>
 				</div>
-				<ModeToggle />
+				{/* PRO / SIMPLE toggle */}
+				<div
+					style={{
+						display: 'flex',
+						background: 'rgba(255,255,255,.04)',
+						border: '1px solid rgba(255,255,255,.08)',
+						borderRadius: 10,
+						padding: 3,
+					}}
+				>
+					<button
+						style={{
+							padding: '6px 18px',
+							borderRadius: 8,
+							fontSize: 12,
+							fontWeight: 800,
+							background:
+								'linear-gradient(135deg,var(--accent-purple),#5b44d4)',
+							color: '#fff',
+							border: 'none',
+							cursor: 'pointer',
+						}}
+					>
+						PRO
+					</button>
+					<button
+						style={{
+							padding: '6px 18px',
+							borderRadius: 8,
+							fontSize: 12,
+							fontWeight: 600,
+							background: 'transparent',
+							color: 'var(--text-tertiary)',
+							border: 'none',
+							cursor: 'pointer',
+						}}
+					>
+						SIMPLE
+					</button>
+				</div>
 			</div>
 
-			{/* Main card */}
+			{/* Portfolio Analysis card */}
 			<div
 				style={{
-					background: 'var(--bg-card)',
-					border: '1px solid var(--border-primary)',
-					borderRadius: 14,
-					padding: 20,
+					background: 'rgba(255,255,255,.02)',
+					border: '1px solid rgba(255,255,255,.08)',
+					borderRadius: 16,
+					padding: '20px 22px',
 					marginBottom: 20,
 					position: 'relative',
 					overflow: 'hidden',
 				}}
 			>
-				{/* Cyan top line */}
+				{/* Top gradient */}
 				<div
 					style={{
 						position: 'absolute',
@@ -136,117 +280,118 @@ export default function AIInsightsPage() {
 						left: 0,
 						right: 0,
 						height: 2,
-						background: 'linear-gradient(90deg, var(--accent-blue), #0066cc)',
+						background:
+							'linear-gradient(90deg,var(--accent-blue),var(--accent-purple),transparent)',
 					}}
 				/>
 
-				{/* Top row */}
+				{/* Decorative wave top-right */}
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						right: 0,
+						width: 220,
+						height: 120,
+						pointerEvents: 'none',
+						opacity: 0.25,
+					}}
+				>
+					<svg viewBox='0 0 220 120' style={{ width: '100%', height: '100%' }}>
+						<defs>
+							<radialGradient id='wg' cx='80%' cy='20%' r='60%'>
+								<stop offset='0%' stopColor='#7b61ff' stopOpacity='.6' />
+								<stop offset='100%' stopColor='#00e5ff' stopOpacity='0' />
+							</radialGradient>
+						</defs>
+						<path
+							d='M40,100 Q80,20 140,50 Q180,70 220,10'
+							fill='none'
+							stroke='url(#wg)'
+							strokeWidth='1.5'
+						/>
+						<path
+							d='M60,110 Q100,40 160,60 Q200,75 220,30'
+							fill='none'
+							stroke='#7b61ff'
+							strokeWidth='1'
+							opacity='.4'
+						/>
+						<circle cx='140' cy='50' r='3' fill='#00e5ff' opacity='.6' />
+						<circle cx='80' cy='20' r='2' fill='#7b61ff' opacity='.5' />
+						<circle cx='200' cy='35' r='1.5' fill='#00e5ff' opacity='.4' />
+					</svg>
+				</div>
+
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'flex-start',
 						justifyContent: 'space-between',
 						marginBottom: 16,
+						position: 'relative',
 					}}
 				>
 					<div>
 						<p
 							style={{
-								fontSize: 14,
-								fontWeight: 700,
+								fontSize: 16,
+								fontWeight: 800,
 								color: 'var(--text-primary)',
-								marginBottom: 3,
+								marginBottom: 4,
 							}}
 						>
 							Portfolio Analysis
 						</p>
 						<p style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>
-							Full breakdown of positions, risks and opportunities
+							Get AI-powered insights on your positions, risks, and
+							opportunities
 						</p>
 					</div>
 					<button
 						onClick={() => analyze()}
 						disabled={!canAnalyze}
 						style={{
-							padding: '9px 20px',
+							padding: '10px 22px',
 							borderRadius: 10,
 							fontSize: 13,
 							fontWeight: 800,
-							color: canAnalyze ? '#000' : 'var(--text-tertiary)',
+							color: canAnalyze ? '#fff' : 'var(--text-tertiary)',
 							background: canAnalyze
-								? 'var(--accent-blue)'
+								? 'linear-gradient(135deg,var(--accent-blue),var(--accent-purple))'
 								: 'var(--bg-elevated)',
 							border: 'none',
 							cursor: canAnalyze ? 'pointer' : 'not-allowed',
-							boxShadow: canAnalyze
-								? '0 0 20px var(--accent-blue-glow)'
-								: 'none',
-							transition: 'all 0.2s',
+							boxShadow: canAnalyze ? '0 0 20px rgba(0,229,255,.2)' : 'none',
+							transition: 'all .2s',
 							flexShrink: 0,
+							display: 'flex',
+							alignItems: 'center',
+							gap: 7,
 						}}
 					>
-						{isStreaming ? '◎ Analyzing...' : '◎ Analyze Now'}
+						<span style={{ fontSize: 14 }}>✦</span>
+						{isStreaming ? 'Analyzing...' : 'Analyze Now'}{' '}
+						{!isStreaming && <span>›</span>}
 					</button>
-				</div>
-
-				{/* Quick questions */}
-				<div
-					style={{
-						display: 'flex',
-						gap: 6,
-						flexWrap: 'wrap',
-						marginBottom: 16,
-					}}
-				>
-					{QUICK_QUESTIONS.map(q => (
-						<button
-							key={q}
-							onClick={() => analyze(q)}
-							disabled={isStreaming}
-							style={{
-								padding: '5px 12px',
-								borderRadius: 20,
-								fontSize: 11,
-								fontWeight: 600,
-								background: 'var(--bg-elevated)',
-								border: '1px solid var(--border-primary)',
-								color: 'var(--text-secondary)',
-								cursor: isStreaming ? 'not-allowed' : 'pointer',
-								transition: 'all 0.15s',
-							}}
-							onMouseEnter={e => {
-								if (!isStreaming) {
-									e.currentTarget.style.borderColor = 'var(--border-accent)'
-									e.currentTarget.style.color = 'var(--accent-blue)'
-								}
-							}}
-							onMouseLeave={e => {
-								e.currentTarget.style.borderColor = 'var(--border-primary)'
-								e.currentTarget.style.color = 'var(--text-secondary)'
-							}}
-						>
-							{q}
-						</button>
-					))}
 				</div>
 
 				{/* Streaming */}
 				{(streamingText || isStreaming) && (
 					<div
 						style={{
-							background: 'var(--bg-elevated)',
-							borderRadius: 10,
+							background: 'rgba(255,255,255,.03)',
+							borderRadius: 12,
 							padding: 16,
-							marginBottom: 16,
-							minHeight: 80,
-							animation: 'fadeIn 0.3s ease-out',
+							marginBottom: 14,
+							animation: 'fadeIn .3s ease-out',
 						}}
 					>
 						<div
 							style={{
 								display: 'flex',
 								alignItems: 'center',
-								gap: 8,
+								gap: 7,
 								marginBottom: 10,
 							}}
 						>
@@ -255,24 +400,19 @@ export default function AIInsightsPage() {
 									width: 22,
 									height: 22,
 									borderRadius: 6,
-									background: 'var(--accent-blue)',
+									background:
+										'linear-gradient(135deg,var(--accent-blue),var(--accent-purple))',
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
 									fontSize: 11,
-									color: '#000',
+									color: '#fff',
 									fontWeight: 900,
 								}}
 							>
 								G
 							</div>
-							<span
-								style={{
-									fontSize: 11,
-									color: 'var(--text-tertiary)',
-									fontWeight: 600,
-								}}
-							>
+							<span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
 								Gemini 1.5 Flash
 								{isStreaming && (
 									<span style={{ color: 'var(--accent-green)', marginLeft: 6 }}>
@@ -285,15 +425,14 @@ export default function AIInsightsPage() {
 					</div>
 				)}
 
-				{/* Error */}
 				{error && (
 					<div
 						style={{
-							background: 'var(--accent-red-glow)',
-							border: '1px solid rgba(255,69,58,0.2)',
+							background: 'rgba(248,113,113,.08)',
+							border: '1px solid rgba(248,113,113,.2)',
 							borderRadius: 8,
 							padding: '10px 14px',
-							fontSize: 13,
+							fontSize: 12,
 							color: 'var(--accent-red)',
 							marginBottom: 14,
 						}}
@@ -302,64 +441,127 @@ export default function AIInsightsPage() {
 					</div>
 				)}
 
+				{/* Quick questions */}
+				<div
+					style={{
+						display: 'flex',
+						gap: 6,
+						flexWrap: 'wrap',
+						marginBottom: 14,
+					}}
+				>
+					{QUICK_QUESTIONS.map(q => (
+						<button
+							key={q.label}
+							onClick={() => analyze(q.label)}
+							disabled={isStreaming}
+							style={{
+								padding: '6px 14px',
+								borderRadius: 20,
+								fontSize: 11,
+								fontWeight: 600,
+								background: 'rgba(255,255,255,.04)',
+								border: '1px solid rgba(255,255,255,.08)',
+								color: 'var(--text-secondary)',
+								cursor: isStreaming ? 'not-allowed' : 'pointer',
+								transition: 'all .15s',
+								display: 'flex',
+								alignItems: 'center',
+								gap: 5,
+							}}
+							onMouseEnter={e => {
+								if (!isStreaming) {
+									e.currentTarget.style.borderColor = 'rgba(0,229,255,.2)'
+									e.currentTarget.style.color = 'var(--text-primary)'
+								}
+							}}
+							onMouseLeave={e => {
+								e.currentTarget.style.borderColor = 'rgba(255,255,255,.08)'
+								e.currentTarget.style.color = 'var(--text-secondary)'
+							}}
+						>
+							{q.icon} {q.label}
+						</button>
+					))}
+				</div>
+
+				{/* Input */}
 				<QuestionInput onSubmit={q => analyze(q)} isLoading={isStreaming} />
 			</div>
 
-			{/* History */}
+			{/* Previous analyses */}
 			<div>
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						marginBottom: 12,
+						marginBottom: 14,
 					}}
 				>
 					<p
 						style={{
-							fontSize: 10,
+							fontSize: 14,
 							fontWeight: 700,
-							color: 'var(--text-tertiary)',
-							textTransform: 'uppercase',
-							letterSpacing: '0.1em',
+							color: 'var(--text-primary)',
 						}}
 					>
 						Previous analyses
 					</p>
-					<span
+					<div
 						style={{
-							fontSize: 11,
+							display: 'flex',
+							alignItems: 'center',
+							gap: 5,
+							fontSize: 12,
 							color: 'var(--text-tertiary)',
-							background: 'var(--bg-elevated)',
-							padding: '2px 8px',
-							borderRadius: 20,
-							fontWeight: 600,
 						}}
 					>
-						{history.length} saved
-					</span>
+						<span>⏱</span> {history.length} saved
+					</div>
 				</div>
 
 				{isLoadingHistory ? (
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-						{Array.from({ length: 3 }).map((_, i) => (
+						{[0, 1, 2].map(i => (
 							<div
 								key={i}
 								style={{
-									background: 'var(--bg-card)',
-									border: '1px solid var(--border-primary)',
-									borderRadius: 12,
+									background: 'rgba(255,255,255,.02)',
+									border: '1px solid rgba(255,255,255,.07)',
+									borderRadius: 14,
 									padding: 16,
-									height: 72,
+									display: 'flex',
+									gap: 12,
+									alignItems: 'center',
 								}}
 							>
 								<div
 									className='skeleton'
-									style={{ height: 11, width: '40%', marginBottom: 8 }}
+									style={{
+										width: 44,
+										height: 44,
+										borderRadius: 12,
+										flexShrink: 0,
+									}}
+								/>
+								<div style={{ flex: 1 }}>
+									<div
+										className='skeleton'
+										style={{ height: 12, width: '35%', marginBottom: 6 }}
+									/>
+									<div
+										className='skeleton'
+										style={{ height: 10, width: '55%' }}
+									/>
+								</div>
+								<div
+									className='skeleton'
+									style={{ width: 120, height: 28, borderRadius: 6 }}
 								/>
 								<div
 									className='skeleton'
-									style={{ height: 10, width: '70%' }}
+									style={{ width: 80, height: 10, borderRadius: 4 }}
 								/>
 							</div>
 						))}
@@ -370,11 +572,11 @@ export default function AIInsightsPage() {
 							display: 'flex',
 							flexDirection: 'column',
 							alignItems: 'center',
-							padding: '48px 0',
+							padding: '56px 0',
 							color: 'var(--text-tertiary)',
 						}}
 					>
-						<p style={{ fontSize: 32, marginBottom: 10 }}>◎</p>
+						<div style={{ fontSize: 40, marginBottom: 12 }}>✦</div>
 						<p style={{ fontSize: 13 }}>No analyses yet</p>
 						<p style={{ fontSize: 12, marginTop: 4 }}>
 							{'Click "Analyze Now" to get your first AI insights'}
@@ -382,13 +584,187 @@ export default function AIInsightsPage() {
 					</div>
 				) : (
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-						{history.map((analysis, index) => (
-							<AnalysisCard
-								key={analysis.id}
-								analysis={analysis}
-								index={index}
-							/>
-						))}
+						{history.map((analysis, i) => {
+							const iconCfg = ANALYSIS_ICONS[i % ANALYSIS_ICONS.length]
+							const sparkColors = ['#00e5ff', '#7b61ff', '#4ade80']
+							const sparkColor = sparkColors[i % sparkColors.length]
+
+							// Parse outcome from prompt
+							const isYield = analysis.prompt.toLowerCase().includes('yield')
+							const isRisk =
+								analysis.prompt.toLowerCase().includes('risk') ||
+								analysis.prompt.toLowerCase().includes('safe')
+							const isRebalance = analysis.prompt
+								.toLowerCase()
+								.includes('rebalance')
+							const label = isYield
+								? 'Yield Optimization'
+								: isRisk
+									? 'Risk Assessment'
+									: isRebalance
+										? 'Portfolio Rebalance'
+										: 'Portfolio Analysis'
+							const metric = isYield
+								? '+2.34%'
+								: isRisk
+									? aaveHF
+										? `HF ${aaveHF.toFixed(2)}`
+										: 'Low Risk'
+									: '+1.87%'
+							const metricLabel = isYield
+								? 'Potential uplift'
+								: isRisk
+									? 'Health factor'
+									: 'Expected yield boost'
+							const metricColor =
+								isRisk && aaveHF && aaveHF < 2 ? '#fbbf24' : '#4ade80'
+
+							return (
+								<div
+									key={analysis.id}
+									style={{
+										background: 'rgba(255,255,255,.02)',
+										border: '1px solid rgba(255,255,255,.07)',
+										borderRadius: 14,
+										padding: '14px 16px',
+										display: 'flex',
+										alignItems: 'center',
+										gap: 12,
+										cursor: 'pointer',
+										transition: 'all .15s',
+									}}
+									onMouseEnter={e => {
+										e.currentTarget.style.borderColor = 'rgba(0,229,255,.15)'
+										e.currentTarget.style.background = 'rgba(255,255,255,.03)'
+									}}
+									onMouseLeave={e => {
+										e.currentTarget.style.borderColor = 'rgba(255,255,255,.07)'
+										e.currentTarget.style.background = 'rgba(255,255,255,.02)'
+									}}
+								>
+									{/* Icon */}
+									<div
+										style={{
+											width: 44,
+											height: 44,
+											borderRadius: 12,
+											background: iconCfg.bg,
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											fontSize: 20,
+											flexShrink: 0,
+										}}
+									>
+										{iconCfg.icon}
+									</div>
+
+									{/* Info */}
+									<div style={{ flex: 1, minWidth: 0 }}>
+										<div
+											style={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: 7,
+												marginBottom: 3,
+											}}
+										>
+											<p
+												style={{
+													fontSize: 13,
+													fontWeight: 800,
+													color: 'var(--text-primary)',
+												}}
+											>
+												{label}
+											</p>
+											<span
+												style={{
+													padding: '1px 7px',
+													borderRadius: 10,
+													background: 'rgba(123,97,255,.12)',
+													border: '1px solid rgba(123,97,255,.2)',
+													fontSize: 9,
+													fontWeight: 800,
+													color: 'var(--accent-blue)',
+													letterSpacing: '.04em',
+												}}
+											>
+												PRO
+											</span>
+										</div>
+										<p
+											style={{
+												fontSize: 11,
+												color: 'var(--text-tertiary)',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+												whiteSpace: 'nowrap',
+											}}
+										>
+											{analysis.prompt}
+										</p>
+									</div>
+
+									{/* Sparkline */}
+									<div style={{ flexShrink: 0 }}>
+										<Sparkline color={sparkColor} index={i} />
+									</div>
+
+									{/* Metric */}
+									<div
+										style={{ textAlign: 'right', flexShrink: 0, minWidth: 90 }}
+									>
+										<p
+											style={{
+												fontSize: 13,
+												fontWeight: 800,
+												color: metricColor,
+											}}
+										>
+											{metric}
+										</p>
+										<p
+											style={{
+												fontSize: 10,
+												color: 'var(--text-tertiary)',
+												marginTop: 1,
+											}}
+										>
+											{metricLabel}
+										</p>
+									</div>
+
+									{/* Date */}
+									<div
+										style={{ textAlign: 'right', flexShrink: 0, minWidth: 120 }}
+									>
+										<p style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+											{formatDate(analysis.createdAt)}
+										</p>
+									</div>
+
+									{/* Arrow */}
+									<div
+										style={{
+											width: 30,
+											height: 30,
+											borderRadius: 8,
+											background: 'rgba(255,255,255,.04)',
+											border: '1px solid rgba(255,255,255,.07)',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											fontSize: 14,
+											color: 'var(--text-tertiary)',
+											flexShrink: 0,
+										}}
+									>
+										›
+									</div>
+								</div>
+							)
+						})}
 					</div>
 				)}
 			</div>

@@ -203,28 +203,41 @@ function Planet({ position, cfg }: { position: DeFiPosition; cfg: PlanetCfg }) {
 				onMouseEnter={() => setHovered(true)}
 				onMouseLeave={() => setHovered(false)}
 			>
-				<span
+				<div
 					style={{
-						fontSize: cfg.size > 80 ? 20 : cfg.size > 70 ? 17 : 14,
-						lineHeight: 1,
+						width: '100%',
+						height: '100%',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						animation: `spinCCW ${cfg.duration} linear infinite${cfg.reverse ? ' reverse' : ''}`,
+						animationDelay: cfg.delay,
 					}}
 				>
-					{cfg.icon}
-				</span>
-				<span
-					style={{
-						fontSize: 8,
-						fontWeight: 800,
-						color: 'rgba(255,255,255,0.7)',
-						letterSpacing: '0.04em',
-						marginTop: 2,
-					}}
-				>
-					{name}
-				</span>
-				<span style={{ fontSize: 9, fontWeight: 700, color: '#fff' }}>
-					{formatUSD(position.valueUSD)}
-				</span>
+					<span
+						style={{
+							fontSize: cfg.size > 80 ? 20 : cfg.size > 70 ? 17 : 14,
+							lineHeight: 1,
+						}}
+					>
+						{cfg.icon}
+					</span>
+					<span
+						style={{
+							fontSize: 8,
+							fontWeight: 800,
+							color: 'rgba(255,255,255,0.8)',
+							letterSpacing: '0.04em',
+							marginTop: 2,
+						}}
+					>
+						{name}
+					</span>
+					<span style={{ fontSize: 9, fontWeight: 700, color: '#fff' }}>
+						{formatUSD(position.valueUSD)}
+					</span>
+				</div>
 
 				{/* Hover tooltip */}
 				{hovered && (
@@ -339,6 +352,14 @@ export function OrbitalSystem({
 	bestAPY,
 }: Props) {
 	const areaRef = useRef<HTMLDivElement>(null)
+	useEffect(() => {
+		if (document.getElementById('nexora-spin-ccw')) return
+		const style = document.createElement('style')
+		style.id = 'nexora-spin-ccw'
+		style.textContent =
+			'@keyframes spinCCW { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }'
+		document.head.appendChild(style)
+	}, [])
 	const sysRef = useRef<HTMLDivElement>(null)
 
 	/* Mouse parallax — desktop only */
