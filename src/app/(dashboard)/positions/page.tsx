@@ -175,6 +175,7 @@ export default function PositionsPage() {
 
 			{/* Filter pills */}
 			<div
+				className='filter-pills-wrap'
 				style={{ display: 'flex', gap: 6, marginBottom: 18, flexWrap: 'wrap' }}
 			>
 				{FILTERS.map(f => {
@@ -239,6 +240,7 @@ export default function PositionsPage() {
 				</div>
 			) : (
 				<div
+					className='positions-grid'
 					style={{
 						display: 'grid',
 						gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))',

@@ -51,7 +51,7 @@ const ILVisualizer = dynamic(
 
 export default function AnalyticsPage() {
 	return (
-		<div className='fade-in' style={{ maxWidth: 900 }}>
+		<div className='fade-in' style={{ width: '100%', maxWidth: '100%' }}>
 			{/* Header */}
 			<div style={{ marginBottom: 24 }}>
 				<h1

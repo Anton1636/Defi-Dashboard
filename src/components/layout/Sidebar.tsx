@@ -3,13 +3,15 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSidebarStore } from '@/store/sidebarStore'
+import { AlertBadge } from '@/components/alerts/AlertBadge'
 
 const NAV_MAIN = [
 	{ href: '/portfolio', label: 'Portfolio', icon: '◈' },
 	{ href: '/positions', label: 'Positions', icon: '⬡' },
 	{ href: '/analytics', label: 'Analytics', icon: '↗' },
-	{ href: '/ai-insights', label: 'AI Insights', icon: '◎', badge: '3' },
+	{ href: '/ai-insights', label: 'AI Insights', icon: '✦', badge: '3' },
 ]
+
 const NAV_SECONDARY = [
 	{ href: '/transactions', label: 'Transactions', icon: '⟳' },
 	{ href: '/approvals', label: 'Approvals', icon: '🛡' },
@@ -82,6 +84,7 @@ function NavLink({
 					{badge}
 				</span>
 			)}
+			{href === '/alerts' && <AlertBadge />}
 		</Link>
 	)
 }

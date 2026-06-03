@@ -214,6 +214,7 @@ export function GasWidget() {
 
 			{/* Tier cards */}
 			<div
+				className='gas-tiers-grid'
 				style={{
 					display: 'grid',
 					gridTemplateColumns: 'repeat(3,1fr)',

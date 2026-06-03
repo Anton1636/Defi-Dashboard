@@ -3,7 +3,6 @@ import { auth } from '../../../auth'
 import { Sidebar, MobileDrawer } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { MobileNav } from '@/components/layout/MobileNav'
-import { PriceProvider } from '@/components/providers/PriceProvider'
 
 export default async function DashboardLayout({
 	children,
@@ -11,7 +10,7 @@ export default async function DashboardLayout({
 	children: React.ReactNode
 }) {
 	const session = await auth()
-	if (!session) redirect('/?modal=signin')
+	if (!session) redirect('/login')
 
 	return (
 		<div
@@ -21,23 +20,36 @@ export default async function DashboardLayout({
 				background: 'var(--bg-primary)',
 			}}
 		>
-			<PriceProvider />
+			{/* Desktop sidebar */}
 			<Sidebar />
+
+			{/* Mobile drawer */}
 			<MobileDrawer />
+
+			{/* Main content */}
 			<div
 				style={{
 					flex: 1,
 					display: 'flex',
 					flexDirection: 'column',
-					overflow: 'hidden',
 					minWidth: 0,
+					overflow: 'hidden',
 				}}
 			>
 				<TopBar />
-				<main style={{ flex: 1, overflowY: 'auto', minWidth: 0 }}>
+
+				<main
+					style={{
+						flex: 1,
+						minWidth: 0,
+						overflowY: 'auto',
+					}}
+				>
 					{children}
 				</main>
 			</div>
+
+			{/* Mobile bottom nav */}
 			<MobileNav />
 		</div>
 	)
