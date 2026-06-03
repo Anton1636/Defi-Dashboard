@@ -8,8 +8,8 @@ import { useRouter } from 'next/navigation'
 import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import type { AavePosition, CompoundPosition } from '@/types'
-import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis } from 'recharts'
 import { PieChart, Pie, Cell } from 'recharts'
+import { PortfolioChart } from '@/components/charts/PortfolioChart'
 
 const OrbitalSystem = dynamic(
 	() => import('@/components/orbital/OrbitalSystem').then(m => m.OrbitalSystem),
@@ -32,30 +32,6 @@ function fmt(v: number) {
 	if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(2)}M`
 	if (v >= 1_000) return `$${(v / 1_000).toFixed(2)}K`
 	return `$${v.toFixed(2)}`
-}
-
-/* ── Generate mock chart data ── */
-function seededRand(seed: number) {
-	const x = Math.sin(seed + 1) * 10000
-	return x - Math.floor(x)
-}
-
-function genChartData(base: number, points = 24) {
-	const data = []
-	let v = base * 0.88
-	for (let i = 0; i < points; i++) {
-		const trend = base * (0.88 + (i / points) * 0.12)
-		v =
-			v * 0.82 +
-			trend * 0.18 +
-			(seededRand(base * 0.001 + i * 7.3) - 0.5) * base * 0.012
-		data.push({
-			time: `${String(i).padStart(2, '0')}:00`,
-			value: Math.max(v, base * 0.75),
-		})
-	}
-	data[data.length - 1].value = base
-	return data
 }
 
 const PROTOCOL_COLORS: Record<string, string> = {
@@ -158,14 +134,11 @@ function DesktopPortfolio() {
 	const { data: portfolio } = usePortfolio()
 	const prices = usePriceStore(s => s.prices)
 	const router = useRouter()
-	const [timeRange, setTimeRange] = useState('24H')
 	const [assetTab, setAssetTab] = useState('All')
 	const positions = useMemo(() => {
 		return portfolio?.positions ?? []
 	}, [portfolio?.positions])
 	const totalValue = portfolio?.totalValueUSD ?? 0
-	const change = portfolio?.change24hPercent ?? 0
-	const changeDollar = (totalValue * change) / 100
 	const seed = useMemo(() => {
 		if (!positions.length) return []
 
@@ -178,14 +151,6 @@ function DesktopPortfolio() {
 			}
 		})
 	}, [positions])
-
-	const chartData = useMemo(
-		() => genChartData(totalValue || 24000),
-		[totalValue],
-	)
-
-	const totalPnl = totalValue * 0.201
-	const dailyYield = totalValue * 0.00323
 
 	// Protocol allocation
 	const protocolAlloc = positions.map((p, i) => ({
@@ -280,255 +245,16 @@ function DesktopPortfolio() {
 		>
 			{/* CENTER — main content */}
 			<div style={{ flex: 1, overflowY: 'auto', padding: '20px', minWidth: 0 }}>
-				{/* Portfolio Overview */}
-				<div
-					style={{
-						background: 'rgba(255,255,255,.02)',
-						border: '1px solid rgba(255,255,255,.07)',
-						borderRadius: 16,
-						padding: 20,
-						marginBottom: 16,
-						position: 'relative',
-						overflow: 'hidden',
-					}}
-				>
-					<div
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							right: 0,
-							height: 2,
-							background:
-								'linear-gradient(90deg,var(--accent-blue),var(--accent-purple),transparent)',
-						}}
+				{/* Portfolio Chart */}
+				<div style={{ marginBottom: 16 }}>
+					<PortfolioChart
+						totalValue={totalValue}
+						positions={positions.map(p => ({
+							protocol: p.protocol,
+							valueUSD: p.valueUSD,
+						}))}
 					/>
-
-					{/* Header */}
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-							marginBottom: 16,
-						}}
-					>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-							<p
-								style={{
-									fontSize: 14,
-									fontWeight: 800,
-									color: 'rgba(255,255,255,.7)',
-								}}
-							>
-								Portfolio Overview
-							</p>
-							<span
-								style={{
-									fontSize: 14,
-									color: 'rgba(255,255,255,.3)',
-									cursor: 'pointer',
-								}}
-							>
-								👁
-							</span>
-						</div>
-						<div style={{ display: 'flex', gap: 4 }}>
-							{['24H', '7D', '30D', '90D', 'ALL'].map(t => (
-								<button
-									key={t}
-									onClick={() => setTimeRange(t)}
-									style={{
-										padding: '4px 10px',
-										borderRadius: 6,
-										fontSize: 10,
-										fontWeight: 700,
-										background:
-											timeRange === t
-												? 'rgba(0,229,255,.12)'
-												: 'rgba(255,255,255,.04)',
-										border: `1px solid ${timeRange === t ? 'rgba(0,229,255,.25)' : 'rgba(255,255,255,.07)'}`,
-										color:
-											timeRange === t
-												? 'var(--accent-blue)'
-												: 'rgba(255,255,255,.35)',
-										cursor: 'pointer',
-										transition: 'all .15s',
-									}}
-								>
-									{t}
-								</button>
-							))}
-						</div>
-					</div>
-
-					<div style={{ display: 'flex', gap: 20 }}>
-						{/* Left stats */}
-						<div style={{ width: 180, flexShrink: 0 }}>
-							<div style={{ marginBottom: 20 }}>
-								<p
-									style={{
-										fontSize: 32,
-										fontWeight: 900,
-										letterSpacing: '-1.5px',
-										color: '#fff',
-										lineHeight: 1,
-									}}
-								>
-									$
-									{totalValue.toLocaleString('en-US', {
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 2,
-									})}
-								</p>
-								<p
-									style={{
-										fontSize: 12,
-										fontWeight: 700,
-										color: change >= 0 ? '#4ade80' : '#f87171',
-										marginTop: 5,
-									}}
-								>
-									{change >= 0 ? '↑' : '↓'} ${Math.abs(changeDollar).toFixed(2)}{' '}
-									({Math.abs(change).toFixed(2)}%) 24h
-								</p>
-							</div>
-							{[
-								{
-									icon: '◈',
-									label: 'Total Value',
-									val: fmt(totalValue),
-									color: 'rgba(255,255,255,.7)',
-								},
-								{
-									icon: '📈',
-									label: 'Total PnL',
-									val: `+${fmt(totalPnl)}`,
-									color: '#4ade80',
-								},
-								{
-									icon: '💰',
-									label: 'Total Yield (24h)',
-									val: fmt(dailyYield),
-									color: '#4ade80',
-								},
-								{
-									icon: 'A',
-									label: 'Best Performing',
-									val: 'AAVE V3',
-									color: 'var(--accent-blue)',
-								},
-							].map(s => (
-								<div
-									key={s.label}
-									style={{
-										display: 'flex',
-										alignItems: 'center',
-										gap: 8,
-										marginBottom: 10,
-									}}
-								>
-									<div
-										style={{
-											width: 26,
-											height: 26,
-											borderRadius: 7,
-											background: 'rgba(255,255,255,.05)',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											fontSize: 11,
-											flexShrink: 0,
-										}}
-									>
-										{s.icon}
-									</div>
-									<div>
-										<p
-											style={{
-												fontSize: 9,
-												color: 'rgba(255,255,255,.3)',
-												marginBottom: 1,
-												fontWeight: 600,
-											}}
-										>
-											{s.label}
-										</p>
-										<p
-											style={{ fontSize: 12, fontWeight: 700, color: s.color }}
-										>
-											{s.val}
-										</p>
-									</div>
-								</div>
-							))}
-						</div>
-
-						{/* Chart */}
-						<div style={{ flex: 1, height: 200 }}>
-							<ResponsiveContainer width='100%' height='100%'>
-								<AreaChart
-									data={chartData}
-									margin={{ top: 5, right: 0, left: 0, bottom: 0 }}
-								>
-									<defs>
-										<linearGradient id='chartGrad' x1='0' y1='0' x2='1' y2='0'>
-											<stop offset='0%' stopColor='#7b61ff' />
-											<stop offset='50%' stopColor='#00e5ff' />
-											<stop offset='100%' stopColor='#00e5ff' />
-										</linearGradient>
-										<linearGradient id='fillGrad' x1='0' y1='0' x2='0' y2='1'>
-											<stop offset='0%' stopColor='#00e5ff' stopOpacity='0.2' />
-											<stop offset='100%' stopColor='#7b61ff' stopOpacity='0' />
-										</linearGradient>
-									</defs>
-									<YAxis domain={['dataMin', 'dataMax']} hide />
-									<Tooltip
-										contentStyle={{
-											background: 'rgba(5,6,10,.97)',
-											border: '1px solid rgba(255,255,255,.1)',
-											borderRadius: 8,
-											fontSize: 11,
-										}}
-										labelStyle={{ color: 'rgba(255,255,255,.5)' }}
-										formatter={value => [fmt(Number(value)), 'Value']}
-									/>
-									<Area
-										type='monotone'
-										dataKey='value'
-										stroke='url(#chartGrad)'
-										strokeWidth={2}
-										fill='url(#fillGrad)'
-									/>
-								</AreaChart>
-							</ResponsiveContainer>
-							{/* X labels */}
-							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									padding: '4px 0',
-									fontSize: 9,
-									color: 'rgba(255,255,255,.2)',
-									fontVariantNumeric: 'tabular-nums',
-								}}
-							>
-								{[
-									'00:00',
-									'04:00',
-									'08:00',
-									'12:00',
-									'16:00',
-									'20:00',
-									'24:00',
-								].map(t => (
-									<span key={t}>{t}</span>
-								))}
-							</div>
-						</div>
-					</div>
 				</div>
-
 				{/* Protocol Allocation */}
 				<div style={{ marginBottom: 16 }}>
 					<div
