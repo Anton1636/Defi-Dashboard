@@ -890,6 +890,63 @@ body {
 ═══════════════════════════════════════════ */
 
 @media (max-width: 768px) {
+	/* Liquidity page — full height fix */
+	.liquidity-page {
+		height: auto !important;
+	}
+
+	/* Chart + sidebar stack vertically */
+	.liquidity-main-wrap {
+		flex-direction: column !important;
+	}
+
+	/* Sidebar full width horizontal */
+	.liquidity-sidebar {
+		width: 100% !important;
+		border-left: none !important;
+		border-top: 1px solid var(--border-1) !important;
+		flex-direction: row !important;
+		flex-wrap: wrap !important;
+		max-height: none !important;
+		overflow-x: auto !important;
+		overflow-y: hidden !important;
+	}
+	.liquidity-sidebar > div {
+		flex: 1 1 150px !important;
+		min-width: 140px !important;
+		border-bottom: none !important;
+		border-right: 1px solid var(--border-1) !important;
+	}
+	.liquidity-sidebar > div:last-child {
+		border-right: none !important;
+	}
+
+	/* Chart height on mobile */
+	.liquidity-chart-area {
+		min-height: 280px !important;
+		height: 280px !important;
+	}
+}
+
+@media (max-width: 768px) {
+	/* Liquidity heatmap — sidebar goes below */
+	.liquidity-sidebar {
+		width: 100% !important;
+		border-left: none !important;
+		border-top: 1px solid var(--border-1) !important;
+		flex-direction: row !important;
+		flex-wrap: wrap !important;
+		overflow-x: auto !important;
+	}
+	.liquidity-sidebar > div {
+		flex: 1 1 140px !important;
+		border-bottom: none !important;
+		border-right: 1px solid var(--border-1) !important;
+		min-width: 140px !important;
+	}
+}
+
+@media (max-width: 768px) {
 	/* ── Layout ── */
 	.layout-analytics {
 		padding: 14px;
@@ -1053,5 +1110,13 @@ body {
 	}
 	#mobile-portfolio {
 		display: block !important;
+	}
+}
+
+@media (max-width: 768px) {
+	/* Risk topology right panel — full width */
+	.risk-right-panel {
+		flex: 1 1 100% !important;
+		width: 100% !important;
 	}
 }

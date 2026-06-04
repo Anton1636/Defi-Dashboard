@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSidebarStore } from '@/store/sidebarStore'
 import { AlertBadge } from '@/components/alerts/AlertBadge'
+import { useIsClient } from '@/hooks/useIsClient'
 
 const NAV_MAIN = [
 	{ href: '/portfolio', label: 'Portfolio', icon: '◈' },
@@ -16,7 +17,10 @@ const NAV_SECONDARY = [
 	{ href: '/transactions', label: 'Transactions', icon: '⟳' },
 	{ href: '/approvals', label: 'Approvals', icon: '🛡' },
 	{ href: '/alerts', label: 'Alerts', icon: '🔔' },
+	{ href: '/risk', label: 'Risk Map', icon: '🎯' },
+	{ href: '/liquidity', label: 'Heat Map', icon: '🌡' },
 	{ href: '/watchlist', label: 'Watchlist', icon: '★' },
+	{ href: '/compare', label: 'Compare', icon: '⚖' },
 	{ href: '/settings', label: 'Settings', icon: '⚙' },
 ]
 
@@ -32,7 +36,8 @@ function NavLink({
 	badge?: string
 }) {
 	const pathname = usePathname()
-	const isActive = pathname === href
+	const isClient = useIsClient()
+	const isActive = isClient && pathname === href
 	return (
 		<Link
 			href={href}
