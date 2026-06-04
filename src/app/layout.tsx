@@ -1,7 +1,10 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { Providers } from './providers'
 import './globals.css'
+import { ServiceWorkerRegistration } from '@/components/pwa/ServiceWorkerRegistration'
+import { OfflineBanner } from '@/components/pwa/OfflineBanner'
+import { PWAInstallBanner } from '@/components/pwa/PWAInstallBanner'
 
 const inter = Inter({
 	subsets: ['latin'],
@@ -21,6 +24,19 @@ export const metadata: Metadata = {
 		'blockchain',
 		'liquidity',
 	],
+	manifest: '/manifest.json',
+	appleWebApp: {
+		capable: true,
+		statusBarStyle: 'black-translucent',
+		title: 'NEXORA',
+	},
+	icons: {
+		apple: '/icons/icon-192.png',
+	},
+}
+
+export const viewport: Viewport = {
+	themeColor: '#05060a',
 }
 
 export default function RootLayout({
@@ -46,7 +62,10 @@ export default function RootLayout({
 				/>
 			</head>
 			<body>
+				<ServiceWorkerRegistration />
+				<OfflineBanner />
 				<Providers>{children}</Providers>
+				<PWAInstallBanner />
 			</body>
 		</html>
 	)
