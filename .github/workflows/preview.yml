@@ -4,11 +4,13 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   preview:
     name: Deploy Preview
     runs-on: ubuntu-latest
-    # Only run if Vercel token is configured
     if: ${{ vars.VERCEL_ORG_ID != '' }}
 
     steps:
@@ -18,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install Vercel CLI

@@ -7,12 +7,10 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
-  # ─────────────────────────────────────
-  # Job 1: TypeScript + ESLint
-  # ─────────────────────────────────────
   lint-typecheck:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
@@ -32,7 +30,7 @@ jobs:
       - name: Generate Prisma client
         run: npx prisma generate
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://user:pass@localhost:5432/nexora' }}
+          DATABASE_URL: postgresql://user:pass@localhost:5432/nexora
 
       - name: TypeScript typecheck
         run: npx tsc --noEmit
@@ -40,9 +38,6 @@ jobs:
       - name: ESLint
         run: npx eslint src --ext .ts,.tsx --max-warnings 0
 
-  # ─────────────────────────────────────
-  # Job 2: Build check
-  # ─────────────────────────────────────
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -68,12 +63,11 @@ jobs:
       - name: Build Next.js
         run: npm run build
         env:
-          # Use mock data in CI — no real DB or wallet needed
           NEXT_PUBLIC_USE_MOCK_DATA: true
           NEXT_PUBLIC_APP_URL: https://nexora.vercel.app
           NEXT_PUBLIC_INFURA_API_KEY: ${{ secrets.NEXT_PUBLIC_INFURA_API_KEY || 'ci-placeholder' }}
           NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'ci-placeholder' }}
-          AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'ci-placeholder-32-chars-minimum-x' }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET || 'ci-placeholder-32-chars-minimum-xx' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'ci-placeholder' }}
           DATABASE_URL: postgresql://user:pass@localhost:5432/nexora
           GOOGLE_CLIENT_ID: ci-placeholder
@@ -86,9 +80,6 @@ jobs:
           path: .next
           retention-days: 1
 
-  # ─────────────────────────────────────
-  # Job 3: Bundle size check
-  # ─────────────────────────────────────
   bundle-size:
     name: Bundle Size
     runs-on: ubuntu-latest
@@ -110,8 +101,6 @@ jobs:
           echo ""
           echo "=== Total .next size ==="
           du -sh .next/
-          echo ""
-          # Fail if total .next > 100MB
           SIZE=$(du -sm .next/ | cut -f1)
           echo "Total build size: ${SIZE}MB"
           if [ "$SIZE" -gt 100 ]; then
@@ -121,9 +110,6 @@ jobs:
             echo "✅ Build size ${SIZE}MB is within limit"
           fi
 
-  # ─────────────────────────────────────
-  # Job 4: Dependency audit
-  # ─────────────────────────────────────
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
@@ -138,11 +124,10 @@ jobs:
           cache: 'npm'
 
       - name: Run npm audit
-        # Only fail on high/critical vulnerabilities
         run: npm audit --audit-level=high
         continue-on-error: true
 
-      - name: Check for known Web3 vulnerabilities
+      - name: Check Web3 dependencies
         run: |
           echo "=== Checking Web3 dependencies ==="
           npm list wagmi viem @rainbow-me/rainbowkit 2>/dev/null | head -20
