@@ -33,7 +33,7 @@ jobs:
 
       - name: Install & generate
         run: |
-          npm ci
+          npm install --legacy-peer-deps
           npx prisma generate
         env:
           DATABASE_URL: postgresql://user:pass@localhost:5432/nexora
@@ -106,7 +106,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Run Prisma migrations
         run: npx prisma migrate deploy
