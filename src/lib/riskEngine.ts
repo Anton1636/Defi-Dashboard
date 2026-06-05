@@ -54,7 +54,7 @@ export function calcRisk(
 ): RiskSummary {
 	const nodes: RiskNode[] = []
 
-	positions.forEach((pos, i) => {
+	positions.forEach(pos => {
 		const exposurePct = totalValue > 0 ? (pos.valueUSD / totalValue) * 100 : 0
 		let riskScore = 0
 		const riskFactors: string[] = []

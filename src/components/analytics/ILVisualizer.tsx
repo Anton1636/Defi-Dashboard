@@ -513,7 +513,7 @@ export function ILVisualizer() {
 			>
 				💡{' '}
 				<strong style={{ color: 'var(--text-primary)' }}>
-					Why "impermanent"?
+					{'Why "impermanent"?'}
 				</strong>{' '}
 				If prices return to the original ratio, the loss disappears. The loss
 				only becomes permanent when you withdraw your liquidity at a different

@@ -10,28 +10,26 @@ export interface PWAState {
 }
 
 export function usePWA() {
-	const [state, setState] = useState<PWAState>({
-		isInstalled: false,
-		isOnline: true,
-		canInstall: false,
-		notificationPermission: 'default',
+	const [state, setState] = useState<PWAState>(() => {
+		if (typeof window === 'undefined')
+			return {
+				isInstalled: false,
+				isOnline: true,
+				canInstall: false,
+				notificationPermission: 'default',
+			}
+		return {
+			isInstalled: window.matchMedia('(display-mode: standalone)').matches,
+			isOnline: navigator.onLine,
+			canInstall: false,
+			notificationPermission:
+				'Notification' in window
+					? Notification.permission
+					: ('unsupported' as const),
+		}
 	})
 
 	useEffect(() => {
-		const isInstalled = window.matchMedia('(display-mode: standalone)').matches
-		const isOnline = navigator.onLine
-		const notifPerm =
-			'Notification' in window
-				? Notification.permission
-				: ('unsupported' as const)
-
-		setState(s => ({
-			...s,
-			isInstalled,
-			isOnline,
-			notificationPermission: notifPerm,
-		}))
-
 		const onOnline = () => setState(s => ({ ...s, isOnline: true }))
 		const onOffline = () => setState(s => ({ ...s, isOnline: false }))
 		window.addEventListener('online', onOnline)

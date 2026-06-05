@@ -5,7 +5,7 @@ export const portfolioResolvers = {
 	Query: {
 		portfolio: async (
 			_: unknown,
-			{ walletAddress }: { walletAddress: string },
+			{ _walletAddress }: { _walletAddress: string },
 			ctx: GraphQLContext,
 		) => {
 			if (!ctx.user) {
@@ -15,7 +15,7 @@ export const portfolioResolvers = {
 			}
 
 			return {
-				walletAddress,
+				_walletAddress,
 				totalValueUSD: 0,
 				change24hPercent: 0,
 				positions: [],
@@ -25,7 +25,7 @@ export const portfolioResolvers = {
 
 		positions: async (
 			_: unknown,
-			{ walletAddress }: { walletAddress: string },
+			_args: { _walletAddress: string },
 			ctx: GraphQLContext,
 		) => {
 			if (!ctx.user) {
@@ -55,7 +55,6 @@ export const portfolioResolvers = {
 			})
 		},
 
-		// AI history з PostgreSQL
 		aiHistory: async (
 			_: unknown,
 			{ limit = 10 }: { limit?: number },
@@ -91,7 +90,7 @@ export const portfolioResolvers = {
 	Mutation: {
 		saveSnapshot: async (
 			_: unknown,
-			{ walletAddress }: { walletAddress: string },
+			{ _walletAddress }: { _walletAddress: string },
 			ctx: GraphQLContext,
 		) => {
 			if (!ctx.user) {
@@ -101,7 +100,7 @@ export const portfolioResolvers = {
 			}
 
 			const wallet = await ctx.prisma.wallet.findFirst({
-				where: { address: walletAddress, userId: ctx.user.id },
+				where: { address: _walletAddress, userId: ctx.user.id },
 			})
 
 			if (!wallet) {
@@ -177,7 +176,7 @@ export const portfolioResolvers = {
 
 		analyzePortfolio: async (
 			_: unknown,
-			{ walletAddress }: { walletAddress: string },
+			_args: { _walletAddress: string },
 			ctx: GraphQLContext,
 		) => {
 			if (!ctx.user) {

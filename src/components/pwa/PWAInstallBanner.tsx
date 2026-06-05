@@ -10,25 +10,24 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallBanner() {
 	const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 	const [show, setShow] = useState(false)
-	const [installed, setInstalled] = useState(false)
+	const [installed, setInstalled] = useState(
+		typeof window !== 'undefined'
+			? window.matchMedia('(display-mode: standalone)').matches
+			: false,
+	)
 
 	useEffect(() => {
-		// Check if already installed
-		if (window.matchMedia('(display-mode: standalone)').matches) {
-			setInstalled(true)
-			return
-		}
+		if (installed) return
 
 		const handler = (e: Event) => {
 			e.preventDefault()
 			setPrompt(e as BeforeInstallPromptEvent)
-			// Show banner after 3 seconds
 			setTimeout(() => setShow(true), 3000)
 		}
 
 		window.addEventListener('beforeinstallprompt', handler)
 		return () => window.removeEventListener('beforeinstallprompt', handler)
-	}, [])
+	}, [installed])
 
 	if (installed || !show || !prompt) return null
 
