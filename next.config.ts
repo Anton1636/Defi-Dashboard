@@ -87,7 +87,6 @@ const nextConfig: NextConfig = {
 			...config.resolve.fallback,
 			'@react-native-async-storage/async-storage': false,
 			'pino-pretty': false,
-			ethers: false,
 		}
 		return config
 	},
