@@ -46,6 +46,7 @@ const csp = [
 ].join('; ')
 
 const nextConfig: NextConfig = {
+	typedRoutes: false,
 	output: isProd ? 'standalone' : undefined,
 	poweredByHeader: false,
 	compress: true,
@@ -69,7 +70,6 @@ const nextConfig: NextConfig = {
 			'@aave/math-utils',
 			'zustand',
 		],
-		typedRoutes: false,
 	},
 
 	turbopack: {
