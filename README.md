@@ -53,6 +53,89 @@ Most DeFi dashboards are data viewers. NEXORA is a **financial operating system*
 
 ---
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Docker Desktop (PostgreSQL)
+- [Infura](https://infura.io) account (free)
+- [Google Cloud](https://console.cloud.google.com) OAuth credentials
+- [WalletConnect](https://cloud.walletconnect.com) project ID (free)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/Anton1636/Defi-Dashboard.git
+cd Defi-Dashboard
+npm install
+```
+
+### 2. Environment Setup
+
+Create `.env.local` in the project root:
+
+```env
+# ─── Database ───────────────────────────────────────
+# PostgreSQL via Docker (see docker-compose.yml)
+DATABASE_URL="postgresql://user:password@localhost:5432/defi_dashboard"
+
+# ─── Auth ───────────────────────────────────────────
+# Generate: openssl rand -base64 32
+AUTH_SECRET="your-32-char-secret"
+
+# Google OAuth: console.cloud.google.com → Credentials
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+
+# ─── Blockchain ─────────────────────────────────────
+# Infura: infura.io → Create project → Project ID
+NEXT_PUBLIC_INFURA_API_KEY="your-infura-key"
+
+# WalletConnect: cloud.walletconnect.com → New Project
+NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your-walletconnect-id"
+
+# ─── AI ─────────────────────────────────────────────
+# Gemini: aistudio.google.com → Get API key (free tier)
+GEMINI_API_KEY="your-gemini-key"
+
+# ─── App ────────────────────────────────────────────
+# true = mock portfolio data (no wallet needed)
+# false = real on-chain data (requires mainnet wallet)
+NEXT_PUBLIC_USE_MOCK_DATA=true
+NEXT_PUBLIC_APP_URL="http://localhost:3001"
+```
+
+### 3. Database
+
+```bash
+# Start PostgreSQL
+docker compose up -d
+
+# Run migrations
+npx prisma migrate dev
+
+# Generate Prisma client
+npx prisma generate
+```
+
+### 4. Run
+
+```bash
+npm run dev
+# → http://localhost:3001
+```
+
+### 5. Sign In Options
+
+| Method       | Requirements        | Portfolio data |
+| ------------ | ------------------- | -------------- |
+| Google OAuth | Google account      | Mock ($24,850) |
+| MetaMask     | Extension + Sepolia | Mock (testnet) |
+| MetaMask     | Extension + Mainnet | Real positions |
+
+---
+
 ## Features
 
 ### 📊 Portfolio
@@ -308,89 +391,6 @@ src/
 ├── store/                   # priceStore (Zustand), sidebarStore (Zustand)
 └── types/                   # DeFiPosition, UniswapPosition, AavePosition, CompoundPosition
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- Docker Desktop (PostgreSQL)
-- [Infura](https://infura.io) account (free)
-- [Google Cloud](https://console.cloud.google.com) OAuth credentials
-- [WalletConnect](https://cloud.walletconnect.com) project ID (free)
-
-### 1. Clone & Install
-
-```bash
-git clone https://github.com/Anton1636/Defi-Dashboard.git
-cd Defi-Dashboard
-npm install
-```
-
-### 2. Environment Setup
-
-Create `.env.local` in the project root:
-
-```env
-# ─── Database ───────────────────────────────────────
-# PostgreSQL via Docker (see docker-compose.yml)
-DATABASE_URL="postgresql://user:password@localhost:5432/defi_dashboard"
-
-# ─── Auth ───────────────────────────────────────────
-# Generate: openssl rand -base64 32
-AUTH_SECRET="your-32-char-secret"
-
-# Google OAuth: console.cloud.google.com → Credentials
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
-# ─── Blockchain ─────────────────────────────────────
-# Infura: infura.io → Create project → Project ID
-NEXT_PUBLIC_INFURA_API_KEY="your-infura-key"
-
-# WalletConnect: cloud.walletconnect.com → New Project
-NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your-walletconnect-id"
-
-# ─── AI ─────────────────────────────────────────────
-# Gemini: aistudio.google.com → Get API key (free tier)
-GEMINI_API_KEY="your-gemini-key"
-
-# ─── App ────────────────────────────────────────────
-# true = mock portfolio data (no wallet needed)
-# false = real on-chain data (requires mainnet wallet)
-NEXT_PUBLIC_USE_MOCK_DATA=true
-NEXT_PUBLIC_APP_URL="http://localhost:3001"
-```
-
-### 3. Database
-
-```bash
-# Start PostgreSQL
-docker compose up -d
-
-# Run migrations
-npx prisma migrate dev
-
-# Generate Prisma client
-npx prisma generate
-```
-
-### 4. Run
-
-```bash
-npm run dev
-# → http://localhost:3001
-```
-
-### 5. Sign In Options
-
-| Method       | Requirements        | Portfolio data |
-| ------------ | ------------------- | -------------- |
-| Google OAuth | Google account      | Mock ($24,850) |
-| MetaMask     | Extension + Sepolia | Mock (testnet) |
-| MetaMask     | Extension + Mainnet | Real positions |
 
 ---
 
