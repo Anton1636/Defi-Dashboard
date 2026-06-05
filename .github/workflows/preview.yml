@@ -1,0 +1,67 @@
+name: Preview Deployment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    # Only run if Vercel token is configured
+    if: ${{ vars.VERCEL_ORG_ID != '' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build for preview
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to preview
+        id: deploy
+        run: |
+          URL=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "preview_url=$URL" >> $GITHUB_OUTPUT
+          echo "Preview URL: $URL"
+
+      - name: Comment preview URL on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const url = '${{ steps.deploy.outputs.preview_url }}';
+            const body = [
+              '## 🚀 Preview Deployment Ready',
+              '',
+              `**URL:** ${url}`,
+              '',
+              '| Page | Link |',
+              '|------|------|',
+              `| Portfolio | ${url}/portfolio |`,
+              `| Positions | ${url}/positions |`,
+              `| Analytics | ${url}/analytics |`,
+              `| AI Insights | ${url}/ai-insights |`,
+              `| Risk Map | ${url}/risk |`,
+              `| Heat Map | ${url}/liquidity |`,
+              '',
+              '> Sign in with Google to access the dashboard with mock data.',
+            ].join('\n');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });

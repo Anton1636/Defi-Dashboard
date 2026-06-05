@@ -1518,17 +1518,6 @@ export default function PortfolioPage() {
 			<div className='fade-in' id='mobile-portfolio'>
 				<MobilePortfolio />
 			</div>
-			{/* CSS switcher */}
-			<style>{`
-				@media(min-width:1025px){
-					#desktop-portfolio{display:block!important}
-					#mobile-portfolio{display:none!important}
-				}
-				@media(max-width:1024px){
-					#desktop-portfolio{display:none!important}
-					#mobile-portfolio{display:block!important}
-				}
-			`}</style>
 		</>
 	)
 }

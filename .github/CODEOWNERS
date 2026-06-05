@@ -1,0 +1,10 @@
+# Default reviewers for all files
+* @Anton1636
+
+# Design system
+src/app/globals.css @Anton1636
+src/components/ui/ @Anton1636
+
+# Web3 layer — extra careful
+src/lib/wagmi.ts @Anton1636
+src/hooks/useWallet.ts @Anton1636

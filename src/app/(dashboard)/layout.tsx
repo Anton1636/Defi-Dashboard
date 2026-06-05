@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation'
 import { auth } from '../../../auth'
-import { Sidebar, MobileDrawer } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { MobileNav } from '@/components/layout/MobileNav'
+import { MobileDrawer } from '@/components/layout/Sidebar'
+import { Sidebar } from '@/components/layout/Sidebar'
 
 export default async function DashboardLayout({
 	children,
@@ -14,18 +15,17 @@ export default async function DashboardLayout({
 
 	return (
 		<div
+			data-dashboard-root
 			style={{
 				display: 'flex',
+				alignItems: 'flex-start',
 				minHeight: '100vh',
 				background: 'var(--bg-primary)',
 			}}
 		>
-			{/* Desktop sidebar */}
 			<Sidebar />
-
 			{/* Mobile drawer */}
 			<MobileDrawer />
-
 			{/* Main content */}
 			<div
 				style={{
@@ -48,7 +48,6 @@ export default async function DashboardLayout({
 					{children}
 				</main>
 			</div>
-
 			{/* Mobile bottom nav */}
 			<MobileNav />
 		</div>

@@ -195,6 +195,9 @@ body {
 		-apple-system,
 		sans-serif;
 	line-height: 1.5;
+	margin: 0;
+	padding: 0;
+	display: block;
 }
 ::-webkit-scrollbar {
 	width: 3px;
@@ -519,6 +522,7 @@ body {
 /* Mobile nav */
 .sidebar {
 	display: flex;
+	flex-shrink: 0;
 }
 .mobile-nav {
 	display: none;
@@ -837,117 +841,87 @@ body {
 /* ═══════════════════════════════════════════
    RESPONSIVE BREAKPOINTS
 ═══════════════════════════════════════════ */
-@media (max-width: 1024px) {
-	.sidebar {
-		display: none !important;
-	}
-	.topbar-nav-pills {
-		display: none !important;
-	}
-	.mobile-burger {
-		display: flex !important;
-	}
-	.dashboard-main {
-		padding-bottom: var(--mobile-nav-height);
-	}
-	.grid-main {
-		grid-template-columns: 1fr;
-	}
-	.layout-analytics {
-		padding: 14px;
-	}
+
+/* Portfolio desktop/mobile switch — defaults */
+#desktop-portfolio {
+	display: none;
 }
-@media (max-width: 768px) {
-	.mobile-nav {
-		display: flex !important;
-	}
-	.grid-auto-3 {
-		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-	}
-	.layout-action {
-		padding: 16px;
-		max-width: 100%;
-	}
+#mobile-portfolio {
+	display: block;
 }
+
+/* ── Desktop (≥ 1025px) ── */
 @media (min-width: 1025px) {
+	.sidebar {
+		display: flex !important;
+		width: 160px !important;
+		flex-shrink: 0 !important;
+	}
 	.mobile-burger {
 		display: none !important;
 	}
 	.mobile-nav {
 		display: none !important;
 	}
-	.sidebar {
-		display: flex !important;
-	}
 	.topbar-nav-pills {
 		display: flex !important;
 	}
+
+	#desktop-portfolio {
+		display: block !important;
+	}
+	#mobile-portfolio {
+		display: none !important;
+	}
 }
 
-/* ═══════════════════════════════════════════
-   MOBILE ADAPTIVE — Variant A
-   Quick responsive fixes for all pages
-═══════════════════════════════════════════ */
-
-@media (max-width: 768px) {
-	/* Liquidity page — full height fix */
-	.liquidity-page {
-		height: auto !important;
+/* ── Tablet (769–1024px) ── */
+@media (min-width: 769px) {
+	.sidebar {
+		display: flex !important;
+		width: 160px !important;
+		flex-shrink: 0 !important;
 	}
-
-	/* Chart + sidebar stack vertically */
-	.liquidity-main-wrap {
-		flex-direction: column !important;
+	.mobile-nav {
+		display: none !important;
 	}
-
-	/* Sidebar full width horizontal */
-	.liquidity-sidebar {
-		width: 100% !important;
-		border-left: none !important;
-		border-top: 1px solid var(--border-1) !important;
-		flex-direction: row !important;
-		flex-wrap: wrap !important;
-		max-height: none !important;
-		overflow-x: auto !important;
-		overflow-y: hidden !important;
-	}
-	.liquidity-sidebar > div {
-		flex: 1 1 150px !important;
-		min-width: 140px !important;
-		border-bottom: none !important;
-		border-right: 1px solid var(--border-1) !important;
-	}
-	.liquidity-sidebar > div:last-child {
-		border-right: none !important;
-	}
-
-	/* Chart height on mobile */
-	.liquidity-chart-area {
-		min-height: 280px !important;
-		height: 280px !important;
+	.mobile-burger {
+		display: none !important;
 	}
 }
 
 @media (max-width: 768px) {
-	/* Liquidity heatmap — sidebar goes below */
-	.liquidity-sidebar {
-		width: 100% !important;
-		border-left: none !important;
-		border-top: 1px solid var(--border-1) !important;
-		flex-direction: row !important;
-		flex-wrap: wrap !important;
-		overflow-x: auto !important;
+	.sidebar {
+		display: none !important;
 	}
-	.liquidity-sidebar > div {
-		flex: 1 1 140px !important;
-		border-bottom: none !important;
-		border-right: 1px solid var(--border-1) !important;
-		min-width: 140px !important;
+	.mobile-nav {
+		display: flex !important;
+	}
+	.mobile-burger {
+		display: flex !important;
 	}
 }
 
+/* ── Mobile (≤ 768px) ── */
 @media (max-width: 768px) {
-	/* ── Layout ── */
+	.sidebar {
+		display: none !important;
+	}
+	.mobile-nav {
+		display: flex !important;
+	}
+	.mobile-burger {
+		display: flex !important;
+	}
+
+	#desktop-portfolio {
+		display: none !important;
+	}
+	#mobile-portfolio {
+		display: block !important;
+	}
+
+	/* Layout */
 	.layout-analytics {
 		padding: 14px;
 	}
@@ -956,7 +930,7 @@ body {
 		max-width: 100%;
 	}
 
-	/* ── Grids → single column ── */
+	/* Grids → single column */
 	.grid-positions {
 		grid-template-columns: 1fr !important;
 	}
@@ -969,21 +943,18 @@ body {
 	.grid-main {
 		grid-template-columns: 1fr !important;
 	}
-
-	/* ── Analytics: Gas tier cards ── */
-	/* GasWidget — 3 cols → 1 col */
-	.gas-tiers-grid {
-		grid-template-columns: 1fr !important;
-		gap: 8px !important;
-	}
-
-	/* ── Positions: cards stack ── */
 	.positions-grid {
 		grid-template-columns: 1fr !important;
 		gap: 10px !important;
 	}
 
-	/* ── Assets table → hide less important columns ── */
+	/* Gas widget */
+	.gas-tiers-grid {
+		grid-template-columns: 1fr !important;
+		gap: 8px !important;
+	}
+
+	/* Assets table */
 	.assets-table-balance,
 	.assets-table-apy {
 		display: none !important;
@@ -992,31 +963,23 @@ body {
 		grid-template-columns: 2fr 1fr 1fr 30px !important;
 	}
 
-	/* ── Portfolio desktop → force mobile ── */
-	#desktop-portfolio {
-		display: none !important;
-	}
-	#mobile-portfolio {
-		display: block !important;
-	}
-
-	/* ── Right panel in desktop → hide ── */
+	/* Right panel */
 	.desktop-right-panel {
 		display: none !important;
 	}
 
-	/* ── Cards ── */
+	/* Cards */
 	.card {
 		border-radius: 16px !important;
 	}
 
-	/* ── TopBar ── */
+	/* TopBar */
 	.topbar-chain-pill,
 	.topbar-wallet-pill {
 		display: none !important;
 	}
 
-	/* ── AI Insights history rows ── */
+	/* AI history */
 	.ai-history-row-date,
 	.ai-history-sparkline {
 		display: none !important;
@@ -1026,29 +989,29 @@ body {
 		padding: 11px 12px !important;
 	}
 
-	/* ── Protocol allocation cards ── */
+	/* Protocol allocation */
 	.protocol-alloc-grid {
 		grid-template-columns: repeat(2, 1fr) !important;
 		gap: 8px !important;
 	}
 
-	/* ── Stat cells ── */
+	/* Stat cells */
 	.stat-cell-grid {
 		grid-template-columns: repeat(2, 1fr) !important;
 	}
 
-	/* ── Section headings ── */
+	/* Headings */
 	.page-title-xl {
 		font-size: 18px !important;
 	}
 
-	/* ── Buttons — full width on mobile ── */
+	/* Buttons */
 	.btn-full-mobile {
 		width: 100% !important;
 		justify-content: center !important;
 	}
 
-	/* ── Filter pills — horizontal scroll ── */
+	/* Filter pills */
 	.filter-pills-wrap {
 		overflow-x: auto !important;
 		flex-wrap: nowrap !important;
@@ -1060,13 +1023,13 @@ body {
 		display: none !important;
 	}
 
-	/* ── Ticker — smaller text ── */
+	/* Ticker */
 	.ticker-item {
 		padding: 0 12px !important;
 		font-size: 10px !important;
 	}
 
-	/* ── Gas suggestions rows ── */
+	/* Suggestions */
 	.suggestion-row {
 		flex-wrap: wrap !important;
 		gap: 6px !important;
@@ -1076,47 +1039,59 @@ body {
 		align-self: flex-end !important;
 	}
 
-	/* ── Simulator — 2 col grid ── */
+	/* Simulator */
 	.simulator-types-grid {
 		grid-template-columns: repeat(2, 1fr) !important;
 		gap: 8px !important;
 	}
 
-	/* ── Padding resets ── */
+	/* Padding */
 	.sb-section {
 		padding: 12px 14px !important;
 	}
 	.panel-card {
 		padding: 12px !important;
 	}
-}
 
-/* Tablet (768-1024) */
-@media (min-width: 769px) and (max-width: 1024px) {
-	.layout-analytics {
-		padding: 18px 20px;
-	}
-	.grid-auto-3 {
-		grid-template-columns: repeat(2, 1fr) !important;
-	}
-	.grid-positions {
-		grid-template-columns: repeat(2, 1fr) !important;
-	}
-	.protocol-alloc-grid {
-		grid-template-columns: repeat(3, 1fr) !important;
-	}
-	#desktop-portfolio {
-		display: none !important;
-	}
-	#mobile-portfolio {
-		display: block !important;
-	}
-}
-
-@media (max-width: 768px) {
-	/* Risk topology right panel — full width */
+	/* Risk topology */
 	.risk-right-panel {
 		flex: 1 1 100% !important;
 		width: 100% !important;
 	}
+
+	/* Liquidity */
+	.liquidity-page {
+		height: auto !important;
+	}
+	.liquidity-main-wrap {
+		flex-direction: column !important;
+	}
+	.liquidity-chart-area {
+		min-height: 280px !important;
+		height: 280px !important;
+	}
+	.liquidity-sidebar {
+		width: 100% !important;
+		border-left: none !important;
+		border-top: 1px solid var(--border-1) !important;
+		flex-direction: row !important;
+		flex-wrap: wrap !important;
+		overflow-x: auto !important;
+		overflow-y: hidden !important;
+	}
+	.liquidity-sidebar > div {
+		flex: 1 1 140px !important;
+		min-width: 140px !important;
+		border-bottom: none !important;
+		border-right: 1px solid var(--border-1) !important;
+	}
+	.liquidity-sidebar > div:last-child {
+		border-right: none !important;
+	}
+}
+
+/* Dashboard root — force flex */
+[data-dashboard-root] {
+	display: flex !important;
+	min-height: 100vh;
 }

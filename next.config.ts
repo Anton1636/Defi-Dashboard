@@ -18,6 +18,8 @@ const csp = [
 	"font-src 'self' data:",
 	[
 		"connect-src 'self'",
+		'https://api.geckoterminal.com',
+		'https://gateway.thegraph.com',
 		'https://api.thegraph.com',
 		'https://mainnet.infura.io',
 		'https://arbitrum-mainnet.infura.io',
@@ -125,6 +127,16 @@ const nextConfig: NextConfig = {
 					{
 						key: 'Cache-Control',
 						value: 'public, max-age=31536000, immutable',
+					},
+				],
+			},
+			{
+				source: '/sw.js',
+				headers: [
+					{ key: 'Service-Worker-Allowed', value: '/' },
+					{
+						key: 'Cache-Control',
+						value: 'no-cache, no-store, must-revalidate',
 					},
 				],
 			},
