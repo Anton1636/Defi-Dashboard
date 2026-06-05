@@ -275,8 +275,12 @@ export function PortfolioChart({
 							data={totalData.map(p => ({ label: p.label, value: p.value }))}
 							margin={{ top: 5, right: 4, left: 0, bottom: 0 }}
 							onMouseMove={e => {
-								if (e.activeTooltipIndex !== undefined)
+								if (
+									e.activeTooltipIndex !== undefined &&
+									typeof e.activeTooltipIndex === 'number'
+								) {
 									setHovered(e.activeTooltipIndex)
+								}
 							}}
 							onMouseLeave={() => setHovered(null)}
 						>
