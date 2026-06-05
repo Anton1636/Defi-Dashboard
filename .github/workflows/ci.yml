@@ -80,7 +80,6 @@ jobs:
           path: .next
           retention-days: 1
 
-  bundle-size:
     name: Bundle Size
     runs-on: ubuntu-latest
     needs: build
