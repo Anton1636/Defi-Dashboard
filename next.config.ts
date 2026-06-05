@@ -78,7 +78,18 @@ const nextConfig: NextConfig = {
 			'pino-pretty': './src/lib/empty-module.ts',
 			'pg-native': './src/lib/empty-module.ts',
 			'ox/tempo': './src/lib/empty-module.ts',
+			ethers: './src/lib/empty-module.ts',
 		},
+	},
+
+	webpack(config) {
+		config.resolve.fallback = {
+			...config.resolve.fallback,
+			'@react-native-async-storage/async-storage': false,
+			'pino-pretty': false,
+			ethers: false,
+		}
+		return config
 	},
 
 	images: {
