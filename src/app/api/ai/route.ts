@@ -6,7 +6,7 @@ import { buildPortfolioPrompt, getGeminiStream } from '@/lib/gemini'
 import { getPortfolio } from '@/lib/defi/portfolio'
 import { walletAddressSchema, validate } from '@/lib/security/validation'
 import { z } from 'zod'
-import { Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 
 const aiRequestSchema = z.object({
 	walletAddress: z.string(),
