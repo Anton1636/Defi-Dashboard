@@ -14,14 +14,10 @@ const NAV_MAIN = [
 ]
 
 const NAV_SECONDARY = [
-	{ href: '/transactions', label: 'Transactions', icon: '⟳' },
-	{ href: '/approvals', label: 'Approvals', icon: '🛡' },
 	{ href: '/alerts', label: 'Alerts', icon: '🔔' },
 	{ href: '/risk', label: 'Risk Map', icon: '🎯' },
 	{ href: '/liquidity', label: 'Heat Map', icon: '🌡' },
-	{ href: '/watchlist', label: 'Watchlist', icon: '★' },
 	{ href: '/compare', label: 'Compare', icon: '⚖' },
-	{ href: '/settings', label: 'Settings', icon: '⚙' },
 ]
 
 function NavLink({
