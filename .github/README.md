@@ -1,3 +1,10 @@
+#Screenshots
+<img width="1907" height="862" alt="image" src="https://github.com/user-attachments/assets/9a766dc8-df00-4c16-8294-e58bc95ef36a" />
+<img width="1918" height="854" alt="image" src="https://github.com/user-attachments/assets/e126a0d0-65c3-4f53-9b57-0c2704c90185" />
+
+##Link
+http://defi-dashboard-topaz-phi.vercel.app/
+
 # GitHub Actions Setup
 
 ## Required Secrets
