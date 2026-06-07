@@ -2,14 +2,15 @@
 
 > **Your DeFi portfolio, all in one place.**  
 > Track positions across Uniswap, Aave and Compound. Real-time prices, AI insights, multi-chain support.
-
-<img width="1907" height="862" alt="image" src="https://github.com/user-attachments/assets/9a766dc8-df00-4c16-8294-e58bc95ef36a" />
-<img width="1918" height="854" alt="image" src="https://github.com/user-attachments/assets/e126a0d0-65c3-4f53-9b57-0c2704c90185" />
-
+> 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue?logo=typescript)](https://www.typescriptlang.org)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-purple)](./public/manifest.json)
+
+<img width="1907" height="862" alt="image" src="https://github.com/user-attachments/assets/9a766dc8-df00-4c16-8294-e58bc95ef36a" />
+<img width="1918" height="854" alt="image" src="https://github.com/user-attachments/assets/e126a0d0-65c3-4f53-9b57-0c2704c90185" />
+
 
 ---
 
